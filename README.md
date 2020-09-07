@@ -20,8 +20,8 @@ An application allows users to play checkers with others. You need to be registe
 
 #### Project integration
 - [X] Set up Django Project
-- [ ] Set up React App
-- [ ] Database Connection
+- [X] Set up React App
+- [X] Database Connection
 - [ ] Dockerize project
 - [ ] Deploy
 
