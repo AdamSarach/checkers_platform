@@ -1,4 +1,4 @@
-#Checkers Platform
+# Checkers Platform
 
 #### Description
 An application allows users to play checkers with others. You need to be registered and logged in to play a game.
@@ -6,12 +6,12 @@ An application allows users to play checkers with others. You need to be registe
 
 #### Stack
 
-:heavy_multiplication_x: Backend: Django
-:heavy_multiplication_x: Frontend: React
-:heavy_multiplication_x: Data Base: PostreSQL
-:heavy_multiplication_x: Tests: pyTest
-:heavy_multiplication_x: Virtualization: Docker
-:heavy_multiplication_x: Deployment: AWS
+:heavy_multiplication_x: Backend: Django  
+:heavy_multiplication_x: Frontend: React  
+:heavy_multiplication_x: Data Base: PostreSQL  
+:heavy_multiplication_x: Tests: pyTest  
+:heavy_multiplication_x: Virtualization: Docker  
+:heavy_multiplication_x: Deployment: AWS  
 
 #### Links
 [Game Rules](https://www.downtownrochestermn.com/_files/docs/checkers-instructions.pdf)
