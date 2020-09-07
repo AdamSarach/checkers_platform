@@ -5,7 +5,7 @@ An application allows users to play checkers with others. You need to be registe
 
 
 #### Stack
-
+  
 :heavy_multiplication_x: Backend: Django  
 :heavy_multiplication_x: Frontend: React  
 :heavy_multiplication_x: Data Base: PostreSQL  

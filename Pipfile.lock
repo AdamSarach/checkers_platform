@@ -46,6 +46,7 @@
                 "sha256:b6feb6455337df834f6c9962d6ccf771515b7d939bca142b29c20c2376bc6111"
             ],
             "index": "pypi",
+
             "version": "==20.2.0"
         },
         "cffi": {
@@ -123,6 +124,7 @@
                 "sha256:eb80a288e3cfc08f679f95da72d2ef90cb74f6d8a8ba69d2f215c5e110b2ca32",
                 "sha256:fa7fbcc40e2210aca26c7ac8a39467eae444d90a2c346cbcffd9133a166bcc67"
             ],
+
             "index": "pypi",
             "version": "==3.1"
         },
