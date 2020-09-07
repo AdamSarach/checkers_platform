@@ -33,6 +33,7 @@ pyOpenSSL = "==19.1.0"
 service_identity = "==18.1.0"
 "zope.interface" = "==5.1.0"
 Twisted = {extras = ["tls"],version = "==20.3.0"}
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

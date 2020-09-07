@@ -21,6 +21,7 @@ An application allows users to play checkers with others. You need to be registe
 #### Project integration
 - [X] Set up Django Project
 - [X] Set up React App
+- [X] Set up Websockets Protocol
 - [X] Database Connection
 - [ ] Dockerize project
 - [ ] Deploy
