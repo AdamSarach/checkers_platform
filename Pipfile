@@ -3,11 +3,14 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+
 [dev-packages]
 pytest = "*"
 
 [packages]
-
 python-decouple = "==3.3"
 channels = "==2.4.0"
 asgiref = "==3.2.10"
@@ -33,8 +36,11 @@ PyHamcrest = "==2.0.2"
 pyOpenSSL = "==19.1.0"
 service_identity = "==18.1.0"
 "zope.interface" = "==5.1.0"
-Twisted = {extras = ["tls"],version = "==20.3.0"}
-psycopg2 = "*"
+psycopg2 = "==2.8.6"
 
 [requires]
 python_version = "3.8"
+
+[packages.Twisted]
+extras = [ "tls",]
+version = "==20.3.0"
