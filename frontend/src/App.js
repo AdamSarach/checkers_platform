@@ -1,39 +1,53 @@
 import React from 'react';
 import ReactDOM from "react-dom"
-
-import logo from './logo.svg';
 import './App.css';
-import Main_photo from './checkers_placeholder.png'
-
+import Mainpage from './Mainpage'
+import Loginpage from './Loginpage'
+import Registerpage from './Registerpage'
 
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.showLoginPage = this.showLoginPage.bind(this);
+        this.showRegisterPage = this.showRegisterPage.bind(this);
+        this.state = {
+            mainPageVisible: true,
+            loginPageVisible: false,
+            registerPageVisible: false
+        }
+    }
+
     showLoginPage() {
-        alert('Login Page!');
+        // alert('Login Page!');
+        this.setState({
+                registerPageVisible: false,
+                mainPageVisible: false,
+                loginPageVisible: true
+
+            }
+        )
     };
 
     showRegisterPage() {
-        alert('RegisterPage!');
+        // alert('RegisterPage!');
+        this.setState({
+                mainPageVisible: false,
+                loginPageVisible: false,
+                registerPageVisible: true
+            }
+        )
     };
 
     render() {
         return (
             <div id="outer-box">
                 <div id="main-box">
-                    <div>
-                        <h3 className="centered" id="title">Welcome to Checkers!</h3>
-                    </div>
-                    <div>
-                        {/*{Main_photo}*/}
-                        <img id="placeholder-photo" src={Main_photo} alt="Placeholder"/>
-                    </div>
-                    <div>
-                        <p className="close-to-bottom centered">Please <span className="span-link"
-                            onClick={this.showLoginPage}> sign in </span> or <span className="span-link"
-                            onClick={this.showRegisterPage}> register </span> to play a game.</p>
-                    </div>
+                    {this.state.mainPageVisible ?
+                        <Mainpage showLoginPage={this.showLoginPage} showRegisterPage={this.showRegisterPage}/> : null}
+                    {this.state.loginPageVisible ? <Loginpage showRegisterPage={this.showRegisterPage}/> : null}
+                    {this.state.registerPageVisible ? <Registerpage showLoginPage={this.showLoginPage}/> : null}
                 </div>
             </div>
-
 
         )
     }
@@ -41,9 +55,3 @@ class App extends React.Component {
 
 export default App;
 
-
-class Mainphoto extends React.Component {
-    render() {
-        return
-    };
-}
