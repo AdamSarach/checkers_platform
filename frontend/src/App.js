@@ -4,51 +4,129 @@ import './App.css';
 import Mainpage from './Mainpage'
 import Loginpage from './Loginpage'
 import Registerpage from './Registerpage'
+import Lobby from './Lobby'
 
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.showLoginPage = this.showLoginPage.bind(this);
-        this.showRegisterPage = this.showRegisterPage.bind(this);
+        this.display_form = this.display_form.bind(this);
         this.state = {
-            mainPageVisible: true,
-            loginPageVisible: false,
-            registerPageVisible: false
+
+            displayed_form: '',
+            logged_in: localStorage.getItem('token') ? true : false,
+            username: ''
         }
     }
 
-    showLoginPage() {
-        // alert('Login Page!');
-        this.setState({
-                registerPageVisible: false,
-                mainPageVisible: false,
-                loginPageVisible: true
 
-            }
-        )
+    componentDidMount() {
+        if (this.state.logged_in) {
+            fetch('http://localhost:8000/login_and_register/current_user/', {
+                headers: {
+                    Authorization: `JWT ${localStorage.getItem('token')}`
+                }
+            })
+                .then(res => res.json())
+                .then(json => {
+                    this.setState({username: json.username});
+                });
+        }
+    }
+
+    handle_login = (e, data) => {
+        e.preventDefault();
+        fetch('http://localhost:8000/token-auth/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(json => {
+                localStorage.setItem('token', json.token);
+                this.setState({
+                    logged_in: true,
+                    displayed_form: 'lobby',
+                    username: json.user.username
+                });
+            });
     };
 
-    showRegisterPage() {
-        // alert('RegisterPage!');
-        this.setState({
-                mainPageVisible: false,
-                loginPageVisible: false,
-                registerPageVisible: true
-            }
-        )
+    handle_signup = (e, data) => {
+        e.preventDefault();
+        fetch('http://localhost:8000/login_and_register/users/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(json => {
+                localStorage.setItem('token', json.token);
+                this.setState({
+                    logged_in: true,
+                    displayed_form: 'lobby',
+                    username: json.username
+                });
+            });
     };
+
+    handle_logout = () => {
+        localStorage.removeItem('token');
+        this.setState({logged_in: false, username: '', displayed_form: 'mainpage'});
+    };
+
+    display_form = form => {
+        this.setState({
+            displayed_form: form
+        });
+    };
+
 
     render() {
+        let form;
+        switch (this.state.displayed_form) {
+            case 'login':
+                form = <Loginpage handle_login={this.handle_login} display_form={this.display_form}
+                                  logged_in={this.state.logged_in}
+                                  display_form={this.display_form}
+                                  handle_logout={this.handle_logout}/>;
+                break;
+            case 'signup':
+                form = <Registerpage handle_signup={this.handle_signup} display_form={this.display_form}
+                                     logged_in={this.state.logged_in}
+                                     display_form={this.display_form}
+                                     handle_logout={this.handle_logout}/>;
+                break;
+            case 'mainpage':
+                form = <Mainpage showLoginPage={this.showLoginPage} display_form={this.display_form}
+                                 logged_in={this.state.logged_in}
+                                 display_form={this.display_form}
+                                 handle_logout={this.handle_logout}/>;
+                break;
+            case 'lobby':
+                form = <Lobby display_form={this.display_form}
+                                 logged_in={this.state.logged_in}
+                                 user={this.state.username}
+                                 display_form={this.display_form}
+                                 handle_logout={this.handle_logout}/>;
+            break;
+
+            default:
+                form = <Mainpage showLoginPage={this.showLoginPage} display_form={this.display_form}
+                                 logged_in={this.state.logged_in}
+                                 display_form={this.display_form}
+                                 handle_logout={this.handle_logout}/>;
+        }
+
         return (
             <div id="outer-box">
                 <div id="main-box">
-                    {this.state.mainPageVisible ?
-                        <Mainpage showLoginPage={this.showLoginPage} showRegisterPage={this.showRegisterPage}/> : null}
-                    {this.state.loginPageVisible ? <Loginpage showRegisterPage={this.showRegisterPage}/> : null}
-                    {this.state.registerPageVisible ? <Registerpage showLoginPage={this.showLoginPage}/> : null}
+                    {form}
                 </div>
             </div>
-
         )
     }
 }

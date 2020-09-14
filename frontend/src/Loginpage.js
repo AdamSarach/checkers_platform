@@ -1,9 +1,27 @@
 import React from "react";
+import PropTypes from 'prop-types';
+
 
 class Loginpage extends React.Component {
     constructor(props) {
         super(props);
-    }
+    };
+
+    state = {
+        username: '',
+        password: ''
+    };
+
+    handle_change = e => {
+        const name = e.target.name;
+        const value = e.target.value;
+        this.setState(prevstate => {
+            const newState = {...prevstate};
+            newState[name] = value;
+            return newState;
+        });
+    };
+
     render() {
         return (
             <div id="main-page">
@@ -11,12 +29,28 @@ class Loginpage extends React.Component {
                     <h3 className="centered" id="title">Login page</h3>
                 </div>
                 <div>
-                {/*Login Form*/}
+                    <form className="login-form" onSubmit={e => this.props.handle_login(e, this.state)}>
+                        <label htmlFor="username">Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={this.state.username}
+                            onChange={this.handle_change}
+                        />
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={this.state.password}
+                            onChange={this.handle_change}
+                        />
+                        <input type="submit" value="Sign In"/>
+                    </form>
                 </div>
                 <div>
                     <p className="close-to-bottom centered">Don't have an account?
                         <span className="span-link" onClick={() =>
-                            this.props.showRegisterPage()
+                            this.props.display_form('signup')
                         }> Register </span>
                     </p>
                 </div>
@@ -26,3 +60,7 @@ class Loginpage extends React.Component {
 }
 
 export default Loginpage;
+
+Loginpage.propTypes = {
+    handle_login: PropTypes.func.isRequired
+};
