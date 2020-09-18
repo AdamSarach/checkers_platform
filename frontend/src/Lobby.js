@@ -6,6 +6,17 @@ class Lobby extends React.Component {
         super(props);
     }
 
+    componentDidMount() {
+        this.fetchNames()
+    }
+
+    fetchNames() {
+        console.log("Fetching...")
+        fetch('http://127.0.0.1:8000/api/all_users/')
+            .then(response => response.json())
+            .then(data => console.log('Data: ', data))
+    }
+
     render() {
         return (
             <div id="main-page">
@@ -16,6 +27,7 @@ class Lobby extends React.Component {
                     </h3>
                 </div>
                 <div>
+
                     {/*Logged in player list*/}
                 </div>
                 <div>
