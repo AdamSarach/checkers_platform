@@ -17,16 +17,18 @@ from rest_framework import generics, permissions
 @permission_classes([])
 def get_current_users(request):
     response_list = []
-    users_current = Profile.objects.all()
-    # serializer = UserSerializer(users, many=True)
-    for user in users_current:
-        user_data = {}
-        # if user.online():
-        #     user_data['username'] = user.username
-        #     response_list.append(user_data)
-        user_data['seen'] = user.online() or "Problem with cache"
-        response_list.append(user_data)
-    return Response(response_list)
+    users_current = User.objects.filter(profile__is_online=True)
+    # users_current = User.objects.all()
+    serializer = UserSerializer(users_current, many=True)
+    return Response(serializer.data)
+    # for user in users_current:
+    #     user_data = {}
+    #     # if user.online():
+    #     #     user_data['username'] = user.username
+    #     #     response_list.append(user_data)
+    #     user_data['seen'] = user.profile.online() or "Problem with cache"
+    #     response_list.append(user_data)
+    # return Response(response_list)
 # q_ids = [o.id for o in q if o.method()]
 # users_current = users_current.filter(id__in=q_ids)
 
@@ -40,6 +42,22 @@ def get_all_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
+
+
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
+
+
+@receiver(user_logged_in)
+def got_online(sender, user, request, **kwargs):
+    user.profile.is_online = True
+    user.profile.save()
+
+
+@receiver(user_logged_out)
+def got_offline(sender, user, request, **kwargs):
+    user.profile.is_online = False
+    user.profile.save()
 
 
 

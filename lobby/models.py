@@ -8,23 +8,27 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-class Profile(User):
-    class Meta:
-        proxy = True
-
-    def last_seen(self):
-        return cache.get('seen_%s' % self.username)
-
-    def online(self):
-        if self.last_seen():
-            now = datetime.datetime.now()
-            if now > self.last_seen() + datetime.timedelta(
-                    seconds=settings.USER_ONLINE_TIMEOUT):
-                return False
-            else:
-                return True
-        else:
-            return False
+# class Profile(User):
+#     class Meta:
+#         proxy = True
+#
+#     def last_seen(self):
+#         return cache.get('seen_%s' % self.username)
+#
+#     def online(self):
+#         if self.last_seen():
+#             now = datetime.datetime.now()
+#             if now > self.last_seen() + datetime.timedelta(
+#                     seconds=settings.USER_ONLINE_TIMEOUT):
+#                 return False
+#             else:
+#                 return True
+#         else:
+#             return False
+#
+class Profile(models.Model):
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
+    is_online = models.BooleanField(null=False)
 
 # class Profile(models.Model):
 #     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
@@ -42,6 +46,8 @@ class Profile(User):
 #                 return True
 #         else:
 #             return False
+#
+#
 
 
 # @receiver(post_save, sender=User)
@@ -54,5 +60,12 @@ class Profile(User):
 # def save_user_profile(sender, instance, **kwargs):
 #     instance.profile.save()
 
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance, is_online=True)
+
+
+post_save.connect(create_user_profile, sender=User)
 
 
