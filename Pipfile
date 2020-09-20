@@ -40,6 +40,8 @@ psycopg2 = "==2.8.6"
 djangorestframework = "*"
 djangorestframework-jwt = "*"
 django-cors-headers = "*"
+django-pymemcache = "*"
+python-memcached = "*"
 
 [requires]
 python_version = "3.8"

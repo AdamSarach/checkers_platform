@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'login_and_register.apps.LoginAndRegisterConfig',
+    'lobby.apps.LobbyConfig',
 
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'lobby.middleware.ActiveUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -171,3 +173,18 @@ JWT_AUTH = {
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_SECURE = True
+SESSION_SAVE_EVERY_REQUEST = True
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+# Number of seconds of inactivity before a user is marked offline
+USER_ONLINE_TIMEOUT = 300
+# Number of seconds that we will keep track of inactive users for before
+# their last seen is removed from the cache
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7

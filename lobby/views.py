@@ -1,48 +1,34 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.utils import timezone
+from django.core.cache import caches
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .serializers import UserSerializer
-
-
-# @api_view(['GET'])
-# @permission_classes([])
-# def get_current_users(request):
-#     active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-#     user_id_list = []
-#     for session in active_sessions:
-#         data = session.get_decoded()
-#         user_id_list.append(data.get('_auth_user_id', None))
-#         users = User.objects.filter(id__in=user_id_list)
-#     # Query all logged in users based on id list
-#     users_serializer = UserSerializer(users, many=True)
-#     return Response(users_serializer.data)
 
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
-from django.utils import timezone
-
-def xget_current_users():
-    active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-    user_id_list = []
-    for session in active_sessions:
-        data = session.get_decoded()
-        user_id_list.append(data.get('_auth_user_id', None))
-    # Query all logged in users based on id list
-    return User.objects.filter(id__in=user_id_list)
-
+from .serializers import UserSerializer
+from lobby.models import Profile
 
 from rest_framework import generics, permissions
 
 
-class get_current_users(generics.ListCreateAPIView):
-    permission_classes = ()
-    queryset = xget_current_users()
-    serializer_class = UserSerializer
+@api_view(['GET'])
+@permission_classes([])
+def get_current_users(request):
+    response_list = []
+    users_current = Profile.objects.all()
+    # serializer = UserSerializer(users, many=True)
+    for user in users_current:
+        user_data = {}
+        # if user.online():
+        #     user_data['username'] = user.username
+        #     response_list.append(user_data)
+        user_data['seen'] = user.online() or "Problem with cache"
+        response_list.append(user_data)
+    return Response(response_list)
+# q_ids = [o.id for o in q if o.method()]
+# users_current = users_current.filter(id__in=q_ids)
 
 
 @api_view(['GET'])

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0f65186fd36f7d5229c0e6dc81f569353ea5e34de48f1968293d8ecc0eb75361"
+            "sha256": "8ec5844bca041076e38ad4c408f9c40e1d01930f091e707d0c3965b3f83008bf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -154,6 +154,14 @@
             "index": "pypi",
             "version": "==3.5.0"
         },
+        "django-pymemcache": {
+            "hashes": [
+                "sha256:53734eed5940350569f5cd90644dfe97755bb08f42c97d72bb149ab0c667dbdc",
+                "sha256:e2a9185dff1fc77c11c462f21cc4d8353683e354b85409639eaf77c9b373ffd8"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0"
+        },
         "djangorestframework": {
             "hashes": [
                 "sha256:6dd02d5a4bd2516fb93f80360673bf540c3b6641fec8766b1da2870a5aa00b32",
@@ -274,6 +282,13 @@
             ],
             "version": "==1.7.1"
         },
+        "pymemcache": {
+            "hashes": [
+                "sha256:47882ab1c7e5e1dea67df8aa9faf410ce82e606fd5f29501273a60ff61d7cc99",
+                "sha256:f7d81053122b5c5217cd15393c0184cd6d8032c4f018ae92ce6dcdf50399f954"
+            ],
+            "version": "==3.4.0"
+        },
         "pyopenssl": {
             "hashes": [
                 "sha256:621880965a720b8ece2f1b2f54ea2071966ab00e2970ad2ce11d596102063504",
@@ -288,6 +303,14 @@
             ],
             "index": "pypi",
             "version": "==3.3"
+        },
+        "python-memcached": {
+            "hashes": [
+                "sha256:4dac64916871bd3550263323fc2ce18e1e439080a2d5670c594cf3118d99b594",
+                "sha256:a2e28637be13ee0bf1a8b6843e7490f9456fd3f2a4cb60471733c7b5d5557e4f"
+            ],
+            "index": "pypi",
+            "version": "==1.59"
         },
         "pytz": {
             "hashes": [
