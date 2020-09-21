@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('token-auth/', obtain_jwt_token),
     path('', TemplateView.as_view(template_name='index.html')),
-    path('login_and_register/', include('login_and_register.urls'))
+    path('login_and_register/', include('login_and_register.urls')),
+    path('api/', include('lobby.urls')),
 ]
