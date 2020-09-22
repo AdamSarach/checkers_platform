@@ -3,10 +3,28 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.models import User
 
 
+class UserCreationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'password')
+
+    def create(self, validated_data):
+        user = super(UserCreationSerializer, self).create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ('username',)
+
+
+"""For future use?"""
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):

@@ -14,7 +14,8 @@ class App extends React.Component {
 
             displayed_form: '',
             logged_in: localStorage.getItem('token') ? true : false,
-            username: ''
+            username: '',
+            message: ''
         }
     }
 
@@ -74,9 +75,25 @@ class App extends React.Component {
     };
 
     handle_logout = () => {
-        localStorage.removeItem('token');
-        this.setState({logged_in: false, username: '', displayed_form: 'mainpage'});
-    };
+        fetch('http://localhost:8000/login_and_register/logout/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+
+            },
+        })
+            .then(res => res.json())
+            .then(json => {
+                localStorage.removeItem('token');
+                this.setState({
+                    logged_in: false,
+                    username: '',
+                    displayed_form: 'mainpage',
+                    message: "User logged out succesfully."
+                });
+                console.log(this.state.message);
+            });
+    }
 
     display_form = form => {
         this.setState({
@@ -85,7 +102,8 @@ class App extends React.Component {
     };
 
 
-    render() {
+    render()
+    {
         let form;
         switch (this.state.displayed_form) {
             case 'login':
@@ -108,11 +126,11 @@ class App extends React.Component {
                 break;
             case 'lobby':
                 form = <Lobby display_form={this.display_form}
-                                 logged_in={this.state.logged_in}
-                                 user={this.state.username}
-                                 display_form={this.display_form}
-                                 handle_logout={this.handle_logout}/>;
-            break;
+                              logged_in={this.state.logged_in}
+                              user={this.state.username}
+                              display_form={this.display_form}
+                              handle_logout={this.handle_logout}/>;
+                break;
 
             default:
                 form = <Mainpage showLoginPage={this.showLoginPage} display_form={this.display_form}
@@ -127,9 +145,9 @@ class App extends React.Component {
                     {form}
                 </div>
             </div>
-        )
+            )
+        }
     }
-}
 
 export default App;
 

@@ -1,56 +1,88 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
 
-from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
+from .serializers import UserSerializer, UserCreationSerializer
+
+
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, UserSerializerWithToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import generics
+from rest_framework.permissions import *
 
 
-# Create your views here.
-
-
-# def start_page(request):
-#     context = {}
-#     return render(request, 'index.html', context)
-#
-#
-# def get_register_form(request):
-#     form = UserCreationForm()
-#     context = {'register_form': form}
-#     return context
-#
-#
-# def show_register(request):
-#     form = UserCreationForm()
-#     context = {'register_form': form}
-#     return render(request, 'register.html', context)
+class NewUserAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreationSerializer
+    permission_classes = (AllowAny,)
 
 
 @api_view(['GET'])
 def current_user(request):
-    """
-    Determine the current user by their token, and return their data
-    """
+    user = JWTAuthentication.get_user(request.data)
+    serializer = UserSerializer(user)
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+'''Add token to blacklist - ToDo'''
+# @api_view(['GET'])
+# def logout_view(request):
+#     logout(request)
+#     # return Response({"message": "User logged out succesfully."})
 
 
 class UserList(APIView):
-    """
-    Create a new user. It's called 'UserList' because normally we'd have a get
-    method here too, for retrieving a list of all User objects.
-    """
 
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserListUnsafe(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
-        serializer = UserSerializerWithToken(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_current_users(request):
+    response_list = []
+    users_current = User.objects.filter(profile__is_online=True)
+    serializer = UserSerializer(users_current, many=True)
+    if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([])
+def get_current_users_unsafe(request):
+    response_list = []
+    users_current = User.objects.filter(profile__is_online=True)
+    serializer = UserSerializer(users_current, many=True)
+    if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@receiver(user_logged_in)
+def got_online(sender, user, request, **kwargs):
+    user.profile.is_online = True
+    user.profile.save()
+
+
+@receiver(user_logged_out)
+def got_offline(sender, user, request, **kwargs):
+    user.profile.is_online = False
+    user.profile.save()
