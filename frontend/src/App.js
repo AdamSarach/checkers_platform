@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from "react-dom"
 import './App.css';
-import Mainpage from './Mainpage'
-import Loginpage from './Loginpage'
-import Registerpage from './Registerpage'
-import Lobby from './Lobby'
+import Mainpage from './Components/Mainpage'
+import Loginpage from './Components/Loginpage'
+import Registerpage from './Components/Registerpage'
+import Lobby from './Components/Lobby'
 
 class App extends React.Component {
     constructor(props) {
@@ -34,9 +34,24 @@ class App extends React.Component {
         }
     }
 
+    get_current_users() {
+        if (this.state.logged_in) {
+            fetch('http://localhost:8000/api-auth/current_user/', {
+                headers: {
+                    Authorization: `JWT ${localStorage.getItem('token')}`
+                }
+            })
+                .then(res => res.json())
+                .then(json => {
+                    this.setState({username: json.username});
+                });
+        }
+    };
+
+
     handle_login = (e, data) => {
         e.preventDefault();
-        fetch('http://localhost:8000/token-auth/', {
+        fetch('http://localhost:8000/api/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -45,7 +60,8 @@ class App extends React.Component {
         })
             .then(res => res.json())
             .then(json => {
-                localStorage.setItem('token', json.token);
+                localStorage.setItem('token', json['access']);
+                localStorage.setItem('token-refresh', json['refresh']);
                 this.setState({
                     logged_in: true,
                     displayed_form: 'lobby',
@@ -56,7 +72,7 @@ class App extends React.Component {
 
     handle_signup = (e, data) => {
         e.preventDefault();
-        fetch('http://localhost:8000/login_and_register/users/', {
+        fetch('http://localhost:8000/api-auth/login_and_register/new_user/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -64,14 +80,11 @@ class App extends React.Component {
             body: JSON.stringify(data)
         })
             .then(res => res.json())
-            .then(json => {
-                localStorage.setItem('token', json.token);
-                this.setState({
-                    logged_in: true,
-                    displayed_form: 'lobby',
-                    username: json.username
-                });
-            });
+            .then(() => this.setState({
+                    logged_in: false,
+                    displayed_form: 'login',
+                })
+            )
     };
 
     handle_logout = () => {
@@ -102,8 +115,7 @@ class App extends React.Component {
     };
 
 
-    render()
-    {
+    render() {
         let form;
         switch (this.state.displayed_form) {
             case 'login':
@@ -145,9 +157,9 @@ class App extends React.Component {
                     {form}
                 </div>
             </div>
-            )
-        }
+        )
     }
+}
 
 export default App;
 

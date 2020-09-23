@@ -1,13 +1,16 @@
 from django.urls import path
-from .views import current_user, NewUserAPIView, UserList, UserListUnsafe
+from .views import get_current_users, NewUserAPIView, UserList, UserListUnsafe, active_user, get_online, get_offline
 
 from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-    path('current_user/', current_user),
-    path('new_user/', NewUserAPIView.as_view()),
+    path('active_user_by_token/', active_user, name='active-user'),
+    path('current_users/', get_current_users),
+    path('new_user/', NewUserAPIView.as_view(), name='new-user'),
+    path('get_online/', get_online, name='get-online'),
+    path('get_offline/', get_offline, name='get-offline'),
     path('all_users/', UserList.as_view(), name='get-all-users'),
-    path('all_users_unsafe/', UserListUnsafe.as_view()),
+    path('all_users_unsafe/', UserListUnsafe.as_view(), name='get-all-users-unsafe'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout')
 ]

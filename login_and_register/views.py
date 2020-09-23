@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, UserCreationSerializer
 
-
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -12,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
 from rest_framework.permissions import *
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
 
 
 class NewUserAPIView(generics.CreateAPIView):
@@ -21,19 +22,18 @@ class NewUserAPIView(generics.CreateAPIView):
 
 
 @api_view(['GET'])
-def current_user(request):
-    user = JWTAuthentication.get_user(request.data)
+def active_user(request):
+    user = get_active_user_name(request)
     serializer = UserSerializer(user)
-    if serializer.is_valid():
-        return Response(serializer.data)
-    else:
-        Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-'''Add token to blacklist - ToDo'''
-# @api_view(['GET'])
-# def logout_view(request):
-#     logout(request)
-#     # return Response({"message": "User logged out succesfully."})
+
+def get_active_user_name(request):
+    token_object = JWTAuthentication()
+    header = token_object.get_header(request)
+    raw_token = token_object.get_raw_token(header)
+    validated_token = token_object.get_validated_token(raw_token)
+    return token_object.get_user(validated_token)
 
 
 class UserList(APIView):
@@ -45,6 +45,9 @@ class UserList(APIView):
 
 
 class UserListUnsafe(APIView):
+    """
+    To be removed in production
+    """
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
@@ -76,13 +79,26 @@ def get_current_users_unsafe(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@receiver(user_logged_in)
-def got_online(sender, user, request, **kwargs):
+@api_view(['GET'])
+def get_online(request):
+    user = User.objects.get(username=request.user)
     user.profile.is_online = True
     user.profile.save()
+    return Response(status=status.HTTP_200_OK)
 
 
-@receiver(user_logged_out)
-def got_offline(sender, user, request, **kwargs):
-    user.profile.is_online = False
-    user.profile.save()
+@api_view(['GET'])
+def get_offline(request):
+    """
+    Todo - Add token to blacklist
+    """
+    user = get_active_user_name(request)
+    if user == request.user:
+        user = User.objects.get(username=request.user)
+        user.profile.is_online = False
+        user.profile.save()
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
