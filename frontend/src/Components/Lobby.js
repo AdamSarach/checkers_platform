@@ -11,26 +11,70 @@ class Lobby extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchNames()
-        this.fetchOnlineNames()
+        // this.fetchNames()
+        console.log(this.getToken());
+        console.log(this.getActiveUsers());
+        this.getActiveUsers();
     }
 
-    fetchNames() {
-        fetch('http://127.0.0.1:8000/api/all_users/')
-            .then(response => response.json())
-            .then(response => this.setState({currentUsers: response}))
-    }
+    // fetchNames() {
+    //     fetch('http://127.0.0.1:8000/api/all_users/')
+    //         .then(response => response.json())
+    //         .then(response => this.setState({currentUsers: response}))
+    // }
 
-    fetchOnlineNames() {
-        console.log("Before fetching...")
-        fetch('http://127.0.0.1:8000/api/current_users/')
-            .then(response => response.json())
-            .then(response => console.log(response))
+    // fetchOnlineNames() {
+    //     console.log("Before fetching...")
+    //     fetch('http://127.0.0.1:8000/api/current_users/')
+    //         .then(response => response.json())
+    //         .then(response => console.log(response))
         //     .then(response => this.setState({currentUsers: response}))
         // console.log("log after fetch");
         // console.log("Data: ", this.state.currentUsers);
         // this.state.randomString = "This is not a random string";
-    }
+    // }
+
+    // componentDidMount() {
+    //     if (this.state.logged_in) {
+    //         fetch('http://localhost:8000/login_and_register/current_user/', {
+    //             headers: {
+    //                 Authorization: `JWT ${localStorage.getItem('token')}`
+    //             }
+    //         })
+    //             .then(res => res.json())
+    //             .then(json => {
+    //                 this.setState({username: json.username});
+    //             });
+    //     }
+    // }
+
+    getToken = () => localStorage.getItem('token')
+
+    getActiveUsers() {
+        if (this.state.logged_in) {
+            fetch('http://localhost:8000/api-auth/current_users/', {
+                headers: {
+                    Authorization: `Bearer ${this.getToken()}`
+                }
+            })
+                .then(res => {
+                    console.log(res);
+                    console.log(res.ok);
+                    console.log(res.status);
+                    console.log(res.statusText);
+                    console.log(res.type);
+                    console.log(res.url);
+                    console.log(res.body);
+                    if (res.status === 200) {
+                        res.json()
+                            .then(res => {
+                                this.setState({currentUsers: res});
+                                console.log(res);
+                            })
+                    }
+                })
+        }
+    };
 
 
     render() {

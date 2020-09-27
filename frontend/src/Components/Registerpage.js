@@ -7,7 +7,7 @@ class Registerpage extends React.Component {
 
     state = {
         username: '',
-        password: ''
+        password: '',
     };
 
     handle_change = e => {
@@ -18,13 +18,16 @@ class Registerpage extends React.Component {
             newState[name] = value;
             return newState;
         });
+        if (this.props.infoMessage !== ''){
+            this.props.resetInfoMessage();
+        }
     };
 
     render() {
         return (
             <div id="main-page">
                 <div>
-                    <h3 className="centered" id="title">Register page</h3>
+                    <h3 className="badge-success centered" id="title">Register page</h3>
                 </div>
                 <div>
                     <form className="register-form" onSubmit={e => this.props.handle_signup(e, this.state)}>
@@ -43,8 +46,12 @@ class Registerpage extends React.Component {
                             value={this.state.password}
                             onChange={this.handle_change}
                         />
-                        <input type="submit" value="Sign Up"/>
+                        <input className="btn btn-success" type="submit" value="Sign Up"/>
                     </form>
+                </div>
+                <div>
+                    {this.props.infoMessage}
+                    {/*Register Message*/}
                 </div>
                 <div>
                     <p className="close-to-bottom centered">Already have an account?

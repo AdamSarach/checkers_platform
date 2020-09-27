@@ -20,13 +20,16 @@ class Loginpage extends React.Component {
             newState[name] = value;
             return newState;
         });
+        if (this.props.infoMessage !== ''){
+            this.props.resetInfoMessage();
+        }
     };
 
     render() {
         return (
             <div id="main-page">
                 <div>
-                    <h3 className="centered" id="title">Login page</h3>
+                    <h3 className="badge-success centered" id="title">Login page</h3>
                 </div>
                 <div>
                     <form className="login-form" onSubmit={e => this.props.handle_login(e, this.state)}>
@@ -44,8 +47,11 @@ class Loginpage extends React.Component {
                             value={this.state.password}
                             onChange={this.handle_change}
                         />
-                        <input type="submit" value="Sign In"/>
+                        <input type="submit" className="btn btn-success" value="Sign In"/>
                     </form>
+                </div>
+                <div>
+                    {this.props.infoMessage}
                 </div>
                 <div>
                     <p className="close-to-bottom centered">Don't have an account?

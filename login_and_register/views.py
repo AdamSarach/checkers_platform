@@ -14,6 +14,17 @@ from rest_framework.permissions import *
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
+#
+# class NewU(APIView):
+#     def post(self, validated_data):
+#
+#     def post(self, request, format=None):
+#         serializer = SnippetSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class NewUserAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -57,14 +68,11 @@ class UserListUnsafe(APIView):
 
 
 @api_view(['GET'])
-def get_current_users(request):
-    response_list = []
+def get_active_users(request):
+    # response_list = []
     users_current = User.objects.filter(profile__is_online=True)
     serializer = UserSerializer(users_current, many=True)
-    if serializer.is_valid():
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"active_users": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -73,19 +81,19 @@ def get_current_users_unsafe(request):
     response_list = []
     users_current = User.objects.filter(profile__is_online=True)
     serializer = UserSerializer(users_current, many=True)
-    if serializer.is_valid():
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def get_online(request):
-    user = User.objects.get(username=request.user)
+
+    user = get_active_user_name(request)
+    # user = User.objects.get(username=user_by_token)
     user.profile.is_online = True
     user.profile.save()
-    return Response(status=status.HTTP_200_OK)
-
+    # return Response(status=status.HTTP_200_OK)
+    # return Response(type(user_by_token))
+    return Response({'test': user.profile.is_online})
 
 @api_view(['GET'])
 def get_offline(request):
