@@ -12,7 +12,7 @@ class Lobby extends React.Component {
 
     componentDidMount() {
         // this.fetchNames()
-        console.log(this.getToken());
+        console.log(this.props.getTokenFromLocal());
         console.log(this.getActiveUsers());
         this.getActiveUsers();
     }
@@ -48,23 +48,16 @@ class Lobby extends React.Component {
     //     }
     // }
 
-    getToken = () => localStorage.getItem('token')
+
 
     getActiveUsers() {
         if (this.state.logged_in) {
-            fetch('http://localhost:8000/api-auth/current_users/', {
+            fetch('http://localhost:8000/api-auth/active_users/', {
                 headers: {
-                    Authorization: `Bearer ${this.getToken()}`
+                    Authorization: `Bearer ${this.props.getTokenFromLocal}`
                 }
             })
                 .then(res => {
-                    console.log(res);
-                    console.log(res.ok);
-                    console.log(res.status);
-                    console.log(res.statusText);
-                    console.log(res.type);
-                    console.log(res.url);
-                    console.log(res.body);
                     if (res.status === 200) {
                         res.json()
                             .then(res => {
@@ -99,7 +92,7 @@ class Lobby extends React.Component {
                 </div>
                 <div>
                     <p className="close-to-bottom centered">Do you want to
-                        <span className="span-link" onClick={this.props.handle_logout}
+                        <span className="span-link" onClick={this.props.handleLogout}
                         > log out? </span>
                     </p>
                 </div>

@@ -34,12 +34,12 @@ class NewUserAPIView(generics.CreateAPIView):
 
 @api_view(['GET'])
 def active_user(request):
-    user = get_active_user_name(request)
+    user = get_username_by_token(request)
     serializer = UserSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def get_active_user_name(request):
+def get_username_by_token(request):
     token_object = JWTAuthentication()
     header = token_object.get_header(request)
     raw_token = token_object.get_raw_token(header)
@@ -77,7 +77,8 @@ def get_active_users(request):
 
 @api_view(['GET'])
 @permission_classes([])
-def get_current_users_unsafe(request):
+def get_active_users_unsafe(request):
+    """To be deleted in production"""
     response_list = []
     users_current = User.objects.filter(profile__is_online=True)
     serializer = UserSerializer(users_current, many=True)
@@ -87,20 +88,21 @@ def get_current_users_unsafe(request):
 @api_view(['GET'])
 def get_online(request):
 
-    user = get_active_user_name(request)
-    # user = User.objects.get(username=user_by_token)
+    # try:
+    user = get_username_by_token(request)
+    # except:
+    #     return Response({'message': "Token couldn't be verified."})
     user.profile.is_online = True
     user.profile.save()
-    # return Response(status=status.HTTP_200_OK)
-    # return Response(type(user_by_token))
     return Response({'test': user.profile.is_online})
+
 
 @api_view(['GET'])
 def get_offline(request):
     """
     Todo - Add token to blacklist
     """
-    user = get_active_user_name(request)
+    user = get_username_by_token(request)
     if user == request.user:
         user = User.objects.get(username=request.user)
         user.profile.is_online = False

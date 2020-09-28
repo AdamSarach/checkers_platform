@@ -21,10 +21,10 @@ class Mainpage extends React.Component {
                 <div>
                     <p className="close-to-bottom centered">Please
                         <span className="span-link" onClick={() =>
-                            this.props.display_form('login')
+                            this.props.displayForm('login')
                         }> sign in </span> or
                         <span className="span-link" onClick={() =>
-                            this.props.display_form('signup')
+                            this.props.displayForm('signup')
                         }> register </span> to play a game.
                     </p>
                 </div>
