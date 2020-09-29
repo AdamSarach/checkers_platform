@@ -23,19 +23,20 @@ class App extends React.Component {
             )
     }
 
-    makeAuthentication = () => {
-        this.createAccessToken()
-            .then( () => this.loginWithToken());
-    }
+    // makeAuthentication = () => {
+    //     this.createAccessToken()
+    //         .then( () => this.loginWithToken());
+    // }
+    //
+    // loginWithToken = () => {
+    //     fetch('http://localhost:8000/api-auth/get_online/', {
+    //                             headers: {
+    //                             Authorization: `Bearer ${this.getTokenFromLocal()}`
+    //                             }}
+    //     )}
 
-    loginWithToken = () => {
-        fetch('http://localhost:8000/api-auth/get_online/', {
-                                headers: {
-                                Authorization: `Bearer ${this.getTokenFromLocal()}`
-                                }}
-        )}
-
-    createAccessToken = (e, data) => {
+    // createAccessToken = (e, data) => {
+    makeAuthentication = (e, data) => {
         e.preventDefault();
         var status;
         fetch('http://localhost:8000/api/token/', {
@@ -48,20 +49,23 @@ class App extends React.Component {
             .then(res => {
                 status = res.status;
                 res.json()
-                    .then(res => {
+                    .then( (res) => {
+                        console.log(res.body);
                         if (status === 200) {
                             localStorage.setItem('token', res['access']);
                             localStorage.setItem('token-refresh', res['refresh']);
-                            this.setState({
-                                logged_in: true,
-                                displayedForm: 'lobby',
-                                username: data.username
-                            });
-                            // fetch('http://localhost:8000/api-auth/get_online/', {
-                            //     headers: {
-                            //     Authorization: `Bearer ${this.getTokenFromLocal()}`
-                            //     }
-                            // })
+                            fetch('http://localhost:8000/api-auth/get_online/', {
+                                method: 'GET',
+                                headers: {
+                                Authorization: `Bearer ${this.getTokenFromLocal()}`
+                                }
+                            })
+                                .then( () =>
+                                    this.setState({
+                                    logged_in: true,
+                                    displayedForm: 'lobby',
+                                    username: data.username
+                            }))
                         } else {
                             this.setState({
                                 infoMessage: "Provide valid credentials",
@@ -107,20 +111,17 @@ class App extends React.Component {
         fetch('http://localhost:8000/api-auth/get_offline/', {
             method: 'GET',
             headers: {
-
+                Authorization: `Bearer ${this.getTokenFromLocal()}`
             },
         })
             .then(res => {
-                res.json().then(res => {
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('token-refresh');
-                        this.setState({
-                            logged_in: false,
-                            username: '',
-                            displayedForm: 'mainpage',
-                        });
-                    }
-                )
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('token-refresh');
+                    this.setState({
+                        logged_in: false,
+                        username: '',
+                        displayedForm: 'mainpage',
+                    });
             });
     }
 

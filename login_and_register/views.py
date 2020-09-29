@@ -72,7 +72,7 @@ def get_active_users(request):
     # response_list = []
     users_current = User.objects.filter(profile__is_online=True)
     serializer = UserSerializer(users_current, many=True)
-    return Response({"active_users": serializer.data}, status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

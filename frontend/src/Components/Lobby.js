@@ -5,7 +5,7 @@ class Lobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentUsers: [{username: "FirstUser"}, {username: "SecondUser"}],
+            currentUsers: [{username: "There is an error"}, {username: "Seriously"}],
             randomString: "This is random string"
         }
     }
@@ -51,23 +51,24 @@ class Lobby extends React.Component {
 
 
     getActiveUsers() {
-        if (this.state.logged_in) {
+        var userList;
             fetch('http://localhost:8000/api-auth/active_users/', {
                 headers: {
-                    Authorization: `Bearer ${this.props.getTokenFromLocal}`
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             })
                 .then(res => {
                     if (res.status === 200) {
                         res.json()
                             .then(res => {
+                                userList = res;
                                 this.setState({currentUsers: res});
                                 console.log(res);
                             })
                     }
                 })
-        }
     };
+
 
 
     render() {
@@ -85,7 +86,7 @@ class Lobby extends React.Component {
                     <ul>
                         {currentUsersList.map((current_person) => (
                             <li className="current-users">
-                                {current_person.username}
+                                {current_person['username']}
                             </li>
                         ))}
                     </ul>
