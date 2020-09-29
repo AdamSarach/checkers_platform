@@ -1,56 +1,114 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
 
-from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
+from .serializers import UserSerializer, UserCreationSerializer
+
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, UserSerializerWithToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import generics
+from rest_framework.permissions import *
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
-# Create your views here.
+#
+# class NewU(APIView):
+#     def post(self, validated_data):
+#
+#     def post(self, request, format=None):
+#         serializer = SnippetSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# def start_page(request):
-#     context = {}
-#     return render(request, 'index.html', context)
-#
-#
-# def get_register_form(request):
-#     form = UserCreationForm()
-#     context = {'register_form': form}
-#     return context
-#
-#
-# def show_register(request):
-#     form = UserCreationForm()
-#     context = {'register_form': form}
-#     return render(request, 'register.html', context)
+class NewUserAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreationSerializer
+    permission_classes = (AllowAny,)
 
 
 @api_view(['GET'])
-def current_user(request):
-    """
-    Determine the current user by their token, and return their data
-    """
+def active_user(request):
+    user = get_username_by_token(request)
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+
+def get_username_by_token(request):
+    token_object = JWTAuthentication()
+    header = token_object.get_header(request)
+    raw_token = token_object.get_raw_token(header)
+    validated_token = token_object.get_validated_token(raw_token)
+    return token_object.get_user(validated_token)
 
 
 class UserList(APIView):
-    """
-    Create a new user. It's called 'UserList' because normally we'd have a get
-    method here too, for retrieving a list of all User objects.
-    """
 
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserListUnsafe(APIView):
+    """
+    To be removed in production
+    """
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, format=None):
-        serializer = UserSerializerWithToken(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_active_users(request):
+    # response_list = []
+    users_current = User.objects.filter(profile__is_online=True)
+    serializer = UserSerializer(users_current, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([])
+def get_active_users_unsafe(request):
+    """To be deleted in production"""
+    response_list = []
+    users_current = User.objects.filter(profile__is_online=True)
+    serializer = UserSerializer(users_current, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_online(request):
+
+    # try:
+    user = get_username_by_token(request)
+    # except:
+    #     return Response({'message': "Token couldn't be verified."})
+    user.profile.is_online = True
+    user.profile.save()
+    return Response({'test': user.profile.is_online})
+
+
+@api_view(['GET'])
+def get_offline(request):
+    """
+    Todo - Add token to blacklist
+    """
+    user = get_username_by_token(request)
+    if user == request.user:
+        user = User.objects.get(username=request.user)
+        user.profile.is_online = False
+        user.profile.save()
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+

@@ -4,8 +4,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 500px;
-    width: 350px;
+    height: 65%;
+    width: 35%;
     border-radius: 20px;
     border: 10px solid saddlebrown;
 }
@@ -14,8 +14,11 @@
     display: relative;
 }
 
-#placeholder-photo {
-    max-width:100%;
+#placeholder-photo{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width:80%;
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -47,4 +50,13 @@
 input {
     display: block;
     margin: 5px 0 5px;
+}
+
+.login-form, .register-form {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width:80%;
+    padding-left: 10px;
+    padding-right: 10px;
 }

@@ -46,12 +46,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'login_and_register.apps.LoginAndRegisterConfig',
     'lobby.apps.LobbyConfig',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'lobby.middleware.ActiveUserMiddleware',
+    # 'lobby.middleware.ActiveUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -153,9 +154,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
@@ -167,24 +168,31 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
-JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'checkers.utils.my_jwt_response_handler'
+# # JWT_AUTH = {
+# #     'JWT_RESPONSE_PAYLOAD_HANDLER': 'checkers.utils.my_jwt_response_handler'
+# # }
+#
+#
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_SECURE = True
+# SESSION_SAVE_EVERY_REQUEST = True
+#
+# # CACHES = {
+# #     'default': {
+# #         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+# #         'LOCATION': '127.0.0.1:11211',
+# #     }
+# # }
+#
+# # Number of seconds of inactivity before a user is marked offline
+# USER_ONLINE_TIMEOUT = 300
+# # Number of seconds that we will keep track of inactive users for before
+# # their last seen is removed from the cache
+# USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
 }
-
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_SECURE = True
-SESSION_SAVE_EVERY_REQUEST = True
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
-
-# Number of seconds of inactivity before a user is marked offline
-USER_ONLINE_TIMEOUT = 300
-# Number of seconds that we will keep track of inactive users for before
-# their last seen is removed from the cache
-USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7

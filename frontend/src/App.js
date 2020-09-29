@@ -1,125 +1,175 @@
 import React from 'react';
 import ReactDOM from "react-dom"
 import './App.css';
-import Mainpage from './Mainpage'
-import Loginpage from './Loginpage'
-import Registerpage from './Registerpage'
-import Lobby from './Lobby'
+import Mainpage from './Components/Mainpage'
+import Loginpage from './Components/Loginpage'
+import Registerpage from './Components/Registerpage'
+import Lobby from './Components/Lobby'
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.display_form = this.display_form.bind(this);
-        this.state = {
 
-            displayed_form: '',
-            logged_in: localStorage.getItem('token') ? true : false,
-            username: ''
-        }
+    state = {
+        displayedForm: 'mainpage',
+        logged_in: false,
+        username: '',
+        infoMessage: '',
+        initialView: true,
+        token: '',
     }
 
+    onResetInfoMessage = () =>{
+        this.setState(
+            {'infoMessage': ''}
+            )
+    }
 
-    componentDidMount() {
-        if (this.state.logged_in) {
-            fetch('http://localhost:8000/login_and_register/current_user/', {
-                headers: {
-                    Authorization: `JWT ${localStorage.getItem('token')}`
-                }
+    // makeAuthentication = () => {
+    //     this.createAccessToken()
+    //         .then( () => this.loginWithToken());
+    // }
+    //
+    // loginWithToken = () => {
+    //     fetch('http://localhost:8000/api-auth/get_online/', {
+    //                             headers: {
+    //                             Authorization: `Bearer ${this.getTokenFromLocal()}`
+    //                             }}
+    //     )}
+
+    // createAccessToken = (e, data) => {
+    makeAuthentication = (e, data) => {
+        e.preventDefault();
+        var status;
+        fetch('http://localhost:8000/api/token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                status = res.status;
+                res.json()
+                    .then( (res) => {
+                        console.log(res.body);
+                        if (status === 200) {
+                            localStorage.setItem('token', res['access']);
+                            localStorage.setItem('token-refresh', res['refresh']);
+                            fetch('http://localhost:8000/api-auth/get_online/', {
+                                method: 'GET',
+                                headers: {
+                                Authorization: `Bearer ${this.getTokenFromLocal()}`
+                                }
+                            })
+                                .then( () =>
+                                    this.setState({
+                                    logged_in: true,
+                                    displayedForm: 'lobby',
+                                    username: data.username
+                            }))
+                        } else {
+                            this.setState({
+                                infoMessage: "Provide valid credentials",
+                            });
+                        }
+                    }
+                )
             })
-                .then(res => res.json())
-                .then(json => {
-                    this.setState({username: json.username});
-                });
-        }
+
+    };
+
+
+    handleSignup = (e, data) => {
+        e.preventDefault();
+        var status;
+        fetch('http://localhost:8000/api-auth/new_user/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                status = res.status;
+                res.json().then(res => {
+                        if (status === 201) {
+                            this.setState({
+                                infoMessage: "User has been registered. Please log in.",
+                                displayedForm: 'login',
+                            });
+                        } else {
+                            this.setState({
+                                infoMessage: res['username'],
+                            });
+                        }
+                    }
+                )
+            });
     }
 
-    handle_login = (e, data) => {
-        e.preventDefault();
-        fetch('http://localhost:8000/token-auth/', {
-            method: 'POST',
+    handleLogout = () => {
+        var status;
+        fetch('http://localhost:8000/api-auth/get_offline/', {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${this.getTokenFromLocal()}`
             },
-            body: JSON.stringify(data)
         })
-            .then(res => res.json())
-            .then(json => {
-                localStorage.setItem('token', json.token);
-                this.setState({
-                    logged_in: true,
-                    displayed_form: 'lobby',
-                    username: json.user.username
-                });
+            .then(res => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('token-refresh');
+                    this.setState({
+                        logged_in: false,
+                        username: '',
+                        displayedForm: 'mainpage',
+                    });
             });
-    };
+    }
 
-    handle_signup = (e, data) => {
-        e.preventDefault();
-        fetch('http://localhost:8000/login_and_register/users/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then(json => {
-                localStorage.setItem('token', json.token);
-                this.setState({
-                    logged_in: true,
-                    displayed_form: 'lobby',
-                    username: json.username
-                });
-            });
-    };
 
-    handle_logout = () => {
-        localStorage.removeItem('token');
-        this.setState({logged_in: false, username: '', displayed_form: 'mainpage'});
-    };
-
-    display_form = form => {
+    displayForm = form => {
         this.setState({
-            displayed_form: form
+            displayedForm: form,
+            infoMessage: ''
         });
     };
 
 
-    render() {
-        let form;
-        switch (this.state.displayed_form) {
+    chooseLayout() {
+        switch (this.state.displayedForm) {
             case 'login':
-                form = <Loginpage handle_login={this.handle_login} display_form={this.display_form}
+                return <Loginpage makeAuthentication={this.makeAuthentication}
                                   logged_in={this.state.logged_in}
-                                  display_form={this.display_form}
-                                  handle_logout={this.handle_logout}/>;
-                break;
+                                  infoMessage = {this.state.infoMessage}
+                                  resetInfoMessage = {this.onResetInfoMessage}
+                                  onFormChange = {this.onFormChange}
+                                  displayForm={this.displayForm}
+                                  />;
             case 'signup':
-                form = <Registerpage handle_signup={this.handle_signup} display_form={this.display_form}
+                return <Registerpage handleSignup={this.handleSignup}
                                      logged_in={this.state.logged_in}
-                                     display_form={this.display_form}
-                                     handle_logout={this.handle_logout}/>;
-                break;
+                                     resetInfoMessage = {this.onResetInfoMessage}
+                                     infoMessage = {this.state.infoMessage}
+                                     onFormChange = {this.onFormChange}
+                                     displayForm={this.displayForm}
+                                     />;
             case 'mainpage':
-                form = <Mainpage showLoginPage={this.showLoginPage} display_form={this.display_form}
+                return <Mainpage showLoginPage={this.showLoginPage}
                                  logged_in={this.state.logged_in}
-                                 display_form={this.display_form}
-                                 handle_logout={this.handle_logout}/>;
-                break;
+                                 displayForm={this.displayForm}
+                                 />;
             case 'lobby':
-                form = <Lobby display_form={this.display_form}
-                                 logged_in={this.state.logged_in}
-                                 user={this.state.username}
-                                 display_form={this.display_form}
-                                 handle_logout={this.handle_logout}/>;
-            break;
-
-            default:
-                form = <Mainpage showLoginPage={this.showLoginPage} display_form={this.display_form}
-                                 logged_in={this.state.logged_in}
-                                 display_form={this.display_form}
-                                 handle_logout={this.handle_logout}/>;
+                return <Lobby displayForm={this.displayForm}
+                              logged_in={this.state.logged_in}
+                              user={this.state.username}
+                              handleLogout={this.handleLogout}
+                              getTokenFromLocal={this.getTokenFromLocal}/>;
         }
+    }
+
+    getTokenFromLocal = () => localStorage.getItem('token')
+
+    render() {
+        let form = this.chooseLayout();
 
         return (
             <div id="outer-box">
