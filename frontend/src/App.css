@@ -60,3 +60,9 @@ input {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+#chat-message-submit, #chat-message-input{
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*display: inline-block;*/
+}
