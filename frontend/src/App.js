@@ -5,6 +5,7 @@ import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Lobby from './Components/Lobby'
+import Game from './Components/Game'
 
 class App extends React.Component {
 
@@ -163,6 +164,11 @@ class App extends React.Component {
                               user={this.state.username}
                               handleLogout={this.handleLogout}
                               getTokenFromLocal={this.getTokenFromLocal}/>;
+            case 'game':
+            return <Game displayForm={this.displayForm}
+                         logged_in={this.state.logged_in}
+                         user={this.state.username}
+                         getTokenFromLocal={this.getTokenFromLocal}/>;
         }
     }
 

@@ -7,7 +7,7 @@ class Lobby extends React.Component {
         super(props);
         this.state = {
             currentUsers: [{username: "There is an error"}, {username: "Seriously"}],
-            randomString: "This is random string"
+            randomString: "To be changed - online users"
         }
     }
 
@@ -71,6 +71,11 @@ class Lobby extends React.Component {
                 })
     };
 
+    playGame = () =>{
+        console.log("It works!");
+        this.props.displayForm('game')
+        // document.getElementById("user-list").value = "";
+    }
 
 
     render() {
@@ -85,13 +90,24 @@ class Lobby extends React.Component {
                 </div>
                 <div>
                     <p>{this.state.randomString}</p>
-                    <ul>
-                        {currentUsersList.map((current_person) => (
-                            <li className="current-users">
-                                {current_person['username']}
-                            </li>
+                    <button className="btn btn-sm btn-outline-dark" onClick={this.playGame}>Play a game</button>
+
+                    <div id="user-list">
+                        {currentUsersList.map((current_person, index) => (
+                            <div key={index} className="current-users flex-wrapper task-wrapper">
+                                <div style={{flex:7}}>
+                                    <span>{current_person['username']}</span>
+                                </div>
+                                <div style={{flex:1}}>
+                                    <button className="btn btn-sm btn-outline-info">Invite</button>
+                                </div>
+                                <div style={{flex:1}}>
+                                    <button className="btn btn-sm btn-outline-dark">Chat</button>
+                                </div>
+
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
                 <div>
                     <Chatwindow
