@@ -1,5 +1,6 @@
 import Main_photo from "./checkers_placeholder.png";
 import React from "react";
+import Chatwindow from "./Chatwindow";
 
 class Lobby extends React.Component {
     constructor(props) {
@@ -12,6 +13,7 @@ class Lobby extends React.Component {
 
     componentDidMount() {
         // this.fetchNames()
+        console.log("Lobby, componentdidmount: " + this.props.username);
         console.log(this.props.getTokenFromLocal());
         console.log(this.getActiveUsers());
         this.getActiveUsers();
@@ -90,6 +92,11 @@ class Lobby extends React.Component {
                             </li>
                         ))}
                     </ul>
+                </div>
+                <div>
+                    <Chatwindow
+                    user={this.props.user}
+                    />
                 </div>
                 <div>
                     <p className="close-to-bottom centered">Do you want to
