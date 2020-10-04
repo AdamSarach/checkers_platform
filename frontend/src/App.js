@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from "react-dom"
-import './App.css';
+import './App.scss';
 import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Lobby from './Components/Lobby'
+import Game from './Components/Game'
 
 class App extends React.Component {
 
     state = {
+        // Change displayedForm for tests
         displayedForm: 'mainpage',
         logged_in: false,
         username: '',
@@ -163,6 +165,11 @@ class App extends React.Component {
                               user={this.state.username}
                               handleLogout={this.handleLogout}
                               getTokenFromLocal={this.getTokenFromLocal}/>;
+            case 'game':
+            return <Game displayForm={this.displayForm}
+                         logged_in={this.state.logged_in}
+                         user={this.state.username}
+                         getTokenFromLocal={this.getTokenFromLocal}/>;
         }
     }
 
@@ -172,11 +179,17 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div id="outer-box">
-                <div id="main-box">
-                    {form}
+            <div id="react-box">
+                <div id="inner-react-box">
+                    <div id="outer-box">
+                        <div id="main-box">
+                            {form}
+                        </div>
+                    </div>
                 </div>
+
             </div>
+
         )
     }
 }

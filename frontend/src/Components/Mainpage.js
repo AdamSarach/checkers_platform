@@ -9,17 +9,18 @@ class Mainpage extends React.Component {
     render() {
         return (
             <div id="main-page">
-                <div>
-                    <h3 className="centered" id="title">Welcome to Checkers!</h3>
+                <div id="title">
+                    <h1> <span className="badge badge-success">Welcome to Checkers!</span> </h1>
                 </div>
-                <div>
-                    {/*For npm start*/}
+                <div id="div-photo">
+                    {/*For react dev*/}
                     {/*<img id="placeholder-photo" src={Main_photo} alt="Placeholder"/>*/}
                     {/*For django runserver*/}
-                    <img id="placeholder-photo" src="/static/checkers_placeholder.png" alt="Placeholder"/>
+                    <img id="mainpage-photo" src="/static/checkers_placeholder.png" onClick={() =>
+                            this.props.displayForm('login')} alt="Placeholder"/>
                 </div>
                 <div>
-                    <p className="close-to-bottom centered">Please
+                    <p className="centered padding-close-to-bottom">Please
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('login')
                         }> sign in </span> or
