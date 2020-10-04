@@ -1,6 +1,5 @@
 import React from "react";
 
-// const roomName = JSON.parse(document.getElementById('room-name').textContent);
 const roomName = 'all'
 
 const chatSocket = new WebSocket(
@@ -11,13 +10,12 @@ const chatSocket = new WebSocket(
     + '/'
 );
 
-// props.username to add
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     document.getElementById("chat-log").value += (data.user + ": " + data.message + '\n');
+    const chatarea = document.getElementById('chat-log');
+    chatarea.scrollTop = chatarea.scrollHeight;
 };
-
-
 
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly');
@@ -41,7 +39,8 @@ class Chatwindow extends React.Component {
 
     clickEnter = (e) => {
         if (e.key === 'Enter') {
-            document.getElementById("chat-message-submit").click();
+            this.handleChatMessage();
+            // document.getElementById("chat-message-submit").click();
         }
     };
 
@@ -59,46 +58,29 @@ class Chatwindow extends React.Component {
 
     render() {
 
-
-        // document.querySelector('#chat-message-input').focus();
-        // document.querySelector('#chat-message-input').onkeyup = function(e) {
-        //     if (e.keyCode === 13) {  // enter, return
-        //         document.querySelector('#chat-message-submit').click();
-        //     }
-        // };
-
-        // document.querySelector('#chat-message-submit').onclick = function(e) {
-        //     const messageInputDom = document.querySelector('#chat-message-input');
-        //     const message = messageInputDom.value;
-        //     chatSocket.send(JSON.stringify({
-        //         'message': message
-        //     }));
-        //     messageInputDom.value = '';
-        // };
-
         return (
             <div id="chat-window">
-                <textarea id="chat-log" cols="40" rows="4"></textarea>
+                <textarea className="border-padding border-padding-larger" id="chat-log" cols="40" rows="4" disabled></textarea>
                 <br />
-                <div>
-                    <input className="pull-left"
+                <div className="flex-wrapper">
+                    <input className="pull-left border-padding border-padding-larger border-padding-lastitem"
                     id="chat-message-input"
                     type="text"
                     size="40"
                     onKeyPress = {this.clickEnter}
+                    style={{flex: 7}}
                     />
                     <br />
-                    <input
-                        className="pull-right"
-                        id="chat-message-submit"
-                        type="button"
-                        value="Send"
-                        onClick={this.handleChatMessage}
-                    />
+                    {/*<input*/}
+                    {/*    className="pull-right"*/}
+                    {/*    id="chat-message-submit"*/}
+                    {/*    type="button"*/}
+                    {/*    value="Send"*/}
+                    {/*    onClick={this.handleChatMessage}*/}
+                    {/*    style={{flex: 1}}*/}
+                    {/*/>*/}
                 </div>
             </div>
-
-
             )
         }
     }

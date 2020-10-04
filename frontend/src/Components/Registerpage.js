@@ -53,7 +53,7 @@ class Registerpage extends React.Component {
                     {this.props.infoMessage}
                 </div>
                 <div>
-                    <p className="close-to-bottom centered">Already have an account?
+                    <p className="centered">Already have an account?
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('login')
                         }> Sign in </span>

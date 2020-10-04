@@ -53,7 +53,7 @@ class Loginpage extends React.Component {
                     {this.props.infoMessage}
                 </div>
                 <div>
-                    <p className="close-to-bottom centered">Don't have an account?
+                    <p className="centered">Don't have an account?
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('signup')
                         }> Register </span>
