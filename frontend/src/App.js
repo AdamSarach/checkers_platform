@@ -179,13 +179,9 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div id="react-box">
-                <div id="inner-react-box">
-                    <div id="outer-box">
-                        <div id="main-box">
-                            {form}
-                        </div>
-                    </div>
+            <div className="website-all">
+                <div className="container d-flex align-items-center">
+                        {form}
                 </div>
 
             </div>

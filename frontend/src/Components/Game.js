@@ -22,6 +22,7 @@ class Game extends React.Component {
 
     render() {
         return (
+            <div className="game-page website-styles center-main-container ">
             <main>
 
                 <div className="flex-wrapper border-padding btn-group">
@@ -124,6 +125,8 @@ class Game extends React.Component {
 
 
             </main>
+            </div>
+
         );
     };
 }

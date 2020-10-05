@@ -25,9 +25,9 @@ class Registerpage extends React.Component {
 
     render() {
         return (
-            <div id="main-page">
+            <div className="register-page website-styles center-main-container ">
                 <div>
-                    <h3 className="badge-success centered" id="title">Register page</h3>
+                    <h3 className="badge-success centered title">Register page</h3>
                 </div>
                 <div>
                     <form className="register-form" onSubmit={e => this.props.handleSignup(e, this.state)}>

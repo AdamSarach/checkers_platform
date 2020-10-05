@@ -1,4 +1,4 @@
-import Main_photo from "./checkers_placeholder.png";
+// import Main_photo from "./checkers_placeholder.png";
 import React from "react";
 
 class Mainpage extends React.Component {
@@ -8,11 +8,11 @@ class Mainpage extends React.Component {
 
     render() {
         return (
-            <div id="main-page">
-                <div id="title">
+            <div className="main-page website-styles center-main-container ">
+                <div className="title">
                     <h1> <span className="badge badge-success">Welcome to Checkers!</span> </h1>
                 </div>
-                <div id="div-photo">
+                <div className="div-photo">
                     {/*For react dev*/}
                     {/*<img id="placeholder-photo" src={Main_photo} alt="Placeholder"/>*/}
                     {/*For django runserver*/}
@@ -33,5 +33,7 @@ class Mainpage extends React.Component {
         );
     };
 }
+
+
 
 export default Mainpage;

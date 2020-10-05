@@ -1,50 +1,175 @@
+// light green
 $color-default: palegreen;
+//bootstrap success color
+$color-border: #28a745;
 
-#react-box{
-    height: 100vh;
-    width: 100vw;
-    //background-color: #0c5460;
-    //background: #343a40;
+
+//MAIN STYLES>>>>>
+
+.website-all{
+    min-height: 100%;
+    min-height: 100vh;
+    min-width: 100%;
+    min-width: 100vw;
     background: rgb(46,204,113); /* Old browsers */
     background: -moz-linear-gradient(left,  rgba(46,204,113,1) 0%, rgba(1,165,138,1) 50%, rgba(41,128,185,1) 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ecc71', endColorstr='#2980b9',GradientType=1 ); /* IE6-9 */
-    border: 1px solid white;
+    //display: relative;
+    //    display: flex;
+    //align-items: center;
 }
 
+.website-styles {
+   background-color: $color-default;
+    border-radius: 20px;
+    border: 10px solid $color-border;
+}
 
+.center-main-container {
+    //position: absolute;
+    //top: 50%;
+    //left: 50%;
+    //transform: translate(-50%, -50%);
+}
 
-#main-box {
-    background-color: $color-default;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.main-page {
     max-height: 90vh;
     min-width: 40vh;
-    border-radius: 20px;
-    border: 10px solid #28a745;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    overflow: hidden;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        height: 95%;
+        height: 95vw;
+    }
+    @media (min-width:1025px) {
+        width: 35%;
+        width: 35vw;
+        height: 80%;
+        height: 80vw;
+        /* Your desktop styles here */
+    }
 }
 
-#outer-box {
-    //background: red;
-    //      background-color: red;
-    display: relative;
+.login-page, .register-page  {
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        /* Your desktop styles here */
+    }
 }
 
-#div-photo {
+.lobby-page {
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        /* Your desktop styles here */
+    }
+}
+
+.game-page{
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        /* Your desktop styles here */
+    }
 
 }
+
+
+//<<<<<MAIN STYLES
+
+
+
+//MAIN PAGE>>>>>
 
 #mainpage-photo{
+
+    display: block;
+    margin: auto;
+    width: auto;
+    height: auto;
+    padding: 10px;
+}
+
+//<<<<<MAIN PAGE
+
+
+
+input {
+    display: block;
+    margin: 5px 0 5px;
+}
+
+//LOGIN & REGISTER PAGE>>>>>
+
+.login-form, .register-form {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    max-width:80%;
+    width:80%;
     padding-left: 10px;
     padding-right: 10px;
 }
+
+//<<<<<LOGIN & REGISTER PAGE
+
+//LOBBY>>>>>
+
+#user-list {
+    border-top: 5px solid $color-border;
+    border-bottom: 5px solid $color-border;
+}
+
+#chat-message-input{
+    width: 80%;
+}
+
+#chat-message-submit{
+    width: 20%;
+}
+
+#chat-log {
+    resize: none;
+    color: black;
+}
+
+@media screen and (max-width: 600px) {
+    .div-scrollable {
+        max-height: 200px;
+    }
+}
+
+#chat-log {
+    margin-top: 10px;
+}
+
+//<<<<<LOBBY
+
+//GENERAL>>>>>
 
 .centered {
     display: flex;
@@ -57,7 +182,7 @@ $color-default: palegreen;
     font-weight: bold;
 }
 
-#title {
+.title {
     padding-top: 10px;
     width: 100%;
     display: flex;
@@ -73,40 +198,6 @@ $color-default: palegreen;
     text-decoration:underline;
 }
 
-input {
-    display: block;
-    margin: 5px 0 5px;
-}
-
-.login-form, .register-form {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width:80%;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-//#chat-message-submit, #chat-message-input{
-//    /*margin-left: auto;*/
-//    /*margin-right: auto;*/
-//    /*display: inline-block;*/
-//}
-
-#chat-message-input{
-    width: 80%;
-}
-
-#chat-message-submit{
-    width: 20%;
-}
-
-#chat-log {
-    resize: none;
-    color: black;
-}
-
-
 .flex-wrapper{
   display: flex;
 }
@@ -119,6 +210,12 @@ input {
     padding:20px;
     padding-top: 2px;
     padding-bottom: 2px;
+}
+
+.div-scrollable {
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .border-padding{
@@ -146,3 +243,7 @@ input {
     padding-top: 2px;
     padding-bottom: 2px;
 }
+
+
+//<<<<<<GENERAL
+

@@ -52,10 +52,10 @@ class Lobby extends React.Component {
     render() {
         var currentUsersList = this.state.currentUsers
         return (
-            <div id="main-page">
+            <div className="lobby-page website-styles center-main-container ">
                 <div>
 
-                    <h3 className="centered" id="title">
+                    <h3 className="centered title">
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Something went wrong...'}
                     </h3>
                 </div>
@@ -67,7 +67,7 @@ class Lobby extends React.Component {
                     Active players: {this.state.numbersOfPlayers}
                 </div>
                 <div>
-                    <div id="user-list">
+                    <div id="user-list" className="div-scrollable">
                         {currentUsersList.map((current_person, index) => (
                             <div key={index} className="current-users flex-wrapper task-wrapper">
                                 <div style={{flex: 7}}>
