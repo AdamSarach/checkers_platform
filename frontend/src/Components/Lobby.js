@@ -55,7 +55,11 @@ class Lobby extends React.Component {
             <div id="main-page">
                 <div>
 
+<<<<<<< Updated upstream
                     <h3 className="centered" id="title">
+=======
+                    <h3 className="badge-success centered title">
+>>>>>>> Stashed changes
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Something went wrong...'}
                     </h3>
                 </div>
