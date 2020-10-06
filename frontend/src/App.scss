@@ -15,6 +15,7 @@ $color-default: palegreen;
 
 
 
+<<<<<<< Updated upstream
 #main-box {
     background-color: $color-default;
     position: absolute;
@@ -44,6 +45,110 @@ $color-default: palegreen;
     max-width:80%;
     padding-left: 10px;
     padding-right: 10px;
+=======
+.main-page {
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    overflow: hidden;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+    }
+    @media (min-width:1025px) {
+        width: 35%;
+        width: 35vw;
+        max-height: 80%;
+        max-height: 80vh;
+        /* Your desktop styles here */
+    }
+}
+
+.login-page, .register-page  {
+    max-height: 90vh;
+    width: 40vw;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        width: 30%;
+        width: 30vw;
+        max-height: 80%;
+        max-height: 80vh;
+        /* Your desktop styles here */
+    }
+}
+
+.lobby-page {
+    max-height: 90vh;
+    min-width: 40vw;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        width: 40%;
+        width: 40vw;
+        max-height: 80%;
+        max-height: 80vh;
+        /* Your desktop styles here */
+    }
+}
+
+.game-page{
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        height: 95%;
+        height: 95vh;
+        /* Your mobile styles here */
+    }
+    @media (min-width:1025px) {
+        width: 60%;
+        width: 60vw;
+        height: 90%;
+        height: 90vh;
+        /* Your desktop styles here */
+    }
+
+}
+
+
+//<<<<<MAIN STYLES
+
+
+
+//MAIN PAGE>>>>>
+
+img{
+    max-width: 80%;
+    height: auto;
+    display: block;
+    margin: auto;
+    padding: 10px;
+>>>>>>> Stashed changes
 }
 
 .centered {
