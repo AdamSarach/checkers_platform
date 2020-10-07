@@ -94,6 +94,10 @@ span {
     display: inline-block;
 }
 
+.label-inline-block {
+    display: inline-block;
+}
+
 @media screen and (max-width: 560px) {
     .red-piece {
         height: 4.5vw;
@@ -186,3 +190,4 @@ span {
 table {
     border: 2px solid black;
 }
+

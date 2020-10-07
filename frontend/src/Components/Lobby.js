@@ -52,20 +52,17 @@ class Lobby extends React.Component {
     render() {
         var currentUsersList = this.state.currentUsers
         return (
-            <div id="main-page">
+            <div className="website-styles center-main-container lobby-page">
                 <div>
 
-<<<<<<< Updated upstream
-                    <h3 className="centered" id="title">
-=======
                     <h3 className="badge-success centered title">
->>>>>>> Stashed changes
+
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Something went wrong...'}
                     </h3>
                 </div>
-                <div className="flex-wrapper button-group-padding btn-group">
-                    <button className="btn btn-sm btn-success" onClick={this.playGame}>Look at gameboard layout</button>
-                    <button className="btn btn-sm btn-success" onClick={this.props.handleLogout}>Logout</button>
+                <div className="flex-wrapper button-group-padding btn-group margin-top-zero">
+                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.playGame}>Look at gameboard layout</button>
+                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.props.handleLogout}>Logout</button>
                 </div>
                 <div className="offset-from-border">
                     Active players: {this.state.numbersOfPlayers}

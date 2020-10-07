@@ -26,9 +26,9 @@ class Loginpage extends React.Component {
     };
     render() {
         return (
-            <div id="main-page">
+            <div className="website-styles center-main-container login-page">
                 <div>
-                    <h3 className="badge-success centered" id="title">Login page</h3>
+                    <h3 className="badge-success centered title">Login page</h3>
                 </div>
                 <div>
                     <form className="login-form" onSubmit= {e => this.props.makeAuthentication(e, this.state)}>

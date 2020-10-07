@@ -91,12 +91,9 @@ class Game extends React.Component {
 
 
         return (
-<<<<<<< Updated upstream
-            <main>
 
-=======
             <div className="game-page website-styles center-main-container ">
->>>>>>> Stashed changes
+
                 <div className="flex-wrapper border-padding btn-group">
                     <div style={{flex:3}}>
                         <button className="btn btn-sm btn-success disabled" onClick={this.handleGiveUpButton}>Give up</button>
@@ -109,96 +106,7 @@ class Game extends React.Component {
                     </div>
                 </div>
 
-<<<<<<< Updated upstream
-                <div className="red-turn-text mobile">
-                    Reds turn
-                </div>
-                <table>
-                    <tr>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="0"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="1"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="2"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="3"></p></td>
-                    </tr>
-                    <tr>
-                        <td><p className="red-piece" id="4"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="5"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="6"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="7"></p></td>
-                        <td className="noPieceHere"></td>
-                    </tr>
-                    <tr>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="8"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="9"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="10"></p></td>
-                        <td className="noPieceHere"></td>
-                        <td><p className="red-piece" id="11"></p></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                    </tr>
-                    <tr>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                        <td className="noPieceHere"></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><span className="black-piece" id="12"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="13"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="14"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="15"></span></td>
-                        <td className="noPieceHere"></td>
-                    </tr>
-                    <tr>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="16"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="17"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="18"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="19"></span></td>
-                    </tr>
-                    <tr>
-                        <td><span className="black-piece" id="20"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="21"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="22"></span></td>
-                        <td className="noPieceHere"></td>
-                        <td><span className="black-piece" id="23"></span></td>
-                        <td className="noPieceHere"></td>
-                    </tr>
-                </table>
 
-
-            </main>
-=======
                 <main>
                     {/*<div className="red-turn-text mobile">*/}
                     {/*    Reds turn*/}
@@ -287,22 +195,24 @@ class Game extends React.Component {
                         </tr>
                     </table>
 
-                    <div className="desktop">
+
+                    <div className="desktop label-inline-block ">
                         <div className="red-turn-text">
                             Reds turn
                         </div>
                         <div id="divider">|</div>
-                        <div className="black-turn-text">
+                        <div className="black-turn-text label-inline-block ">
                             Blacks turn
                         </div>
                     </div>
+
+            </main>
 
                     {/*<div className="black-turn-text mobile">*/}
                     {/*    Blacks turn*/}
                     {/*</div>*/}
                 </main>
             </div>
->>>>>>> Stashed changes
         );
     };
 }
