@@ -80,12 +80,17 @@ p {
 }
 
 #divider {
-    font-size: 90px;
+    display: inline-block;
+    font-size: 55px;
     margin-left: 15px;
     margin-right: 15px;
 }
 
 span {
+    display: inline-block;
+}
+
+.label-inline-block {
     display: inline-block;
 }
 
@@ -177,3 +182,4 @@ span {
         font-size: 35px;
     }
 }
+

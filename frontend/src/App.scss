@@ -1,64 +1,175 @@
 $color-default: palegreen;
+$color-success: #28a745;
 
-#react-box{
+.website-all{
     height: 100vh;
     width: 100vw;
-    //background-color: #0c5460;
-    //background: #343a40;
     background: rgb(46,204,113); /* Old browsers */
     background: -moz-linear-gradient(left,  rgba(46,204,113,1) 0%, rgba(1,165,138,1) 50%, rgba(41,128,185,1) 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ecc71', endColorstr='#2980b9',GradientType=1 ); /* IE6-9 */
-    border: 1px solid white;
 }
 
-
-
-#main-box {
+.website-styles{
     background-color: $color-default;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    border: 10px solid $color-success;
+
+}
+
+//.center-main-container{
+//    display: flex;
+//    align-items: center;
+//}
+
+//MAIN STYLES>>>>>
+
+.main-page {
     max-height: 90vh;
     min-width: 40vh;
-    border-radius: 20px;
-    border: 10px solid #28a745;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    //overflow: hidden;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+    }
+    @media (min-width:1025px) {
+        width: 35%;
+        width: 35vw;
+        max-height: 80%;
+        max-height: 80vh;
+    }
 }
 
-#outer-box {
-    //background: red;
-    //      background-color: red;
-    display: relative;
+.login-page, .register-page  {
+    max-height: 90vh;
+    width: 40vw;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+    }
+    @media (min-width:1025px) {
+        width: 30%;
+        width: 30vw;
+        max-height: 80%;
+        max-height: 80vh;
+    }
 }
 
-#div-photo {
+.lobby-page {
+    max-height: 90vh;
+    min-width: 40vw;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
+    }
+    @media (min-width:1025px) {
+        width: 40%;
+        width: 40vw;
+        max-height: 80%;
+        max-height: 80vh;
+    }
+}
+
+.game-page{
+    max-height: 90vh;
+    min-width: 40vh;
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+    @media (max-width: 767px) {
+        width: 95%;
+        width: 95vw;
+        height: 95%;
+        height: 95vh;
+    }
+    @media (min-width:1025px) {
+        width: 60%;
+        width: 60vw;
+        height: 90%;
+        height: 90vh;
+    }
 
 }
 
-#mainpage-photo{
+//<<<<<MAIN STYLES
+
+//MAIN PAGE>>>>>
+
+img{
+    max-width: 80%;
+    height: auto;
+    display: block;
+    margin: auto;
+    padding: 10px;
+}
+
+.bottom-page-info {
+    padding-top: 10px;
+    font-size: larger;
+    font-weight: bold;
+}
+
+//<<<<<MAIN PAGE
+
+//LOGIN AND REGISTER PAGE>>>>>
+
+.login-form, .register-form {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    max-width:80%;
+    width:80%;
     padding-left: 10px;
     padding-right: 10px;
 }
+
+
+//<<<<<LOGIN AND REGISTER PAGE
+
+//LOBBY PAGE>>>>>
+
+#chat-message-input{
+    width: 80%;
+}
+
+#chat-message-submit{
+    width: 20%;
+}
+
+#chat-log {
+    resize: none;
+    color: black;
+}
+
+
+//<<<<<LOBBY PAGE
+
+//GENERAL>>>>>
 
 .centered {
     display: flex;
     justify-content: center;
 }
 
-.padding-close-to-bottom {
-    padding-top: 10px;
-    font-size: larger;
-    font-weight: bold;
-}
 
-#title {
-    padding-top: 10px;
+.title {
+    padding-top: 5px;
+    padding-bottom: 5px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -77,35 +188,6 @@ input {
     display: block;
     margin: 5px 0 5px;
 }
-
-.login-form, .register-form {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width:80%;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-//#chat-message-submit, #chat-message-input{
-//    /*margin-left: auto;*/
-//    /*margin-right: auto;*/
-//    /*display: inline-block;*/
-//}
-
-#chat-message-input{
-    width: 80%;
-}
-
-#chat-message-submit{
-    width: 20%;
-}
-
-#chat-log {
-    resize: none;
-    color: black;
-}
-
 
 .flex-wrapper{
   display: flex;
@@ -145,4 +227,8 @@ input {
     padding-left:20px;
     padding-top: 2px;
     padding-bottom: 2px;
+}
+
+.margin-top-zero {
+    margin-top: 0px;
 }

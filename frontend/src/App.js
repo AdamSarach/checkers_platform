@@ -19,10 +19,10 @@ class App extends React.Component {
         token: '',
     }
 
-    onResetInfoMessage = () =>{
+    onResetInfoMessage = () => {
         this.setState(
             {'infoMessage': ''}
-            )
+        )
     }
 
     // makeAuthentication = () => {
@@ -51,30 +51,30 @@ class App extends React.Component {
             .then(res => {
                 status = res.status;
                 res.json()
-                    .then( (res) => {
-                        console.log(res.body);
-                        if (status === 200) {
-                            localStorage.setItem('token', res['access']);
-                            localStorage.setItem('token-refresh', res['refresh']);
-                            fetch('http://localhost:8000/api-auth/get_online/', {
-                                method: 'GET',
-                                headers: {
-                                Authorization: `Bearer ${this.getTokenFromLocal()}`
-                                }
-                            })
-                                .then( () =>
-                                    this.setState({
-                                    logged_in: true,
-                                    displayedForm: 'lobby',
-                                    username: data.username
-                            }))
-                        } else {
-                            this.setState({
-                                infoMessage: "Provide valid credentials",
-                            });
+                    .then((res) => {
+                            console.log(res.body);
+                            if (status === 200) {
+                                localStorage.setItem('token', res['access']);
+                                localStorage.setItem('token-refresh', res['refresh']);
+                                fetch('http://localhost:8000/api-auth/get_online/', {
+                                    method: 'GET',
+                                    headers: {
+                                        Authorization: `Bearer ${this.getTokenFromLocal()}`
+                                    }
+                                })
+                                    .then(() =>
+                                        this.setState({
+                                            logged_in: true,
+                                            displayedForm: 'lobby',
+                                            username: data.username
+                                        }))
+                            } else {
+                                this.setState({
+                                    infoMessage: "Provide valid credentials",
+                                });
+                            }
                         }
-                    }
-                )
+                    )
             })
 
     };
@@ -117,13 +117,13 @@ class App extends React.Component {
             },
         })
             .then(res => {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('token-refresh');
-                    this.setState({
-                        logged_in: false,
-                        username: '',
-                        displayedForm: 'mainpage',
-                    });
+                localStorage.removeItem('token');
+                localStorage.removeItem('token-refresh');
+                this.setState({
+                    logged_in: false,
+                    username: '',
+                    displayedForm: 'mainpage',
+                });
             });
     }
 
@@ -141,24 +141,24 @@ class App extends React.Component {
             case 'login':
                 return <Loginpage makeAuthentication={this.makeAuthentication}
                                   logged_in={this.state.logged_in}
-                                  infoMessage = {this.state.infoMessage}
-                                  resetInfoMessage = {this.onResetInfoMessage}
-                                  onFormChange = {this.onFormChange}
+                                  infoMessage={this.state.infoMessage}
+                                  resetInfoMessage={this.onResetInfoMessage}
+                                  onFormChange={this.onFormChange}
                                   displayForm={this.displayForm}
-                                  />;
+                />;
             case 'signup':
                 return <Registerpage handleSignup={this.handleSignup}
                                      logged_in={this.state.logged_in}
-                                     resetInfoMessage = {this.onResetInfoMessage}
-                                     infoMessage = {this.state.infoMessage}
-                                     onFormChange = {this.onFormChange}
+                                     resetInfoMessage={this.onResetInfoMessage}
+                                     infoMessage={this.state.infoMessage}
+                                     onFormChange={this.onFormChange}
                                      displayForm={this.displayForm}
-                                     />;
+                />;
             case 'mainpage':
                 return <Mainpage showLoginPage={this.showLoginPage}
                                  logged_in={this.state.logged_in}
                                  displayForm={this.displayForm}
-                                 />;
+                />;
             case 'lobby':
                 return <Lobby displayForm={this.displayForm}
                               logged_in={this.state.logged_in}
@@ -166,10 +166,10 @@ class App extends React.Component {
                               handleLogout={this.handleLogout}
                               getTokenFromLocal={this.getTokenFromLocal}/>;
             case 'game':
-            return <Game displayForm={this.displayForm}
-                         logged_in={this.state.logged_in}
-                         user={this.state.username}
-                         getTokenFromLocal={this.getTokenFromLocal}/>;
+                return <Game displayForm={this.displayForm}
+                             logged_in={this.state.logged_in}
+                             user={this.state.username}
+                             getTokenFromLocal={this.getTokenFromLocal}/>;
         }
     }
 
@@ -179,15 +179,10 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div id="react-box">
-                <div id="inner-react-box">
-                    <div id="outer-box">
-                        <div id="main-box">
-                            {form}
-                        </div>
-                    </div>
+            <div className="website-all">
+                <div className="container d-flex align-items-center">
+                    {form}
                 </div>
-
             </div>
 
         )
