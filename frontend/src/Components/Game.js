@@ -195,7 +195,6 @@ class Game extends React.Component {
                         </tr>
                     </table>
 
-
                     <div className="desktop label-inline-block ">
                         <div className="red-turn-text">
                             Reds turn
@@ -205,13 +204,10 @@ class Game extends React.Component {
                             Blacks turn
                         </div>
                     </div>
-
-            </main>
-
+                </main>
                     {/*<div className="black-turn-text mobile">*/}
                     {/*    Blacks turn*/}
                     {/*</div>*/}
-                </main>
             </div>
         );
     };
