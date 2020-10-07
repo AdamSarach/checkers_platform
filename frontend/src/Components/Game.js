@@ -1,27 +1,9 @@
 import React from "react";
 import './Game.css';
 
-// DOM referenes
-const cells = document.querySelectorAll("td");
-let redsPieces = document.querySelectorAll("p");
-let blacksPieces = document.querySelectorAll("span")
-const redTurnText = document.querySelectorAll(".red-turn-text");
-const blackTurntext = document.querySelectorAll(".black-turn-text");
-const divider = document.querySelector("#divider")
 
-var selectedPiece = {
-    pieceId: -1,
-    indexOfBoardPiece: -1,
-    isKing: false,
-    seventhSpace: false,
-    ninthSpace: false,
-    fourteenthSpace: false,
-    eighteenthSpace: false,
-    minusSeventhSpace: false,
-    minusNinthSpace: false,
-    minusFourteenthSpace: false,
-    minusEighteenthSpace: false
-}
+
+
 
 
 class Game extends React.Component {
@@ -43,11 +25,28 @@ class Game extends React.Component {
             blackScore: 12,
             playerPieces: "tbd"
         }
+        this.selectedPiece = {
+            pieceId: -1,
+            indexOfBoardPiece: -1,
+            isKing: false,
+            seventhSpace: false,
+            ninthSpace: false,
+            fourteenthSpace: false,
+            eighteenthSpace: false,
+            minusSeventhSpace: false,
+            minusNinthSpace: false,
+            minusFourteenthSpace: false,
+            minusEighteenthSpace: false
+        }
+        // DOM referenes
+        this.cells = document.querySelectorAll("td");
+        this.redsPieces = document.querySelectorAll("p");
+        this.blacksPieces = document.querySelectorAll("span")
+        this.redTurnText = document.querySelectorAll(".red-turn-text");
+        this.blackTurntext = document.querySelectorAll(".black-turn-text");
+        this.divider = document.querySelector("#divider")
+
     }
-
-
-
-
 
 
     handleGiveUpButton = () => {
@@ -66,6 +65,7 @@ class Game extends React.Component {
     //Game function
 
     givePiecesEventListeners = () => {
+    //  who plays; true -> reds; false -> blacks
     if (this.state.turn) {
         for (let i = 0; i < redsPieces.length; i++) {
             redsPieces[i].addEventListener("click", this.getPlayerPieces);
@@ -79,12 +79,67 @@ class Game extends React.Component {
 
     getPlayerPieces = () => {
     if (this.state.turn) {
-        this.setState({playerPieces: redsPieces});
+        this.setState({playerPieces: this.redsPieces});
     } else {
-        this.setState({playerPieces: blacksPieces})
+        this.setState({playerPieces: this.blacksPieces})
     }
-    // removeCellonclick();
-    // resetBorders();
+    this.removeCellonclick();
+    this.resetBorders();
+    }
+
+    // removes possible moves from old selected piece (* this is needed because the user might re-select a piece *)
+    removeCellonclick = () => {
+    for (let i = 0; i < this.cells.length; i++) {
+        this.cells[i].removeAttribute("onclick");
+        }
+    }
+
+    // resets borders to default
+    resetBorders = () => {
+    for (let i = 0; i < this.state.playerPieces.length; i++) {
+        this.state.playerPieces[i].style.border = "1px solid white";
+    }
+    this.resetSelectedPieceProperties();
+    this.getSelectedPiece();
+    }
+
+    // resets selected piece properties
+    resetSelectedPieceProperties = () => {
+    this.selectedPiece.pieceId = -1;
+    this.selectedPiece.pieceId = -1;
+    this.selectedPiece.isKing = false;
+    this.selectedPiece.seventhSpace = false;
+    this.selectedPiece.ninthSpace = false;
+    this.selectedPiece.fourteenthSpace = false;
+    this.selectedPiece.eighteenthSpace = false;
+    this.selectedPiece.minusSeventhSpace = false;
+    this.selectedPiece.minusNinthSpace = false;
+    this.selectedPiece.minusFourteenthSpace = false;
+    this.selectedPiece.minusEighteenthSpace = false;
+    }
+
+
+    // gets ID and index of the board cell its on
+    getSelectedPiece = () => {
+    this.selectedPiece.pieceId = parseInt(event.target.id);
+    this.selectedPiece.indexOfBoardPiece = this.findPiece(this.selectedPiece.pieceId);
+    isPieceKing();
+    }
+
+    findPiece = (pieceId) => {
+    let parsed = parseInt(pieceId);
+    return this.state.board.indexOf(parsed);
+    };
+
+    // gets ID and index of the board cell its on
+    getSelectedPiece = () => {
+    this.selectedPiece.pieceId = parseInt(event.target.id);
+    this.selectedPiece.indexOfBoardPiece = this.findPiece(this.selectedPiece.pieceId);
+    isPieceKing();
+}
+
+    componentDidMount() {
+        this.givePiecesEventListeners();
     }
 
     render() {
