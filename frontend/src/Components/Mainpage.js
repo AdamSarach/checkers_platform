@@ -6,6 +6,11 @@ class Mainpage extends React.Component {
         super(props);
     }
 
+    playGame = () => {
+        console.log("It works!");
+        this.props.displayForm('game')
+    }
+
     render() {
         return (
             <div className=" website-styles center-main-container main-page">
@@ -27,6 +32,7 @@ class Mainpage extends React.Component {
                         }> register </span> to play a game.
                     </p>
                 </div>
+                <button className="btn btn-sm btn-success" onClick={this.playGame}>Look at gameboard layout</button>
             </div>
         );
     };

@@ -11,7 +11,7 @@ class App extends React.Component {
 
     state = {
         // Change displayedForm for tests
-        displayedForm: 'mainpage',
+        displayedForm: 'game',
         logged_in: false,
         username: '',
         infoMessage: '',

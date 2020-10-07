@@ -54,7 +54,9 @@ class Lobby extends React.Component {
         return (
             <div className="website-styles center-main-container lobby-page">
                 <div>
+
                     <h3 className="badge-success centered title">
+
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Something went wrong...'}
                     </h3>
                 </div>
