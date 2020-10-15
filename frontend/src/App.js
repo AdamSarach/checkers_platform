@@ -5,13 +5,12 @@ import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Lobby from './Components/Lobby'
-import Game from './Components/Game'
-
+import {Game} from './Game'
 class App extends React.Component {
 
     state = {
         // Change displayedForm for tests
-        displayedForm: 'game',
+        displayedForm: 'mainpage',
         logged_in: false,
         username: '',
         infoMessage: '',
@@ -179,11 +178,14 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div className="website-all">
-                <div className="container d-flex align-items-center">
-                    {form}
-                </div>
+            <div>
+                {form}
             </div>
+            // <div className="website-all">
+            //     <div className="container d-flex align-items-center">
+            //         {form}
+            // {/*    </div>*/}
+            // {/*</div>*/}
 
         )
     }
