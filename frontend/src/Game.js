@@ -246,6 +246,8 @@ export class Game extends React.Component {
             hasJumped: postMoveState.hasJumped,
             stepNumber: this.state.history.length,
             winner: postMoveState.winner,
+
+        //    To-Do: send data through websockets
         });
     }
 

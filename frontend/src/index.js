@@ -8,6 +8,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 // ========================================
 
 ReactDOM.render(
-    <Game />,
+    <App />,
     document.getElementById('root')
 );
