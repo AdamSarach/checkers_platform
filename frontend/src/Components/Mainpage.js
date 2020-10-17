@@ -6,21 +6,24 @@ class Mainpage extends React.Component {
         super(props);
     }
 
+    playGame = () => {
+        console.log("It works!");
+        this.props.displayForm('game')
+    }
+
     render() {
         return (
-            <div className="main-page website-styles center-main-container ">
-                <div className="title">
-                    <h1> <span className="badge badge-success">Welcome to Checkers!</span> </h1>
-                </div>
-                <div className="div-photo">
+            <div className=" website-styles center-main-container main-page">
+                    <h1> <span className="badge badge-success title">Welcome to Checkers!</span> </h1>
+                <div className="photo">
                     {/*For react dev*/}
                     {/*<img id="placeholder-photo" src={Main_photo} alt="Placeholder"/>*/}
                     {/*For django runserver*/}
-                    <img id="mainpage-photo" src="/static/checkers_placeholder.png" onClick={() =>
+                    <img src="/static/checkers_placeholder.png" onClick={() =>
                             this.props.displayForm('login')} alt="Placeholder"/>
                 </div>
                 <div>
-                    <p className="centered padding-close-to-bottom">Please
+                    <p className="centered bottom-page-info">Please
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('login')
                         }> sign in </span> or
@@ -29,6 +32,7 @@ class Mainpage extends React.Component {
                         }> register </span> to play a game.
                     </p>
                 </div>
+                <button className="btn btn-sm btn-success" onClick={this.playGame}>Look at gameboard layout</button>
             </div>
         );
     };

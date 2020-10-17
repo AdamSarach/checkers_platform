@@ -26,7 +26,7 @@ class Loginpage extends React.Component {
     };
     render() {
         return (
-            <div className="login-page website-styles center-main-container ">
+            <div className="website-styles center-main-container login-page">
                 <div>
                     <h3 className="badge-success centered title">Login page</h3>
                 </div>

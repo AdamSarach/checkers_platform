@@ -25,7 +25,7 @@ class Registerpage extends React.Component {
 
     render() {
         return (
-            <div className="register-page website-styles center-main-container ">
+            <div className="website-styles center-main-container register-page">
                 <div>
                     <h3 className="badge-success centered title">Register page</h3>
                 </div>

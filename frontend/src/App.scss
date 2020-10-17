@@ -1,86 +1,89 @@
 // light green
 $color-default: palegreen;
-//bootstrap success color
-$color-border: #28a745;
-
-
-//MAIN STYLES>>>>>
+$color-success: #28a745;
 
 .website-all{
-    min-height: 100%;
-    min-height: 100vh;
-    min-width: 100%;
-    min-width: 100vw;
+    height: 100vh;
+    width: 100vw;
     background: rgb(46,204,113); /* Old browsers */
     background: -moz-linear-gradient(left,  rgba(46,204,113,1) 0%, rgba(1,165,138,1) 50%, rgba(41,128,185,1) 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(left,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right,  rgba(46,204,113,1) 0%,rgba(1,165,138,1) 50%,rgba(41,128,185,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ecc71', endColorstr='#2980b9',GradientType=1 ); /* IE6-9 */
-    //display: relative;
-    //    display: flex;
-    //align-items: center;
 }
 
-.website-styles {
-   background-color: $color-default;
+.website-styles{
+    background-color: $color-default;
     border-radius: 20px;
-    border: 10px solid $color-border;
+    border: 10px solid $color-success;
+
 }
 
-.center-main-container {
-    //position: absolute;
-    //top: 50%;
-    //left: 50%;
-    //transform: translate(-50%, -50%);
-}
+//.center-main-container{
+//    display: flex;
+//    align-items: center;
+//}
+
+//MAIN STYLES>>>>>
 
 .main-page {
     max-height: 90vh;
     min-width: 40vh;
     margin-top: 50px;
     margin-bottom: 50px;
-    overflow: hidden;
+    //overflow: hidden;
 
     @media (max-width: 767px) {
         width: 95%;
         width: 95vw;
-        height: 95%;
-        height: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
     }
     @media (min-width:1025px) {
         width: 35%;
         width: 35vw;
-        height: 80%;
-        height: 80vw;
-        /* Your desktop styles here */
+        max-height: 80%;
+        max-height: 80vh;
     }
 }
 
 .login-page, .register-page  {
     max-height: 90vh;
-    min-width: 40vh;
+    width: 40vw;
     margin-top: 50px;
     margin-bottom: 50px;
 
     @media (max-width: 767px) {
-        /* Your mobile styles here */
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
     }
     @media (min-width:1025px) {
-        /* Your desktop styles here */
+        width: 30%;
+        width: 30vw;
+        max-height: 80%;
+        max-height: 80vh;
     }
 }
 
 .lobby-page {
     max-height: 90vh;
-    min-width: 40vh;
+    min-width: 40vw;
     margin-top: 50px;
     margin-bottom: 50px;
 
     @media (max-width: 767px) {
-        /* Your mobile styles here */
+        width: 95%;
+        width: 95vw;
+        max-height: 95%;
+        max-height: 95vh;
     }
     @media (min-width:1025px) {
-        /* Your desktop styles here */
+        width: 40%;
+        width: 40vw;
+        max-height: 80%;
+        max-height: 80vh;
     }
 }
 
@@ -91,38 +94,41 @@ $color-border: #28a745;
     margin-bottom: 50px;
 
     @media (max-width: 767px) {
-        /* Your mobile styles here */
+        width: 95%;
+        width: 95vw;
+        height: 95%;
+        height: 95vh;
     }
     @media (min-width:1025px) {
-        /* Your desktop styles here */
+        width: 60%;
+        width: 60vw;
+        height: 90%;
+        height: 90vh;
     }
 
 }
 
-
 //<<<<<MAIN STYLES
 
+//MAIN PAGE>>>>>ou
 
-
-//MAIN PAGE>>>>>
-
-#mainpage-photo{
-
+img{
+    max-width: 80%;
+    height: auto;
     display: block;
     margin: auto;
-    width: auto;
-    height: auto;
     padding: 10px;
+}
+
+.bottom-page-info {
+    padding-top: 10px;
+    font-size: larger;
+    font-weight: bold;
 }
 
 //<<<<<MAIN PAGE
 
-
-
-input {
-    display: block;
-    margin: 5px 0 5px;
-}
+//LOGIN AND REGISTER PAGE>>>>>
 
 //LOGIN & REGISTER PAGE>>>>>
 
@@ -135,13 +141,14 @@ input {
     padding-right: 10px;
 }
 
-//<<<<<LOGIN & REGISTER PAGE
 
-//LOBBY>>>>>
+//<<<<<LOGIN AND REGISTER PAGE
+
+//LOBBY PAGE>>>>>
 
 #user-list {
-    border-top: 5px solid $color-border;
-    border-bottom: 5px solid $color-border;
+    border-top: 5px solid $color-success;
+    border-bottom: 5px solid $color-success;
 }
 
 #chat-message-input{
@@ -198,6 +205,38 @@ input {
     text-decoration:underline;
 }
 
+//<<<<<LOBBY PAGE
+
+//GENERAL>>>>>
+
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
+
+.title {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.span-link {
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+    cursor:pointer;
+    color:blue;
+    text-decoration:underline;
+}
+
+input {
+    display: block;
+    margin: 5px 0 5px;
+}
+
 .flex-wrapper{
   display: flex;
 }
@@ -244,6 +283,6 @@ input {
     padding-bottom: 2px;
 }
 
-
-//<<<<<<GENERAL
-
+.margin-top-zero {
+    margin-top: 0px;
+}
