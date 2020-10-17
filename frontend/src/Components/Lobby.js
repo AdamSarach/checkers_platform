@@ -6,22 +6,41 @@ class Lobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentUsers: [{username: "There is an error"}, {username: "Seriously"}],
-            numbersOfPlayers: 0
+            currentUsers: [{username: "Player list in temporary unavailable"}, {username: "Seriously"}],
+            numbersOfPlayers: 2,
+            invitationText : "Invite",
+            invitationButtonValues : [],
         }
     }
 
     componentDidMount() {
-        // this.fetchNames()
-        console.log("Lobby, componentdidmount: " + this.props.username);
-        console.log(this.props.getTokenFromLocal());
-        console.log(this.getActiveUsers());
-        this.getActiveUsers();
+        // console.log(this.getActiveUsers());
+        this.getActiveUsers()
+        // this.produceButtonValues();
+        // console.log(" invitationButtonValues: " +  this.state.invitationButtonValues.length);
+
+    }
+
+    produceButtonValues = () => {
+        var currentUsersList = this.state.currentUsers;
+        var buttonList = [];
+        console.log("currentUsersList: " + currentUsersList.length);
+        currentUsersList
+            .filter(person => person.username !== this.props.user)
+            .map( (current_person) => ( buttonList.push({
+                person: current_person['username'],
+                value: "Invite"
+                }
+            )
+            ));
+        this.setState({invitationButtonValues: buttonList});
     }
 
 
+
+
     getActiveUsers() {
-        var userList;
+        // var userList;
         fetch('http://localhost:8000/api-auth/active_users/', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -31,26 +50,53 @@ class Lobby extends React.Component {
                 if (res.status === 200) {
                     res.json()
                         .then(res => {
-                            userList = res;
+                            // userList = res;
                             this.setState({
                                 currentUsers: res,
                                 numbersOfPlayers: res.length
                             });
-                            console.log(res);
+                            return res
+                            // console.log(res);
                         })
+                }
+                else {
+                //  ToDO:  Handle Server Error
                 }
             })
     };
 
     playGame = () => {
-        console.log("It works!");
+        // console.log("It works!");
         this.props.displayForm('game')
         // document.getElementById("user-list").value = "";
     }
 
 
+    handleInvitation = (e) => {
+        e.preventDefault();
+        // console.log("handle Invitation triggered!");
+        switch (e.target.value) {
+            case "Invite":
+                e.target.value = "Cancel";
+                break;
+            case "Cancel":
+                e.target.value = "Invite";
+                break;
+            default:
+                return null;
+        }
+    }
+
+    changeText = (text) => {
+
+  this.setState({ text });
+}
+
     render() {
         var currentUsersList = this.state.currentUsers
+        var invitationText = this.state.invitationText
+        // console.log ("this.state.invitationText: " + this.state.invitationText)
+
         return (
             <div className="website-styles center-main-container lobby-page">
                 <div>
@@ -69,16 +115,18 @@ class Lobby extends React.Component {
                 </div>
                 <div>
                     <div id="user-list" className="div-scrollable">
-                        {currentUsersList.map((current_person, index) => (
+                        {currentUsersList
+                            .filter(person => person.username !== this.props.user)
+                            .map((current_person, index) => (
                             <div key={index} className="current-users flex-wrapper task-wrapper">
                                 <div style={{flex: 7}}>
                                     <span>{current_person['username']}</span>
                                 </div>
                                 <div style={{flex: 1}}>
-                                    <button className="btn btn-sm btn-outline-info">Invite</button>
+                                    <button id={"invitationButton-" + index} className="btn btn-sm btn-outline-info" onClick={ (e) => {this.handleInvitation(e)}}>{invitationText}</button>
                                 </div>
                                 <div style={{flex: 1}}>
-                                    <button className="btn btn-sm btn-outline-dark">Chat</button>
+                                    <button id={"chatButton-" + index} className="btn btn-sm btn-outline-dark">Chat</button>
                                 </div>
 
                             </div>
@@ -96,3 +144,4 @@ class Lobby extends React.Component {
 }
 
 export default Lobby;
+
