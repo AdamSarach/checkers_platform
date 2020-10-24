@@ -1,4 +1,3 @@
-import Main_photo from "./checkers_placeholder.png";
 import React from "react";
 import Chatwindow from "./Chatwindow";
 
@@ -6,109 +5,132 @@ class Lobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentUsers: [{username: "Player list in temporary unavailable"}, {username: "Seriously"}],
+            currentUsers: ["TestUser1", "TestUser2"],
             numbersOfPlayers: 2,
-            invitationText : "Invite",
-            invitationButtonValues : [],
+            invitationText: "Invite",
+            buttonList: [],
+            sentInvitations: [],
+            receivedInvitations: [],
         }
     }
 
-    componentDidMount() {
-        // console.log(this.getActiveUsers());
-        this.getActiveUsers()
-        // this.produceButtonValues();
-        // console.log(" invitationButtonValues: " +  this.state.invitationButtonValues.length);
-
+    async componentDidMount() {
+        try {
+            const activeUsersResponse = await this.getActiveUsers();
+            if (activeUsersResponse.ok) {
+                let json = await activeUsersResponse.json()
+                let userList = json["active_users"];
+                let listWithoutClientName = userList.filter(person => person !== this.props.user);
+                this.setState({
+                    currentUsers: listWithoutClientName,
+                    numbersOfPlayers: userList.length
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        this.produceButtonValues(this.state.currentUsers);
     }
 
-    produceButtonValues = () => {
-        var currentUsersList = this.state.currentUsers;
-        var buttonList = [];
-        console.log("currentUsersList: " + currentUsersList.length);
-        currentUsersList
-            .filter(person => person.username !== this.props.user)
-            .map( (current_person) => ( buttonList.push({
-                person: current_person['username'],
-                value: "Invite"
+    produceButtonValues = (currentUsersList) => {
+        let inputList = currentUsersList
+            .map((nickname) => {
+                    return ({
+                        [nickname]: {
+                            "inviteButtonValue": "Invite",
+                            "chatButtonValue": "Chat"
+                        }
+                    })
                 }
-            )
-            ));
-        this.setState({invitationButtonValues: buttonList});
+            );
+        this.setState({buttonList: inputList});
+        console.log(this.state.buttonList);
     }
-
-
-
 
     getActiveUsers() {
-        // var userList;
-        fetch('http://localhost:8000/api-auth/active_users/', {
+        return fetch('http://localhost:8000/api-auth/active_users/', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         })
-            .then(res => {
-                if (res.status === 200) {
-                    res.json()
-                        .then(res => {
-                            // userList = res;
-                            this.setState({
-                                currentUsers: res,
-                                numbersOfPlayers: res.length
-                            });
-                            return res
-                            // console.log(res);
-                        })
-                }
-                else {
-                //  ToDO:  Handle Server Error
-                }
-            })
     };
 
     playGame = () => {
-        // console.log("It works!");
         this.props.displayForm('game')
-        // document.getElementById("user-list").value = "";
     }
 
 
     handleInvitation = (e) => {
         e.preventDefault();
-        // console.log("handle Invitation triggered!");
-        switch (e.target.value) {
-            case "Invite":
-                e.target.value = "Cancel";
-                break;
-            case "Cancel":
-                e.target.value = "Invite";
-                break;
-            default:
-                return null;
+        let buttonList = this.state.buttonList;
+        let sentInvitations = this.state.sentInvitations;
+        let id = e.target.id;
+        const name = id.substring(id.indexOf('-') + 1);
+        for (let i = 0; i < buttonList.length; i++) {
+            if (name in buttonList[i]) {
+                if (buttonList[i][name].inviteButtonValue === "Invite") {
+                    buttonList[i][name].inviteButtonValue = "Cancel";
+                    sentInvitations.push(name);
+                    this.setState({sentInvitations: sentInvitations});
+                    this.setState({buttonList: buttonList});
+                    break;
+                } else {
+                    buttonList[i][name].inviteButtonValue = "Invite";
+                    const index = sentInvitations.indexOf(name);
+                    if (index > -1) {
+                        sentInvitations.splice(index, 1);
+                        this.setState({sentInvitations: sentInvitations});
+                    } else {
+                        console.warn("Warning regarding invitation handling");
+                    }
+                    this.setState({buttonList: buttonList});
+                    break;
+                }
+            }
         }
+
+        // if (buttonList[i].key === name) {
+        //     console.log(name);
+        // }
     }
+
+    // buttonList[name].inviteButtonValue = "Cancel";
+    // this.setState({buttonList: buttonList});
+    // switch (e.target.value) {
+    //     case "Invite":
+    //         e.target.value = "Cancel";
+    //         break;
+    //     case "Cancel":
+    //         e.target.value = "Invite";
+    //         break;
+    //     default:
+    //         return null;
+    // }
+
 
     changeText = (text) => {
 
-  this.setState({ text });
-}
+        this.setState({text});
+    }
 
     render() {
-        var currentUsersList = this.state.currentUsers
-        var invitationText = this.state.invitationText
-        // console.log ("this.state.invitationText: " + this.state.invitationText)
+        let currentUsersList = this.state.currentUsers;
+        // console.log(this.state.buttonList);
 
         return (
             <div className="website-styles center-main-container lobby-page">
                 <div>
-
                     <h3 className="badge-success centered title">
-
-                        {this.props.logged_in ? `Hello, ${this.props.user}` : 'Something went wrong...'}
+                        {this.props.logged_in ? `Hello, ${this.props.user}` : 'Please log out and log in again...'}
                     </h3>
                 </div>
                 <div className="flex-wrapper button-group-padding btn-group margin-top-zero">
-                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.playGame}>Look at gameboard layout</button>
-                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.props.handleLogout}>Logout</button>
+                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.playGame}>Look at gameboard
+                        layout
+                    </button>
+                    <button className="btn btn-sm btn-success margin-top-zero"
+                            onClick={this.props.handleLogout}>Logout
+                    </button>
                 </div>
                 <div className="offset-from-border">
                     Active players: {this.state.numbersOfPlayers}
@@ -116,21 +138,28 @@ class Lobby extends React.Component {
                 <div>
                     <div id="user-list" className="div-scrollable">
                         {currentUsersList
-                            .filter(person => person.username !== this.props.user)
-                            .map((current_person, index) => (
-                            <div key={index} className="current-users flex-wrapper task-wrapper">
-                                <div style={{flex: 7}}>
-                                    <span>{current_person['username']}</span>
-                                </div>
-                                <div style={{flex: 1}}>
-                                    <button id={"invitationButton-" + index} className="btn btn-sm btn-outline-info" onClick={ (e) => {this.handleInvitation(e)}}>{invitationText}</button>
-                                </div>
-                                <div style={{flex: 1}}>
-                                    <button id={"chatButton-" + index} className="btn btn-sm btn-outline-dark">Chat</button>
-                                </div>
+                            .map((person, index) => (
+                                <div key={index} className="current-users flex-wrapper task-wrapper">
+                                    <div style={{flex: 7}}>
+                                        <span>{person}</span>
+                                    </div>
+                                    <div style={{flex: 1}}>
+                                        <button id={index + "_invitationButton-" + person}
+                                                className="btn btn-sm btn-outline-info"
+                                                onClick={(e) => {
+                                                    this.handleInvitation(e)
+                                                }}
+                                        >{(this.state.buttonList.length > 1) ? this.state.buttonList[index][person].inviteButtonValue : "Wassup"}
+                                        </button>
+                                    </div>
+                                    <div style={{flex: 1}}>
+                                        <button id={"chatButton-" + index}
+                                                className="btn btn-sm btn-outline-dark">Chat
+                                        </button>
+                                    </div>
 
-                            </div>
-                        ))}
+                                </div>
+                            ))}
                     </div>
                 </div>
                 <div>

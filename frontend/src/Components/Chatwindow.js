@@ -28,7 +28,7 @@ class Chatwindow extends React.Component {
     }
 
     componentDidMount() {
-        console.log("Chat window, componentdidmount: " + this.props.user);
+        // console.log("Chat window, componentdidmount: " + this.props.user);
     }
 
     onResetInfoMessage = () =>{

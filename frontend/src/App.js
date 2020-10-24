@@ -51,7 +51,7 @@ class App extends React.Component {
                 status = res.status;
                 res.json()
                     .then((res) => {
-                            console.log(res.body);
+                            // console.log(res.body);
                             if (status === 200) {
                                 localStorage.setItem('token', res['access']);
                                 localStorage.setItem('token-refresh', res['refresh']);
@@ -67,7 +67,8 @@ class App extends React.Component {
                                             displayedForm: 'lobby',
                                             username: data.username
                                         }))
-                            } else {
+                            }
+                            else {
                                 this.setState({
                                     infoMessage: "Provide valid credentials",
                                 });
