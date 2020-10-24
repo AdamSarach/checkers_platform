@@ -28,7 +28,7 @@ class Chatwindow extends React.Component {
     }
 
     componentDidMount() {
-        console.log("Chat window, componentdidmount: " + this.props.user);
+        // console.log("Chat window, componentdidmount: " + this.props.user);
     }
 
     onResetInfoMessage = () =>{
@@ -69,6 +69,7 @@ class Chatwindow extends React.Component {
                     size="40"
                     onKeyPress = {this.clickEnter}
                     style={{flex: 7}}
+                    placeholder="Write something..."
                     />
                     <br />
                     {/*<input*/}

@@ -71,8 +71,10 @@ class UserListUnsafe(APIView):
 def get_active_users(request):
     # response_list = []
     users_current = User.objects.filter(profile__is_online=True)
-    serializer = UserSerializer(users_current, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    user_list = {"active_users": []}
+    for user in users_current:
+        user_list["active_users"].append(user.username)
+    return Response(user_list, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

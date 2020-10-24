@@ -1,4 +1,4 @@
-import Main_photo from "./checkers_placeholder.png";
+// import Main_photo from "./checkers_placeholder.png";
 import React from "react";
 
 class Mainpage extends React.Component {
@@ -37,5 +37,7 @@ class Mainpage extends React.Component {
         );
     };
 }
+
+
 
 export default Mainpage;

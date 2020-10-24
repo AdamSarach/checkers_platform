@@ -1,3 +1,4 @@
+// light green
 $color-default: palegreen;
 $color-success: #28a745;
 
@@ -129,6 +130,8 @@ img{
 
 //LOGIN AND REGISTER PAGE>>>>>
 
+//LOGIN & REGISTER PAGE>>>>>
+
 .login-form, .register-form {
     display: block;
     margin-left: auto;
@@ -143,6 +146,11 @@ img{
 
 //LOBBY PAGE>>>>>
 
+#user-list {
+    border-top: 5px solid $color-success;
+    border-bottom: 5px solid $color-success;
+}
+
 #chat-message-input{
     width: 80%;
 }
@@ -156,6 +164,46 @@ img{
     color: black;
 }
 
+@media screen and (max-width: 600px) {
+    .div-scrollable {
+        max-height: 200px;
+    }
+}
+
+#chat-log {
+    margin-top: 10px;
+}
+
+//<<<<<LOBBY
+
+//GENERAL>>>>>
+
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
+.padding-close-to-bottom {
+    padding-top: 10px;
+    font-size: larger;
+    font-weight: bold;
+}
+
+.title {
+    padding-top: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.span-link {
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+    cursor:pointer;
+    color:blue;
+    text-decoration:underline;
+}
 
 //<<<<<LOBBY PAGE
 
@@ -201,6 +249,12 @@ input {
     padding:20px;
     padding-top: 2px;
     padding-bottom: 2px;
+}
+
+.div-scrollable {
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .border-padding{
