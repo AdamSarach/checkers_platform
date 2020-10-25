@@ -4,7 +4,8 @@ import './App.scss';
 import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
-import Lobby from './Components/Lobby'
+import Authenticatedarea from './Components/Authenticatedarea'
+// import Lobby from './Components/Lobby'
 import {Game} from './Game'
 class App extends React.Component {
 
@@ -64,7 +65,7 @@ class App extends React.Component {
                                     .then(() =>
                                         this.setState({
                                             logged_in: true,
-                                            displayedForm: 'lobby',
+                                            displayedForm: 'authenticatedArea',
                                             username: data.username
                                         }))
                             }
@@ -159,8 +160,8 @@ class App extends React.Component {
                                  logged_in={this.state.logged_in}
                                  displayForm={this.displayForm}
                 />;
-            case 'lobby':
-                return <Lobby displayForm={this.displayForm}
+            case 'authenticatedArea':
+                return <Authenticatedarea displayForm={this.displayForm}
                               logged_in={this.state.logged_in}
                               user={this.state.username}
                               handleLogout={this.handleLogout}
