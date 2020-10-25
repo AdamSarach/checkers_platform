@@ -87,7 +87,7 @@ class CommunicationConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        data = text_data_json['data']
+        message = text_data_json['data']['message']
         user_sender = text_data_json['userSender']
         receiver = text_data_json['receiver']
         receiver_group_name = 'communication_%s' % receiver
@@ -97,7 +97,7 @@ class CommunicationConsumer(WebsocketConsumer):
             receiver_group_name,
             {
                 'type': 'chat_message',
-                'message': data.message,
+                'message': message,
                 'user_sender': user_sender,
                 'receiver': receiver
             }

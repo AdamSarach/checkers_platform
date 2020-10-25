@@ -1,6 +1,6 @@
 import React from "react";
 
-const roomName = 'all'
+const roomName = 'all';
 
 const chatSocket = new WebSocket(
     'ws://'
@@ -22,29 +22,9 @@ chatSocket.onclose = function (e) {
 };
 
 
-//Communication Socket ->>>>>
-const communicationRoomName = 'sara'
-const communicationSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/communication/'
-    + communicationRoomName
-    + '/'
-);
 
-communicationSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    //Todo: parse userSender and add him to receivedInvitations state in Lobby - extra funnction to be trigerred
-    document.getElementById("communication-log").value += (data.user + " to " + data.receiver + ": " + data.message + '\n');
-    const communicationarea = document.getElementById('communication-log');
-    communicationarea.scrollTop = communicationarea.scrollHeight;
-};
 
-communicationSocket.onclose = function (e) {
-    console.error('Chat socket closed unexpectedly');
-};
 
-//<<<<-Communication Socket
 
 
 class Chatwindow extends React.Component {
@@ -54,6 +34,32 @@ class Chatwindow extends React.Component {
 
     componentDidMount() {
         // console.log("Chat window, componentdidmount: " + this.props.user);
+        //Communication Socket ->>>>>
+        const communicationRoomName = this.props.user;
+        // const communicationRoomName = "meme";
+        // console.log(this.props.user);
+        // console.log(communicationRoomName);
+        this.communicationSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/communication/'
+            + communicationRoomName
+            + '/'
+        );
+
+        this.communicationSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            //To-do: parse userSender and add him to receivedInvitations state in Lobby - extra funnction to be trigerred
+            document.getElementById("communication-log").value += (data.user + " to " + data.receiver + ": " + data.message + '\n');
+            const communicationarea = document.getElementById('communication-log');
+            communicationarea.scrollTop = communicationarea.scrollHeight;
+        };
+
+        this.communicationSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        //<<<<-Communication Socket
     }
 
     onResetInfoMessage = () => {
@@ -82,8 +88,9 @@ class Chatwindow extends React.Component {
         const element = document.getElementById("chat-message-input");
         const message = element.value;
         chatSocket.send(JSON.stringify({
-            'data': {'message': message},
-            'userSender': this.props.user
+            'message': message,
+            'user': this.props.user,
+
         }));
         element.value = '';
     }
@@ -92,9 +99,12 @@ class Chatwindow extends React.Component {
         console.log("Communication window, handlechatmessage: " + this.props.user);
         const element = document.getElementById("communication-message-input");
         const message = element.value;
-        communicationSocket.send(JSON.stringify({
-            'message': message,
-            'user': this.props.user,
+        this.communicationSocket.send(JSON.stringify({
+            'data': {
+                'message': message,
+                'state': ''
+            },
+            'userSender': this.props.user,
             'receiver': 'sara'
         }));
         element.value = '';
