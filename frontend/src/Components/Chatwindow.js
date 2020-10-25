@@ -22,6 +22,29 @@ chatSocket.onclose = function(e) {
 };
 
 
+//Communication Socket ->>>>>
+const communicationRoomName = 'com'
+const communicationSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/communication/'
+    + communicationRoomName
+    + '/'
+);
+
+communicationSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    document.getElementById("communication-log").value += (data.user +" to "+ data.receiver+ ": " + data.message + '\n');
+    const communicationarea = document.getElementById('communication-log');
+    communicationarea.scrollTop = communicationarea.scrollHeight;
+};
+
+communicationSocket.onclose = function (e) {
+    console.error('Chat socket closed unexpectedly');
+};
+//<<<<-Communication Socket
+
+
 class Chatwindow extends React.Component {
     constructor(props) {
         super(props);
@@ -44,6 +67,13 @@ class Chatwindow extends React.Component {
         }
     };
 
+    clickTab = (e) => {
+        if (e.key === 'Enter') {
+            this.handleCommunicationMessage();
+            // document.getElementById("chat-message-submit").click();
+        }
+    };
+
 
     handleChatMessage = (e) => {
         console.log("Chat window, handlechatmessage: " + this.props.user);
@@ -56,9 +86,23 @@ class Chatwindow extends React.Component {
             element.value = '';
     }
 
+    handleCommunicationMessage = (e) => {
+        console.log("Communication window, handlechatmessage: " + this.props.user);
+        const element = document.getElementById("communication-message-input");
+        const message = element.value;
+        communicationSocket.send(JSON.stringify({
+            'message': message,
+            'user': this.props.user,
+            'receiver': 'sara'
+        }));
+        element.value = '';
+    }
+
+
     render() {
 
         return (
+            <div>
             <div id="chat-window">
                 <textarea className="border-padding border-padding-larger" id="chat-log" cols="40" rows="4" disabled></textarea>
                 <br />
@@ -80,6 +124,24 @@ class Chatwindow extends React.Component {
                     {/*    onClick={this.handleChatMessage}*/}
                     {/*    style={{flex: 1}}*/}
                     {/*/>*/}
+                </div>
+            </div>
+                <p>Extra window</p>
+                <div id="communication-window">
+                    <textarea className="border-padding border-padding-larger" id="communication-log" cols="40" rows="4"
+                              disabled></textarea>
+                    <br/>
+                    <div className="flex-wrapper">
+                        <input className="pull-left border-padding border-padding-larger border-padding-lastitem"
+                               id="communication-message-input"
+                               type="text"
+                               size="40"
+                               onKeyPress={this.clickTab}
+                               style={{flex: 7}}
+                               placeholder="Write something..."
+                        />
+                        <br/>
+                    </div>
                 </div>
             </div>
             )

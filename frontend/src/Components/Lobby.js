@@ -5,8 +5,8 @@ class Lobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentUsers: ["TestUser1", "TestUser2"],
-            numbersOfPlayers: 2,
+            currentUsers: ["There are no other players online right now, please wait"],
+            numbersOfPlayers: 1,
             invitationText: "Invite",
             buttonList: [],
             sentInvitations: [],
@@ -44,7 +44,6 @@ class Lobby extends React.Component {
                 }
             );
         this.setState({buttonList: inputList});
-        console.log(this.state.buttonList);
     }
 
     getActiveUsers() {
@@ -58,6 +57,22 @@ class Lobby extends React.Component {
     playGame = () => {
         this.props.displayForm('game')
     }
+
+    runNewIndividualWebSocket = (sender, receiver) => {
+        const roomName = "communication";
+
+        const communicationSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + roomName
+            + sender
+            + '/'
+            + receiver
+            + '/'
+        );
+    }
+
+
 
 
     handleInvitation = (e) => {
@@ -88,34 +103,10 @@ class Lobby extends React.Component {
                 }
             }
         }
-
-        // if (buttonList[i].key === name) {
-        //     console.log(name);
-        // }
-    }
-
-    // buttonList[name].inviteButtonValue = "Cancel";
-    // this.setState({buttonList: buttonList});
-    // switch (e.target.value) {
-    //     case "Invite":
-    //         e.target.value = "Cancel";
-    //         break;
-    //     case "Cancel":
-    //         e.target.value = "Invite";
-    //         break;
-    //     default:
-    //         return null;
-    // }
-
-
-    changeText = (text) => {
-
-        this.setState({text});
     }
 
     render() {
         let currentUsersList = this.state.currentUsers;
-        // console.log(this.state.buttonList);
 
         return (
             <div className="website-styles center-main-container lobby-page">
@@ -137,6 +128,13 @@ class Lobby extends React.Component {
                 </div>
                 <div>
                     <div id="user-list" className="div-scrollable">
+                        {/*Todo - check if any other players are online*/}
+                        {/*if ({this.state.numbersOfPlayers <2}) {*/}
+                        {/*        <div key={index} className="current-users flex-wrapper task-wrapper">*/}
+                        {/*                <div style={{flex: 7}}>*/}
+                        {/*                    <span>currentUsersList[0]</span>*/}
+                        {/*                </div>*/}
+                        {/*    } else*/}
                         {currentUsersList
                             .map((person, index) => (
                                 <div key={index} className="current-users flex-wrapper task-wrapper">
@@ -157,9 +155,9 @@ class Lobby extends React.Component {
                                                 className="btn btn-sm btn-outline-dark">Chat
                                         </button>
                                     </div>
-
                                 </div>
                             ))}
+
                     </div>
                 </div>
                 <div>
