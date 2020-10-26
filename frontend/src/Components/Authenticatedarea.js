@@ -11,15 +11,14 @@ class Authenticatedarea extends React.Component {
     render() {
 
         return (
-            <div>
+            <React.Fragment>
                 <Lobby
                     displayForm={this.props.displayForm}
                     logged_in={this.props.logged_in}
-                    user={this.props.username}
+                    user={this.props.user}
                     handleLogout={this.props.handleLogout}
                     getTokenFromLocal={this.props.getTokenFromLocal}/>
-                />
-            </div>
+            </React.Fragment>
         )
     }
 

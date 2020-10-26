@@ -10,7 +10,7 @@ class Lobby extends React.Component {
             invitationText: "Invite",
             buttonList: [],
             sentInvitations: [],
-            receivedInvitations: [],
+            receivedInvitations: ["sara"],
         }
     }
 
@@ -30,6 +30,8 @@ class Lobby extends React.Component {
             console.log(error);
         }
         this.produceButtonValues(this.state.currentUsers);
+
+
     }
 
     produceButtonValues = (currentUsersList) => {
@@ -71,9 +73,24 @@ class Lobby extends React.Component {
             + '/'
         );
     }
+    acceptOrRejectInvitation = (e) => {
+        e.preventDefault();
+        const button = e.target.value;
+        let id = e.target.id;
+        const name = id.substring(id.indexOf('-') + 1)
+        if (button === "Accept") {
+        //    Todo: start game
+        } else if (button === "Reject") {
+            const receivedInvitations = this.state.receivedInvitations;
+            const index = receivedInvitations.indexOf(name);
+                    if (index > -1) {
+                        receivedInvitations.splice(index, 1);
+                        this.setState({sentInvitations: receivedInvitations});}
 
-
-
+        } else {
+            console.error ("Problem with game invitation")
+        }
+    }
 
     handleInvitation = (e) => {
         e.preventDefault();
@@ -107,7 +124,7 @@ class Lobby extends React.Component {
 
     render() {
         let currentUsersList = this.state.currentUsers;
-
+        const people = this.state.receivedInvitations;
         return (
             <div className="website-styles center-main-container lobby-page">
                 <div>
@@ -141,6 +158,28 @@ class Lobby extends React.Component {
                                     <div style={{flex: 7}}>
                                         <span>{person}</span>
                                     </div>
+                                    {people.includes(person) &&
+                                    // person in this.state.receivedInvitations &&
+                                    <React.Fragment>
+                                        <div style={{flex: 1}}>
+                                            <button id={index + "_acceptButton-" + person}
+                                                    className="btn btn-sm btn-outline-success"
+                                                    onClick={(e) => {
+                                                        this.acceptOrRejectInvitation(e)
+                                                    }}>Accept
+                                            </button>
+                                        </div>
+                                        <div style={{flex: 1}}>
+                                            <button id={index + "_rejectButton-" + person}
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={(e) => {
+                                                        this.acceptOrRejectInvitation(e)
+                                                    }}>Reject
+                                            </button>
+                                        </div>
+                                    </React.Fragment>
+                                    }
+                                    {!people.includes(person) &&
                                     <div style={{flex: 1}}>
                                         <button id={index + "_invitationButton-" + person}
                                                 className="btn btn-sm btn-outline-info"
@@ -150,6 +189,7 @@ class Lobby extends React.Component {
                                         >{(this.state.buttonList.length > 1) ? this.state.buttonList[index][person].inviteButtonValue : "Wassup"}
                                         </button>
                                     </div>
+                                    }
                                     <div style={{flex: 1}}>
                                         <button id={"chatButton-" + index}
                                                 className="btn btn-sm btn-outline-dark">Chat

@@ -33,12 +33,9 @@ class Chatwindow extends React.Component {
     }
 
     componentDidMount() {
-        // console.log("Chat window, componentdidmount: " + this.props.user);
+        //111111
         //Communication Socket ->>>>>
         const communicationRoomName = this.props.user;
-        // const communicationRoomName = "meme";
-        // console.log(this.props.user);
-        // console.log(communicationRoomName);
         this.communicationSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -56,10 +53,11 @@ class Chatwindow extends React.Component {
         };
 
         this.communicationSocket.onclose = function (e) {
-            console.error('Chat socket closed unexpectedly');
+            console.error('Communication socket closed unexpectedly');
         };
 
         //<<<<-Communication Socket
+        //22222
     }
 
     onResetInfoMessage = () => {
@@ -75,13 +73,15 @@ class Chatwindow extends React.Component {
         }
     };
 
+
+    //111111
     clickTab = (e) => {
         if (e.key === 'Enter') {
             this.handleCommunicationMessage();
             // document.getElementById("chat-message-submit").click();
         }
     };
-
+    //222222
 
     handleChatMessage = (e) => {
         console.log("Chat window, handlechatmessage: " + this.props.user);
@@ -95,6 +95,7 @@ class Chatwindow extends React.Component {
         element.value = '';
     }
 
+    //111111
     handleCommunicationMessage = (e) => {
         console.log("Communication window, handlechatmessage: " + this.props.user);
         const element = document.getElementById("communication-message-input");
@@ -109,7 +110,7 @@ class Chatwindow extends React.Component {
         }));
         element.value = '';
     }
-
+    //2222222
 
     render() {
 
