@@ -37,7 +37,7 @@ export class Game extends React.Component {
 
     goToLobby = () => {
         // console.log("Message: Player wants to exit to lobby.")
-        this.props.displayForm('lobby')
+        this.props.displayForm('authenticatedArea')
     }
 
     playAgainButton = () => {
