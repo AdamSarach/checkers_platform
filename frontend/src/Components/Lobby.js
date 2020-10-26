@@ -10,7 +10,7 @@ class Lobby extends React.Component {
             invitationText: "Invite",
             buttonList: [],
             sentInvitations: [],
-            receivedInvitations: ["sara"],
+            receivedInvitations: [],
         }
     }
 
@@ -31,7 +31,46 @@ class Lobby extends React.Component {
         }
         this.produceButtonValues(this.state.currentUsers);
 
+        //111111
+        //Communication Socket ->>>>>
+        const communicationRoomName = this.props.user;
+        this.communicationSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/communication/'
+            + communicationRoomName
+            + '/'
+        );
 
+        this.communicationSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            // console.log(Object.keys(data));
+            const userSender = data.user_sender;
+            let receivedInvitations = this.state.receivedInvitations;
+            if (data.info === 'invite') {
+                receivedInvitations.push(userSender);
+            } else if (data.info === 'cancel') {
+                const index = receivedInvitations.indexOf(userSender);
+                if (index > -1) {
+                    receivedInvitations.splice(index, 1);
+                }
+            } else {
+                console.error ("Invitation message handling error");
+                return;
+            }
+            this.setState({receivedInvitations: receivedInvitations});
+            //To-do: parse userSender and add him to receivedInvitations state in Lobby - extra funnction to be trigerred
+            // document.getElementById("communication-log").value += (data.user + " to " + data.receiver + ": " + data.message + '\n');
+            // const communicationarea = document.getElementById('communication-log');
+            // communicationarea.scrollTop = communicationarea.scrollHeight;
+        };
+
+        this.communicationSocket.onclose = function (e) {
+            console.error('Communication socket closed unexpectedly');
+        };
+
+        //<<<<-Communication Socket
+        //22222
     }
 
     produceButtonValues = (currentUsersList) => {
@@ -60,35 +99,50 @@ class Lobby extends React.Component {
         this.props.displayForm('game')
     }
 
-    runNewIndividualWebSocket = (sender, receiver) => {
-        const roomName = "communication";
 
-        const communicationSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + roomName
-            + sender
-            + '/'
-            + receiver
-            + '/'
-        );
+    //111111
+    clickTab = (e) => {
+        if (e.key === 'Enter') {
+            this.handleCommunicationMessage();
+            // document.getElementById("chat-message-submit").click();
+        }
+    };
+    //222222
+
+    //111111
+    handleCommunicationMessage = (e) => {
+        console.log("Communication window, handlechatmessage: " + this.props.user);
+        const element = document.getElementById("communication-message-input");
+        const message = element.value;
+        this.communicationSocket.send(JSON.stringify({
+            'data': {
+                'message': message,
+                'state': ''
+            },
+            'userSender': this.props.user,
+            'receiver': 'sara'
+        }));
+        element.value = '';
     }
+    //2222222
+
     acceptOrRejectInvitation = (e) => {
         e.preventDefault();
         const button = e.target.value;
         let id = e.target.id;
         const name = id.substring(id.indexOf('-') + 1)
         if (button === "Accept") {
-        //    Todo: start game
+            //    Todo: start game
         } else if (button === "Reject") {
             const receivedInvitations = this.state.receivedInvitations;
             const index = receivedInvitations.indexOf(name);
-                    if (index > -1) {
-                        receivedInvitations.splice(index, 1);
-                        this.setState({sentInvitations: receivedInvitations});}
+            if (index > -1) {
+                receivedInvitations.splice(index, 1);
+                this.setState({sentInvitations: receivedInvitations});
+            }
 
         } else {
-            console.error ("Problem with game invitation")
+            console.error("Problem with game invitation")
         }
     }
 
@@ -105,6 +159,14 @@ class Lobby extends React.Component {
                     sentInvitations.push(name);
                     this.setState({sentInvitations: sentInvitations});
                     this.setState({buttonList: buttonList});
+                    this.communicationSocket.send(JSON.stringify({
+                        'userSender': this.props.user,
+                        'user': name,
+                        'info': "invite"
+                    }));
+                    console.log(`Message has been sent to communicationSocket:                         
+                        'userSender': ${this.props.user},
+                        'user': ${name}`)
                     break;
                 } else {
                     buttonList[i][name].inviteButtonValue = "Invite";
@@ -112,6 +174,11 @@ class Lobby extends React.Component {
                     if (index > -1) {
                         sentInvitations.splice(index, 1);
                         this.setState({sentInvitations: sentInvitations});
+                        this.communicationSocket.send(JSON.stringify({
+                            'userSender': this.props.user,
+                            'user': name,
+                            'info': "cancel"
+                        }));
                     } else {
                         console.warn("Warning regarding invitation handling");
                     }
@@ -203,6 +270,7 @@ class Lobby extends React.Component {
                 <div>
                     <Chatwindow
                         user={this.props.user}
+                        clickTab={this.clickTab}
                     />
                 </div>
             </div>
