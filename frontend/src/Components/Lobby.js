@@ -78,6 +78,7 @@ class Lobby extends React.Component {
             } else if (data.info === 'accept') {
                 console.log("game accepted!")
                 this.props.setOpponent(userSender);
+                this.props.makeFirstPlayer();
                 this.props.playGame();
 
             } else {

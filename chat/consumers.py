@@ -123,19 +123,58 @@ class CommunicationConsumer(WebsocketConsumer):
 
 
 
+class GameConsumer(WebsocketConsumer):
+    def connect(self):
+        self.game_name = self.scope['url_route']['kwargs']['game_name']
+        self.room_group_name = 'game_%s' % self.game_name
 
-# class ChatConsumer(WebsocketConsumer):
-#     def connect(self):
-#         self.accept()
-#
-#     def disconnect(self, close_code):
-#         pass
-#
-#     def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
-#
-#         self.send(text_data=json.dumps({
-#             'message': message
-#         }))
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        user_sender = text_data_json['userSender']
+        receiver = text_data_json['user']
+        game_state = text_data_json['gameState']
+        turn = text_data_json['turn']
+        receiver_group_name = 'game_%s' % receiver
+
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            receiver_group_name,
+            {
+                'type': 'game_message',
+                'user_sender': user_sender,
+                'game_state': game_state,
+                'turn': turn
+            }
+        )
+
+    # Receive message from room group
+    def game_message(self, event):
+        user_sender = event['user_sender']
+        game_state = event['game_state']
+        turn = event['turn']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'user_sender': user_sender,
+            'game_state': game_state,
+            'turn': turn
+        }))
+
+
 
