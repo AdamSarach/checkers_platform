@@ -7,7 +7,7 @@ class Authenticatedarea extends React.Component {
         super(props);
         this.state = {
             displayedScreen: 'lobby',
-            opponentPlayer: '1',
+            opponentPlayer: '"Unknown Player"',
             firstPlayer: '',
         }
     }
@@ -29,7 +29,7 @@ class Authenticatedarea extends React.Component {
             case 'game':
                 return <Game displayedScreen={this.displayedScreen}
                              displayForm={this.props.displayForm}
-                             setOpponent =  {this.setOpponent}
+                             opponent =  {this.state.opponentPlayer}
                              goToLobby = {this.goToLobby}
                              user={this.state.username}
                              getTokenFromLocal={this.getTokenFromLocal}

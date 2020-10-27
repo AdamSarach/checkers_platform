@@ -225,7 +225,7 @@ class Lobby extends React.Component {
                     </h3>
                 </div>
                 <div className="flex-wrapper button-group-padding btn-group margin-top-zero">
-                    <button className="btn btn-sm btn-success margin-top-zero" onClick={this.playGame}>Look at gameboard
+                    <button className="btn btn-sm btn-success margin-top-zero" onClick={() => this.props.playGame()}>Look at gameboard
                         layout
                     </button>
                     <button className="btn btn-sm btn-success margin-top-zero"

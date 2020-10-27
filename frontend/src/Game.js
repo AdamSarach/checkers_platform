@@ -31,6 +31,10 @@ export class Game extends React.Component {
         }
     }
 
+    componentDidMount() {
+
+    }
+
     handleGiveUpButton = () => {
         // console.log("Message: Player has given up.")
     }
@@ -270,6 +274,14 @@ export class Game extends React.Component {
         })
     }
 
+    setBorderColor = () => {
+        if (this.state.winner) {
+            return '#262626'
+        }
+        const shouldBorderColorRed = this.state.history[this.state.history.length-1].currentPlayer;
+        return (shouldBorderColorRed) ? '#cd3532': '#0c9d94'
+    }
+
     render() {
         const columns = this.columns;
         const stateHistory = this.state.history;
@@ -288,6 +300,14 @@ export class Game extends React.Component {
         // if (this.state.stepNumber < 1) {
         //     undoClass += ' disabled';
         // }
+        const isWinner = !!(this.state.winner)
+        if (isWinner) {
+            const button = document.getElementById("playAgainButton");
+            let buttonClass = button.className;
+            const word = "disabled"
+            buttonClass = buttonClass.slice(0, buttonClass.length-word.length);
+            button.className = buttonClass
+        }
 
         switch (this.state.winner) {
             case 'player1pieces':
@@ -332,19 +352,22 @@ export class Game extends React.Component {
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success" onClick={this.props.goToLobby}>Exit to lobby</button>
+                        <button className="btn btn-sm btn-success" onClick={() => this.props.goToLobby()}>Exit to lobby</button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success disabled" onClick={this.playAgainButton}>Ask to play
+                        <button id ="playAgainButton" className="btn btn-sm btn-success disabled" onClick={this.playAgainButton}>Ask to play
                             again
                         </button>
                     </div>
+                </div>
+                <div>
+                    You are playing against {this.props.opponent}
                 </div>
                 <div className="reactCheckers">
                     <div className="game-status">
                         {gameStatus}
                     </div>
-                    <div className="game-board">
+                    <div className="game-board" style={{borderColor: this.setBorderColor()}}>
                         <Board
                             boardState={boardState}
                             currentPlayer={currentPlayer}
