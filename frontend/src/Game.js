@@ -28,16 +28,63 @@ export class Game extends React.Component {
             hasJumped: null,
             stepNumber: 0,
             winner: null,
+            turn: ''
         }
+    }
+
+    componentDidMount() {
+        this.assignTurn();
+
+        //Game Socket  ->>>>>
+        // const gameName = (this.state.turn) ? `${this.props.opponent}+${this.props.user}` : `${this.props.user}+${this.props.opponent}`;
+        const gameName = this.props.user
+        console.log("game name:", gameName)
+        this.gameSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/game/'
+            + gameName
+            + '/'
+        );
+
+        this.gameSocket.onmessage = (e) => {
+            const data= JSON.parse(e.data);
+            const game = data.gameState;
+            let latestHistory = game.history;
+            let history = this.state.history;
+            console.info("Got new history");
+            console.log(latestHistory);
+            console.info("Current history");
+            console.log(history);
+            // let currentState  = Object.assign({}, state.history[state.stepNumber]);
+            this.setState({
+                'activePiece': game.activePiece,
+                'moves': game.moves,
+                'jumpKills': game.jumpKills,
+                'hasJumped': game.hasJumped,
+                'stepNumber': game.stepNumber,
+                'winner': game.winner,
+                'turn': data.turn
+            })
+        }
+
+        this.gameSocket.onclose = function (e) {
+            console.error('Communication socket closed unexpectedly');
+        };
+        //<<<<- Game Socket
     }
 
     handleGiveUpButton = () => {
         // console.log("Message: Player has given up.")
     }
 
-    goToLobby = () => {
-        // console.log("Message: Player wants to exit to lobby.")
-        this.props.displayForm('authenticatedArea')
+    assignTurn = () => {
+        console.log("this.props.isFirstPlayer: ", this.props.isFirstPlayer)
+        if (this.props.isFirstPlayer === true) {
+            this.state.turn = true
+        } else {
+            this.state.turn = false
+        }
     }
 
     playAgainButton = () => {
@@ -113,6 +160,10 @@ export class Game extends React.Component {
 
     handleClick(coordinates) {
 
+        if (this.state.turn === false) {
+            return;
+        }
+
         if (this.state.winner !== null) {
             return;
         }
@@ -171,68 +222,31 @@ export class Game extends React.Component {
 
             this.updateStatePostMove(postMoveState);
 
-            // Start computer move is the player is finished
-            // if (postMoveState.currentPlayer === false && postMoveState.winner === null) {
-            //     this.computerTurn();
-            // }
         }
+
+        //PASS DATA TO ANOTHER PLAYER
+        this.setState({turn: false});
+        const latestHistory = this.state.history[this.state.history.length-1]
+        console.log(latestHistory);
+        this.gameSocket.send(JSON.stringify({
+            'userSender': this.props.user,
+            'user': this.props.opponent,
+            'gameState': {
+                'history': latestHistory,
+                'activePiece': this.state.activePiece,
+                'moves': this.state.moves,
+                'jumpKills': this.state.jumpKills,
+                'hasJumped': this.state.hasJumped,
+                'stepNumber': this.state.stepNumber,
+                'winner': this.state.winner,
+
+            },
+            'turn': !this.state.turn
+        }));
+        //    To-Do: send data through websockets
+        //    Send message to make another player turn equal true
     }
 
-    // computerTurn(piece = null) {
-    //     if (this.state.players > 1) {
-    //         return;
-    //     }
-    //
-    //     setTimeout(()=> {
-    //         const currentState = this.getCurrentState();
-    //         const boardState = currentState.boardState;
-    //
-    //         let computerMove;
-    //         let coordinates;
-    //         let moveTo;
-    //
-    //         // If var piece != null, the piece has previously jumped.
-    //         if (piece === null) {
-    //             //computerMove = this.Opponent.getRandomMove(boardState, 'player2');
-    //             computerMove = this.Opponent.getSmartMove(this.state, boardState, 'player2');
-    //
-    //             coordinates = computerMove.piece;
-    //             moveTo = computerMove.moveTo;
-    //         } else {
-    //             // Prevent the computer player from choosing another piece to move. It must move the active piece
-    //             computerMove = this.ReactCheckers.getMoves(boardState, piece, boardState[piece].isKing, true);
-    //             coordinates = piece;
-    //             moveTo = computerMove[0][Math.floor(Math.random()*computerMove[0].length)];
-    //         }
-    //
-    //         const clickedSquare = boardState[coordinates];
-    //
-    //         let movesData = this.ReactCheckers.getMoves(boardState, coordinates, clickedSquare.isKing, false);
-    //
-    //         this.setState({
-    //             activePiece: coordinates,
-    //             moves: movesData[0],
-    //             jumpKills: movesData[1],
-    //         });
-    //
-    //         setTimeout(()=> {
-    //             const postMoveState = this.ReactCheckers.movePiece(moveTo, this.state);
-    //
-    //             if (postMoveState === null) {
-    //                 return;
-    //             }
-    //
-    //             this.updateStatePostMove(postMoveState);
-    //
-    //             // If the computer player has jumped and is still moving, continue jump with active piece
-    //             if (postMoveState.currentPlayer === false) {
-    //                 this.computerTurn(postMoveState.activePiece);
-    //             }
-    //         },
-    //         500);
-    //     },
-    //     1000);
-    // }
 
     updateStatePostMove(postMoveState) {
         this.setState({
@@ -246,32 +260,23 @@ export class Game extends React.Component {
             hasJumped: postMoveState.hasJumped,
             stepNumber: this.state.history.length,
             winner: postMoveState.winner,
-
-        //    To-Do: send data through websockets
         });
+
     }
 
-    // undo() {
-    //     const backStep = parseInt(this.state.stepNumber, 10) -1;
-    //     if (backStep < 0) {
-    //         return;
-    //     }
-    //     const unsetHistory = this.state.history.slice(0, backStep+1);
-    //     this.setState({
-    //         history: unsetHistory,
-    //         activePiece: null,
-    //         moves: [],
-    //         jumpKills: null,
-    //         hasJumped: null,
-    //         stepNumber: backStep,
-    //         winner: null,
-    //     });
-    // }
 
     setPlayers(players) {
         this.setState({
             players: players,
         })
+    }
+
+    setBorderColor = () => {
+        if (this.state.winner) {
+            return '#262626'
+        }
+        const shouldBorderColorRed = this.state.history[this.state.history.length - 1].currentPlayer;
+        return (shouldBorderColorRed) ? '#cd3532' : '#0c9d94'
     }
 
     render() {
@@ -283,15 +288,17 @@ export class Game extends React.Component {
         const currentPlayer = currentState.currentPlayer;
         const moves = this.state.moves;
 
-//        console.log(this.state);
 
         let gameStatus;
 
-        // let undoClass = 'undo';
-
-        // if (this.state.stepNumber < 1) {
-        //     undoClass += ' disabled';
-        // }
+        const isWinner = !!(this.state.winner)
+        if (isWinner) {
+            const button = document.getElementById("playAgainButton");
+            let buttonClass = button.className;
+            const word = "disabled"
+            buttonClass = buttonClass.slice(0, buttonClass.length - word.length);
+            button.className = buttonClass
+        }
 
         switch (this.state.winner) {
             case 'player1pieces':
@@ -311,21 +318,6 @@ export class Game extends React.Component {
                 break;
         }
 
-        // if (this.state.players === null) {
-        //     return(
-        //
-        //             <div className="players-select">
-        //                 <div className="players">
-        //                     <div className="one-player" onClick={()=> this.setPlayers(1) }>One Player</div>
-        //                 </div>
-        //                 <div className="players">
-        //                     <div className="two-player" onClick={()=> this.setPlayers(2) }>Two Player</div>
-        //                 </div>
-        //             </div>
-        //
-        //     )
-        // }
-
         return (
 
             <div className="game-page website-styles center-main-container ">
@@ -336,19 +328,25 @@ export class Game extends React.Component {
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success" onClick={this.goToLobby}>Exit to lobby</button>
+                        <button className="btn btn-sm btn-success" onClick={() => this.props.goToLobby()}>Exit to
+                            lobby
+                        </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success disabled" onClick={this.playAgainButton}>Ask to play
+                        <button id="playAgainButton" className="btn btn-sm btn-success disabled"
+                                onClick={this.playAgainButton}>Ask to play
                             again
                         </button>
                     </div>
+                </div>
+                <div>
+                    You are playing against {this.props.opponent}
                 </div>
                 <div className="reactCheckers">
                     <div className="game-status">
                         {gameStatus}
                     </div>
-                    <div className="game-board">
+                    <div className="game-board" style={{borderColor: this.setBorderColor()}}>
                         <Board
                             boardState={boardState}
                             currentPlayer={currentPlayer}
@@ -358,9 +356,6 @@ export class Game extends React.Component {
                             onClick={(coordinates) => this.handleClick(coordinates)}
                         />
                     </div>
-                    {/*<div className="time-travel">*/}
-                    {/*    <button className={undoClass} onClick={()=>this.undo()}>Undo</button>*/}
-                    {/*</div>*/}
                 </div>
 
             </div>
@@ -369,22 +364,3 @@ export class Game extends React.Component {
     }
 }
 
-
-// <div className="reactCheckers">
-//      <div className="game-status">
-//          {gameStatus}
-//      </div>
-//      <div className="game-board">
-//          <Board
-//              boardState = {boardState}
-//              currentPlayer = {currentPlayer}
-//              activePiece = {activePiece}
-//              moves = {moves}
-//              columns = {columns}
-//              onClick = {(coordinates) => this.handleClick(coordinates)}
-//          />
-//      </div>
-//      {/*<div className="time-travel">*/}
-//      {/*    <button className={undoClass} onClick={()=>this.undo()}>Undo</button>*/}
-//      {/*</div>*/}
-//  </div>

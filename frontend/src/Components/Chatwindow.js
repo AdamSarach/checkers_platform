@@ -1,7 +1,6 @@
 import React from "react";
 
 const roomName = 'all';
-
 const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -22,11 +21,6 @@ chatSocket.onclose = function (e) {
 };
 
 
-
-
-
-
-
 class Chatwindow extends React.Component {
     constructor(props) {
         super(props);
@@ -45,11 +39,8 @@ class Chatwindow extends React.Component {
     clickEnter = (e) => {
         if (e.key === 'Enter') {
             this.handleChatMessage();
-            // document.getElementById("chat-message-submit").click();
         }
     };
-
-
 
 
     handleChatMessage = (e) => {
@@ -63,7 +54,6 @@ class Chatwindow extends React.Component {
         }));
         element.value = '';
     }
-
 
 
     render() {
@@ -94,23 +84,7 @@ class Chatwindow extends React.Component {
                         {/*/>*/}
                     </div>
                 </div>
-                {/*<p>Extra window</p>*/}
-                {/*<div id="communication-window">*/}
-                {/*    <textarea className="border-padding border-padding-larger" id="communication-log" cols="40" rows="4"*/}
-                {/*              disabled></textarea>*/}
-                {/*    <br/>*/}
-                {/*    <div className="flex-wrapper">*/}
-                {/*        <input className="pull-left border-padding border-padding-larger border-padding-lastitem"*/}
-                {/*               id="communication-message-input"*/}
-                {/*               type="text"*/}
-                {/*               size="40"*/}
-                {/*               onKeyPress={this.props.clickTab}*/}
-                {/*               style={{flex: 7}}*/}
-                {/*               placeholder="Write something..."*/}
-                {/*        />*/}
-                {/*        <br/>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+
             </div>
         )
     }
