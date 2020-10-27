@@ -35,10 +35,6 @@ export class Game extends React.Component {
         // console.log("Message: Player has given up.")
     }
 
-    goToLobby = () => {
-        // console.log("Message: Player wants to exit to lobby.")
-        this.props.displayForm('authenticatedArea')
-    }
 
     playAgainButton = () => {
         // console.log("Message: Player would like to play again.")
@@ -336,7 +332,7 @@ export class Game extends React.Component {
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success" onClick={this.goToLobby}>Exit to lobby</button>
+                        <button className="btn btn-sm btn-success" onClick={this.props.goToLobby}>Exit to lobby</button>
                     </div>
                     <div style={{flex: 3}}>
                         <button className="btn btn-sm btn-success disabled" onClick={this.playAgainButton}>Ask to play

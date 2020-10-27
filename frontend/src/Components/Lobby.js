@@ -11,6 +11,7 @@ class Lobby extends React.Component {
             buttonList: [],
             sentInvitations: [],
             receivedInvitations: [],
+            opponentPlayer: ''
         }
     }
 
@@ -31,7 +32,6 @@ class Lobby extends React.Component {
         }
         this.produceButtonValues(this.state.currentUsers);
 
-        //111111
         //Communication Socket ->>>>>
         const communicationRoomName = this.props.user;
         this.communicationSocket = new WebSocket(
@@ -42,27 +42,48 @@ class Lobby extends React.Component {
             + '/'
         );
 
-        this.communicationSocket.onmessage = function (e) {
+        this.communicationSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
             // console.log(Object.keys(data));
             const userSender = data.user_sender;
             let receivedInvitations = this.state.receivedInvitations;
+
             if (data.info === 'invite') {
                 receivedInvitations.push(userSender);
+                this.setState({receivedInvitations: receivedInvitations});
             } else if (data.info === 'cancel') {
                 const index = receivedInvitations.indexOf(userSender);
                 if (index > -1) {
                     receivedInvitations.splice(index, 1);
+                    this.setState({receivedInvitations: receivedInvitations});
                 }
+            } else if (data.info === 'reject') {
+                let sentInvitations = this.state.sentInvitations;
+                let buttonList = this.state.buttonList;
+                console.log("Sent invs: ", sentInvitations);
+                console.log("Reject sent from: ", userSender);
+                const index = sentInvitations.indexOf(userSender);
+                if (index > -1) {
+                    sentInvitations.splice(index, 1);
+                    console.log("Sent invs: ", sentInvitations);
+                    this.setState({sentInvitations: sentInvitations});
+                    for (let i = 0; i < buttonList.length; i++) {
+                        if (userSender in buttonList[i]) {
+                            buttonList[i][userSender].inviteButtonValue = "Invite";
+                            this.setState({buttonList: buttonList});
+                            break;
+                        }
+                    }
+                }
+            } else if (data.info === 'accept') {
+                console.log("game accepted!")
+                this.props.setOpponent(userSender);
+                this.props.playGame();
+
             } else {
-                console.error ("Invitation message handling error");
-                return;
+                console.error("Invitation message handling error");
             }
-            this.setState({receivedInvitations: receivedInvitations});
-            //To-do: parse userSender and add him to receivedInvitations state in Lobby - extra funnction to be trigerred
-            // document.getElementById("communication-log").value += (data.user + " to " + data.receiver + ": " + data.message + '\n');
-            // const communicationarea = document.getElementById('communication-log');
-            // communicationarea.scrollTop = communicationarea.scrollHeight;
+
         };
 
         this.communicationSocket.onclose = function (e) {
@@ -70,7 +91,6 @@ class Lobby extends React.Component {
         };
 
         //<<<<-Communication Socket
-        //22222
     }
 
     produceButtonValues = (currentUsersList) => {
@@ -95,21 +115,14 @@ class Lobby extends React.Component {
         })
     };
 
-    playGame = () => {
-        this.props.displayForm('game')
-    }
 
-
-    //111111
     clickTab = (e) => {
         if (e.key === 'Enter') {
             this.handleCommunicationMessage();
             // document.getElementById("chat-message-submit").click();
         }
     };
-    //222222
 
-    //111111
     handleCommunicationMessage = (e) => {
         console.log("Communication window, handlechatmessage: " + this.props.user);
         const element = document.getElementById("communication-message-input");
@@ -124,21 +137,32 @@ class Lobby extends React.Component {
         }));
         element.value = '';
     }
-    //2222222
 
     acceptOrRejectInvitation = (e) => {
         e.preventDefault();
-        const button = e.target.value;
+        const button = e.target.textContent;
         let id = e.target.id;
         const name = id.substring(id.indexOf('-') + 1)
         if (button === "Accept") {
-            //    Todo: start game
+            this.communicationSocket.send(JSON.stringify({
+                'userSender': this.props.user,
+                'user': name,
+                'info': "accept"
+            }));
+            this.props.setOpponent(name);
+            this.props.playGame();
+            console.log("game accepted!")
         } else if (button === "Reject") {
             const receivedInvitations = this.state.receivedInvitations;
             const index = receivedInvitations.indexOf(name);
             if (index > -1) {
                 receivedInvitations.splice(index, 1);
-                this.setState({sentInvitations: receivedInvitations});
+                this.setState({receivedInvitations: receivedInvitations});
+                this.communicationSocket.send(JSON.stringify({
+                    'userSender': this.props.user,
+                    'user': name,
+                    'info': "reject"
+                }));
             }
 
         } else {
@@ -189,6 +213,7 @@ class Lobby extends React.Component {
         }
     }
 
+
     render() {
         let currentUsersList = this.state.currentUsers;
         const people = this.state.receivedInvitations;
@@ -226,7 +251,6 @@ class Lobby extends React.Component {
                                         <span>{person}</span>
                                     </div>
                                     {people.includes(person) &&
-                                    // person in this.state.receivedInvitations &&
                                     <React.Fragment>
                                         <div style={{flex: 1}}>
                                             <button id={index + "_acceptButton-" + person}
@@ -249,7 +273,7 @@ class Lobby extends React.Component {
                                     {!people.includes(person) &&
                                     <div style={{flex: 1}}>
                                         <button id={index + "_invitationButton-" + person}
-                                                className="btn btn-sm btn-outline-info"
+                                                className="btn btn-sm btn-outline-dark"
                                                 onClick={(e) => {
                                                     this.handleInvitation(e)
                                                 }}
@@ -257,11 +281,11 @@ class Lobby extends React.Component {
                                         </button>
                                     </div>
                                     }
-                                    <div style={{flex: 1}}>
-                                        <button id={"chatButton-" + index}
-                                                className="btn btn-sm btn-outline-dark">Chat
-                                        </button>
-                                    </div>
+                                    {/*<div style={{flex: 1}}>*/}
+                                    {/*    <button id={"chatButton-" + index}*/}
+                                    {/*            className="btn btn-sm btn-outline-dark">Chat*/}
+                                    {/*    </button>*/}
+                                    {/*</div>*/}
                                 </div>
                             ))}
 
@@ -270,7 +294,6 @@ class Lobby extends React.Component {
                 <div>
                     <Chatwindow
                         user={this.props.user}
-                        clickTab={this.clickTab}
                     />
                 </div>
             </div>
