@@ -48,17 +48,16 @@ export class Game extends React.Component {
         );
 
         this.gameSocket.onmessage = (e) => {
-            const data= JSON.parse(e.data);
-            const game = data.gameState;
-            let latestHistory = game.history;
+            const data = JSON.parse(e.data);
+            const game = data.game_state;
+            console.log(data);
+            console.log(game);
+            console.log(game.activePiece);
             let history = this.state.history;
-            console.info("Got new history");
-            console.log(latestHistory);
-            console.info("Current history");
-            console.log(history);
-            // let currentState  = Object.assign({}, state.history[state.stepNumber]);
+            history.push(data.history);
             this.setState({
-                'activePiece': game.activePiece,
+                'history': history,
+                'activePiece': null,
                 'moves': game.moves,
                 'jumpKills': game.jumpKills,
                 'hasJumped': game.hasJumped,
@@ -100,7 +99,7 @@ export class Game extends React.Component {
         columns.e = 4;
         columns.f = 5;
         columns.g = 6;
-        //keep last column to be named "i", in case of "h", bootstrap will expand last column in weird way
+        //keep last column to be named "i", instead of "h", otherwise bootstrap will expand last column in weird way
         columns.i = 7;
 
         return columns;
@@ -161,11 +160,11 @@ export class Game extends React.Component {
     handleClick(coordinates) {
 
         if (this.state.turn === false) {
-            return;
+            return console.log("Turn raised");
         }
 
         if (this.state.winner !== null) {
-            return;
+            return console.log("Winner raised");
         }
 
         const currentState = this.getCurrentState();
@@ -177,7 +176,7 @@ export class Game extends React.Component {
 
             // Can't select opponents pieces
             if (clickedSquare.player !== returnPlayerName(currentState.currentPlayer)) {
-                return;
+                return console.log("Opponent piece raised");
             }
 
             // Unset active piece if it's clicked
@@ -187,12 +186,12 @@ export class Game extends React.Component {
                     moves: [],
                     jumpKills: null,
                 });
-                return;
+                return console.log("Unset active piece raised");
             }
 
             // Can't choose a new piece if player has already jumped.
             if (this.state.hasJumped !== null && boardState[coordinates] !== null) {
-                return;
+                return console.log("Already jumped raised");
             }
 
             // Set active piece
@@ -225,43 +224,98 @@ export class Game extends React.Component {
         }
 
         //PASS DATA TO ANOTHER PLAYER
-        this.setState({turn: false});
-        const latestHistory = this.state.history[this.state.history.length-1]
-        console.log(latestHistory);
+
+        // const latestHistory = this.state.history[this.state.history.length - 1]
+        // console.log("Send state data...")
+        // console.log("2 = ?", this.state.history.length)
+        // console.group();
+        // console.log('history', latestHistory);
+        // console.log('activePiece', this.state.activePiece);
+        // console.log('moves', this.state.moves);
+        // console.log('jumpKills', this.state.jumpKills);
+        // console.log('hasJumped', this.state.hasJumped);
+        // console.log('stepNumber', this.state.stepNumber);
+        // console.log('winner', this.state.winner);
+        // console.log('turn', !this.state.turn);
+        // console.groupEnd();
+        // console.log("current history", this.state.history);
+        // this.gameSocket.send(JSON.stringify({
+        //     'userSender': this.props.user,
+        //     'user': this.props.opponent,
+        //     'gameState': {
+        //         'history': latestHistory,
+        //         'activePiece': this.state.activePiece,
+        //         'moves': this.state.moves,
+        //         'jumpKills': this.state.jumpKills,
+        //         'hasJumped': this.state.hasJumped,
+        //         'stepNumber': this.state.stepNumber,
+        //         'winner': this.state.winner,
+        //
+        //     },
+        //     'turn': !this.state.turn
+        // }));
+        //    To-Do: send data through websockets
+        //    Send message to make another player turn equal true
+    }
+
+    sendGameSocket = (history, activePiece, moves, jumpKills, hasJumped, stepNumber, winner, turn) => {
+        const latestHistory = history[history.length - 1];
         this.gameSocket.send(JSON.stringify({
             'userSender': this.props.user,
             'user': this.props.opponent,
             'gameState': {
                 'history': latestHistory,
-                'activePiece': this.state.activePiece,
-                'moves': this.state.moves,
-                'jumpKills': this.state.jumpKills,
-                'hasJumped': this.state.hasJumped,
-                'stepNumber': this.state.stepNumber,
-                'winner': this.state.winner,
+                'activePiece': activePiece,
+                'moves': moves,
+                'jumpKills': jumpKills,
+                'hasJumped': hasJumped,
+                'stepNumber': stepNumber,
+                'winner': winner,
 
             },
-            'turn': !this.state.turn
+            'turn': turn
         }));
-        //    To-Do: send data through websockets
-        //    Send message to make another player turn equal true
     }
 
-
     updateStatePostMove(postMoveState) {
+        // console.log("current history", this.state.history)
+        // console.log("Update state...")
+        // console.log("Updated history should look like", this.state.history.concat([{
+        //         boardState: postMoveState.boardState,
+        //         currentPlayer: postMoveState.currentPlayer,
+        //     }]) );
         this.setState({
-            history: this.state.history.concat([{
-                boardState: postMoveState.boardState,
-                currentPlayer: postMoveState.currentPlayer,
-            }]),
-            activePiece: postMoveState.activePiece,
-            moves: postMoveState.moves,
-            jumpKills: postMoveState.jumpKills,
-            hasJumped: postMoveState.hasJumped,
-            stepNumber: this.state.history.length,
-            winner: postMoveState.winner,
-        });
+                history: this.state.history.concat([{
+                    boardState: postMoveState.boardState,
+                    currentPlayer: postMoveState.currentPlayer,
+                }]),
+                activePiece: postMoveState.activePiece,
+                moves: postMoveState.moves,
+                jumpKills: postMoveState.jumpKills,
+                hasJumped: postMoveState.hasJumped,
+                stepNumber: this.state.history.length,
+                winner: postMoveState.winner,
+                turn: false
+            },
+            () => this.sendGameSocket(this.state.history, this.state.activePiece, this.state.moves,
+                this.state.jumpKills, this.state.hasJumped, this.state.stepNumber, this.state.winner, !this.state.turn)
+        );
 
+        // this.setState((state) => {
+        //     return {
+        //         history: state.history.concat([{
+        //             boardState: postMoveState.boardState,
+        //             currentPlayer: postMoveState.currentPlayer,
+        //         }]),
+        //         activePiece: postMoveState.activePiece,
+        //         moves: postMoveState.moves,
+        //         jumpKills: postMoveState.jumpKills,
+        //         hasJumped: postMoveState.hasJumped,
+        //         stepNumber: state.history.length,
+        //         winner: postMoveState.winner,
+        //     }
+        // });
+        console.log("current history", this.state.history);
     }
 
 

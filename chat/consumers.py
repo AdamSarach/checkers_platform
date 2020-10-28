@@ -149,6 +149,8 @@ class GameConsumer(WebsocketConsumer):
         user_sender = text_data_json['userSender']
         receiver = text_data_json['user']
         game_state = text_data_json['gameState']
+        # history = json.dumps(game_state['history'])
+        history = (game_state['history'])
         turn = text_data_json['turn']
         receiver_group_name = 'game_%s' % receiver
 
@@ -159,7 +161,8 @@ class GameConsumer(WebsocketConsumer):
                 'type': 'game_message',
                 'user_sender': user_sender,
                 'game_state': game_state,
-                'turn': turn
+                'turn': turn,
+                'history': history
             }
         )
 
@@ -168,12 +171,14 @@ class GameConsumer(WebsocketConsumer):
         user_sender = event['user_sender']
         game_state = event['game_state']
         turn = event['turn']
+        history = event['history']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'user_sender': user_sender,
             'game_state': game_state,
-            'turn': turn
+            'turn': turn,
+            'history': history
         }))
 
 
