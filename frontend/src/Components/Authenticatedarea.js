@@ -9,7 +9,7 @@ class Authenticatedarea extends React.Component {
         this.state = {
             displayedScreen: 'lobby',
             opponentPlayer: '"Unknown Player"',
-            isFirstPlayer: 'false',
+            isFirstPlayer: false,
         }
     }
 
