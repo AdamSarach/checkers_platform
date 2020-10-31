@@ -29,7 +29,8 @@ export class Game extends React.Component {
             stepNumber: 0,
             winner: null,
             turn: '',
-            gameStatus: ((this.props.isFirstPlayer)? "Click on board" : "Wait for opponent move")
+            gameStatus: ((this.props.isFirstPlayer) ? "Move your piece" : "Wait for opponent move"),
+            winnerInfo: null,
         }
     }
 
@@ -51,10 +52,7 @@ export class Game extends React.Component {
         this.gameSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
             const game = data.game_state;
-            this.setState({gameStatus: this.adjustGameStatus()})
-            console.log(data);
-            console.log(game);
-            console.log(game.activePiece);
+            // this.setState({gameStatus: this.adjustGameStatus()})
             let history = this.state.history;
             history.push(data.history);
             this.setState({
@@ -68,6 +66,9 @@ export class Game extends React.Component {
                 'turn': data.turn
             })
             this.adjustGameStatus(data.history)
+            if (game.winner !== null) {
+                this.setWinnerInfo(game.winner);
+            }
         }
 
         this.gameSocket.onclose = function (e) {
@@ -162,11 +163,19 @@ export class Game extends React.Component {
 
     handleClick(coordinates) {
 
-        if (this.state.turn === false) {
+        if (this.state.turn === false && this.state.moves.length === 0) {
+            // if (this.state.moves.length >= 0) {
             return console.log("Turn raised");
+            // }
+
         }
 
+
+        const isWinner = !!(this.state.winner)
+        if (isWinner) {
+        }
         if (this.state.winner !== null) {
+            this.setWinnerInfo(this.state.winner);
             return console.log("Winner raised");
         }
 
@@ -264,8 +273,9 @@ export class Game extends React.Component {
             () => this.sendGameSocket(this.state.history, this.state.activePiece, this.state.moves,
                 this.state.jumpKills, this.state.hasJumped, this.state.stepNumber, this.state.winner, !this.state.turn)
         );
-
-        console.log("current history", this.state.history);
+        if (postMoveState.winner !== null) {
+            this.setWinnerInfo(postMoveState.winner);
+        }
     }
 
 
@@ -283,14 +293,24 @@ export class Game extends React.Component {
         return (shouldBorderColorRed) ? '#cd3532' : '#0c9d94'
     }
 
+    setWinnerInfo = (winner) => {
+        const playAgainButton = document.getElementById("playAgainButton");
+        playAgainButton.className = "btn btn-sm btn-success";
+        const giveUpButton = document.getElementById("giveUpButton");
+        giveUpButton.className = "btn btn-sm btn-success disabled";
+
+        if (winner === 'player1pieces' || winner === 'player1moves') {
+            this.setState({winnerInfo: this.props.isFirstPlayer ? "You win!" : `${this.props.opponent} wins!`})
+        } else if (winner === 'player2pieces' || winner === 'player2moves') {
+            this.setState({winnerInfo: this.props.isFirstPlayer ? `${this.props.opponent} wins!` : "You win!"})
+        } else {
+            console.warn("setWinnerInfo warning")
+        }
+    }
+
     adjustGameStatus = (history) => {
         try {
             const whoPlays = history.currentPlayer;
-            // console.group();
-            // console.log("who plays", this.state.history);
-            console.log("who plays: ", whoPlays);
-            console.log("isFirstPlayer", this.props.isFirstPlayer);
-            // console.groupEnd();
             if (this.props.isFirstPlayer) {
                 if (!!whoPlays) {
                     console.log("Setstate 'your move'")
@@ -309,13 +329,6 @@ export class Game extends React.Component {
                 }
             }
 
-            // if ((whoPlays && this.props.isFirstPlayer) || (!whoPlays && !this.props.isFirstPlayer)) {
-            //     this.setState({gameStatus: "Your move"});
-            // } else if ((whoPlays && !this.props.isFirstPlayer) || (!whoPlays && this.props.isFirstPlayer)) {
-            //     this.setState({gameStatus: `${this.props.opponent}'s move`});
-            // } else {
-            //     console.warning("adjustGameStatus warning")
-            // }
         } catch (error) {
             console.log(error);
             return "Start"
@@ -332,44 +345,14 @@ export class Game extends React.Component {
         const moves = this.state.moves;
         const gameStatus = this.state.gameStatus
 
-        const isWinner = !!(this.state.winner)
-        if (isWinner) {
-            console.log("is winner");
-            const button = document.getElementById("playAgainButton");
-            let buttonClass = button.className;
-            const word = "disabled"
-            buttonClass = buttonClass.slice(0, buttonClass.length - word.length);
-            button.className = buttonClass
-
-
-        }
-
-        switch (this.state.winner) {
-            case 'player1pieces':
-                this.setState({gameStatus: 'Player One Wins!'})
-                break;
-            case 'player2pieces':
-                this.setState({gameStatus: 'Player Two Wins!'})
-                break;
-            case 'player1moves':
-                this.setState({gameStatus: 'No moves left - Player One Wins!'})
-                break;
-            case 'player2moves':
-                this.setState({gameStatus: 'No moves left - Player Two Wins!'})
-                break;
-            // default:
-            //     this.setState({gameStatus: "Winner unknown"})
-            //     break;
-        }
-
-
         return (
 
             <div className="game-page website-styles center-main-container ">
 
                 <div className="flex-wrapper border-padding btn-group">
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success disabled" onClick={this.handleGiveUpButton}>Give up
+                        <button id="giveUpButton" className="btn btn-sm btn-success"
+                                onClick={this.handleGiveUpButton}>Give up
                         </button>
                     </div>
                     <div style={{flex: 3}}>
@@ -389,7 +372,7 @@ export class Game extends React.Component {
                 </div>
                 <div className="reactCheckers">
                     <div className="game-status" id="game-status">
-                        {gameStatus}
+                        {this.state.winnerInfo || gameStatus}
                     </div>
                     <div className="game-board" style={{borderColor: this.setBorderColor()}}>
                         <Board
