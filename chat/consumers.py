@@ -1,14 +1,3 @@
-# import asyncio
-# import json
-# from django.contrib.auth import get_user_model
-# from channels.consumer import AsyncConsumer
-# from channels.db import database_sync_to_async
-# from .models import Thread, ChatMessage
-#
-#
-
-
-
 
 import json
 from asgiref.sync import async_to_sync
@@ -122,6 +111,52 @@ class CommunicationConsumer(WebsocketConsumer):
         }))
 
 
+class CommunicationGlobalConsumer(WebsocketConsumer):
+    def connect(self):
+        self.room_group_name = 'communication-global'
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        user_sender = text_data_json['userSender']
+        info = text_data_json['info']
+        receiver_group_name = 'communication-global'
+
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            receiver_group_name,
+            {
+                'type': 'communication_global_message',
+                'user_sender': user_sender,
+                'info': info
+            }
+        )
+
+    # Receive message from room group
+    def communication_global_message(self, event):
+        user_sender = event['user_sender']
+        info = event['info']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'user_sender': user_sender,
+            'info': info
+        }))
 
 class GameConsumer(WebsocketConsumer):
     def connect(self):

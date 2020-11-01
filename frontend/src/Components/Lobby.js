@@ -22,6 +22,7 @@ class Lobby extends React.Component {
                 let json = await activeUsersResponse.json()
                 let userList = json["active_users"];
                 let listWithoutClientName = userList.filter(person => person !== this.props.user);
+                console.log("listWithoutClientName", listWithoutClientName);
                 this.setState({
                     currentUsers: listWithoutClientName,
                     numbersOfPlayers: userList.length
@@ -32,7 +33,7 @@ class Lobby extends React.Component {
         }
         this.produceButtonValues(this.state.currentUsers);
 
-        //Communication Socket ->>>>>
+        //Individual Communication Socket ->>>>>
         const communicationRoomName = this.props.user;
         this.communicationSocket = new WebSocket(
             'ws://'
@@ -48,53 +49,116 @@ class Lobby extends React.Component {
             const userSender = data.user_sender;
             let receivedInvitations = this.state.receivedInvitations;
 
-            if (data.info === 'invite') {
-                receivedInvitations.push(userSender);
-                this.setState({receivedInvitations: receivedInvitations});
-            } else if (data.info === 'cancel') {
-                const index = receivedInvitations.indexOf(userSender);
-                if (index > -1) {
-                    receivedInvitations.splice(index, 1);
+            switch (data.info) {
+                case 'invite':
+                    receivedInvitations.push(userSender);
                     this.setState({receivedInvitations: receivedInvitations});
-                }
-            } else if (data.info === 'reject') {
-                let sentInvitations = this.state.sentInvitations;
-                let buttonList = this.state.buttonList;
-                console.log("Sent invs: ", sentInvitations);
-                console.log("Reject sent from: ", userSender);
-                const index = sentInvitations.indexOf(userSender);
-                if (index > -1) {
-                    sentInvitations.splice(index, 1);
+                    break;
+                case 'cancel':
+                    const receiveIndex = receivedInvitations.indexOf(userSender);
+                    if (receiveIndex > -1) {
+                        receivedInvitations.splice(receiveIndex, 1);
+                        this.setState({receivedInvitations: receivedInvitations});
+                    }
+                    break;
+                case 'reject':
+                    let sentInvitations = this.state.sentInvitations;
+                    let buttonList = this.state.buttonList;
                     console.log("Sent invs: ", sentInvitations);
-                    this.setState({sentInvitations: sentInvitations});
-                    for (let i = 0; i < buttonList.length; i++) {
-                        if (userSender in buttonList[i]) {
-                            buttonList[i][userSender].inviteButtonValue = "Invite";
-                            this.setState({buttonList: buttonList});
-                            break;
+                    console.log("Reject sent from: ", userSender);
+                    const sendIndex = sentInvitations.indexOf(userSender);
+                    if (sendIndex > -1) {
+                        sentInvitations.splice(sendIndex, 1);
+                        console.log("Sent invs: ", sentInvitations);
+                        this.setState({sentInvitations: sentInvitations});
+                        for (let i = 0; i < buttonList.length; i++) {
+                            if (userSender in buttonList[i]) {
+                                buttonList[i][userSender].inviteButtonValue = "Invite";
+                                this.setState({buttonList: buttonList});
+                                break;
+                            }
                         }
                     }
-                }
-            } else if (data.info === 'accept') {
-                console.log("game accepted!")
-                this.props.setOpponent(userSender);
-                this.props.makeFirstPlayer();
-                this.props.playGame();
+                    console.warn("Communication message: Player not seen in online list")
+                    break;
+                case 'accept':
+                    console.log("game accepted!")
+                    this.props.setOpponent(userSender);
+                    this.props.makeFirstPlayer();
+                    this.props.playGame();
+                    break;
+                default:
+                    console.error("communication message error");
 
-            } else {
-                console.error("Invitation message handling error");
             }
-
         };
 
         this.communicationSocket.onclose = function (e) {
             console.error('Communication socket closed unexpectedly');
         };
+        //<<<<- IndividualCommunication Socket
 
+
+        //Communication Global Socket ->>>>>
+        this.communicationGlobalSocket = await new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/communication-global/'
+        );
+
+        this.communicationGlobalSocket.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            const userSender = data.user_sender;
+            console.group("check state before update of PlayerList");
+            console.log("currentUsers: ", this.state.currentUsers)
+            console.log("buttonList: ", this.state.buttonList)
+            console.groupEnd();
+            switch (data.info) {
+                case 'login-noticed':
+                    if (userSender === this.props.user) {
+                        console.log("Login noticed from you");
+                        break;
+                    } else {
+                        let users = this.state.currentUsers;
+                        console.log("this.state.currentUsers.includes((userSender))", (!(this.state.currentUsers.includes((userSender)))))
+                        if (!(this.state.currentUsers.includes((userSender)))) {
+                            console.log("users: ", users);
+                            console.log("userSender: ", userSender);
+                            users.push(userSender);
+                            console.log("users after : ", users);
+                            const buttonList = this.getNewButtonList(userSender);
+                            this.setState({
+                                currentUsers: users,
+                                buttonList: buttonList,
+                                numbersOfPlayers: users.length + 1
+                            });
+                        }
+
+
+                    }
+                    break;
+                default:
+                    console.error("communication message error");
+            }
+
+        };
+
+        this.communicationGlobalSocket.onclose = function (e) {
+            console.error('Communication Global Socket closed unexpectedly');
+        };
         //<<<<-Communication Socket
+
+
+        this.communicationGlobalSocket.onopen = () => this.communicationGlobalSocket.send(JSON.stringify({
+            'userSender': this.props.user,
+            'info': "login-noticed"
+        }));
+
     }
 
     produceButtonValues = (currentUsersList) => {
+        console.group("IN: produceButtonValues");
+        console.log("currentUsersList", currentUsersList);
         let inputList = currentUsersList
             .map((nickname) => {
                     return ({
@@ -105,7 +169,28 @@ class Lobby extends React.Component {
                     })
                 }
             );
+        console.log("listToProduce ButtonList", inputList);
+        console.groupEnd();
         this.setState({buttonList: inputList});
+    }
+
+    getNewButtonList = (name) => {
+        console.group("getNewButtonList");
+        console.log("name: ", name)
+
+        const newState = {
+            [name]: {
+                "inviteButtonValue": "Invite",
+                "chatButtonValue": "Chat"
+            }
+        }
+        console.log("newState: ", newState)
+        let list = this.state.buttonList;
+        console.log("list: ", list)
+        list.push(newState)
+        console.log("pushedlist: ", list)
+        console.groupEnd();
+        return list;
     }
 
     getActiveUsers() {
@@ -226,7 +311,8 @@ class Lobby extends React.Component {
                     </h3>
                 </div>
                 <div className="flex-wrapper button-group-padding btn-group margin-top-zero">
-                    <button className="btn btn-sm btn-success margin-top-zero" onClick={() => this.props.playGame()}>Look at gameboard
+                    <button className="btn btn-sm btn-success margin-top-zero"
+                            onClick={() => this.props.playGame()}>Look at gameboard
                         layout
                     </button>
                     <button className="btn btn-sm btn-success margin-top-zero"
