@@ -22,6 +22,7 @@ class Lobby extends React.Component {
                 let json = await activeUsersResponse.json()
                 let userList = json["active_users"];
                 let listWithoutClientName = userList.filter(person => person !== this.props.user);
+                console.log("listWithoutClientName", listWithoutClientName);
                 this.setState({
                     currentUsers: listWithoutClientName,
                     numbersOfPlayers: userList.length
@@ -108,26 +109,33 @@ class Lobby extends React.Component {
         this.communicationGlobalSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
             const userSender = data.user_sender;
+            console.group("check state before update of PlayerList");
+            console.log("currentUsers: ", this.state.currentUsers)
+            console.log("buttonList: ", this.state.buttonList)
+            console.groupEnd();
             switch (data.info) {
                 case 'login-noticed':
                     if (userSender === this.props.user) {
-                        console.log("not handled event")
+                        console.log("Login noticed from you");
                         break;
-                    }
-                    let users = this.state.currentUsers;
-                    // if (!(userSender in users.keys)) {
-                    console.log("users: ", users);
-                    console.log("userSender: ", userSender);
-                    users.push(userSender);
-                    console.log("users after : ", users);
-                    const buttonList = this.getNewButtonList(userSender);
-                    this.setState({
-                        currentUsers: users,
-                        buttonList: buttonList,
-                        numbersOfPlayers: users.length + 1
-                    });
-                    // }
+                    } else {
+                        let users = this.state.currentUsers;
+                        console.log("this.state.currentUsers.includes((userSender))", (!(this.state.currentUsers.includes((userSender)))))
+                        if (!(this.state.currentUsers.includes((userSender)))) {
+                            console.log("users: ", users);
+                            console.log("userSender: ", userSender);
+                            users.push(userSender);
+                            console.log("users after : ", users);
+                            const buttonList = this.getNewButtonList(userSender);
+                            this.setState({
+                                currentUsers: users,
+                                buttonList: buttonList,
+                                numbersOfPlayers: users.length + 1
+                            });
+                        }
 
+
+                    }
                     break;
                 default:
                     console.error("communication message error");
@@ -149,6 +157,8 @@ class Lobby extends React.Component {
     }
 
     produceButtonValues = (currentUsersList) => {
+        console.group("IN: produceButtonValues");
+        console.log("currentUsersList", currentUsersList);
         let inputList = currentUsersList
             .map((nickname) => {
                     return ({
@@ -159,18 +169,28 @@ class Lobby extends React.Component {
                     })
                 }
             );
+        console.log("listToProduce ButtonList", inputList);
+        console.groupEnd();
         this.setState({buttonList: inputList});
     }
 
     getNewButtonList = (name) => {
+        console.group("getNewButtonList");
+        console.log("name: ", name)
+
         const newState = {
             [name]: {
                 "inviteButtonValue": "Invite",
                 "chatButtonValue": "Chat"
             }
         }
+        console.log("newState: ", newState)
         let list = this.state.buttonList;
-        return list.push(newState);
+        console.log("list: ", list)
+        list.push(newState)
+        console.log("pushedlist: ", list)
+        console.groupEnd();
+        return list;
     }
 
     getActiveUsers() {
