@@ -113,30 +113,47 @@ class Lobby extends React.Component {
             console.log("currentUsers: ", this.state.currentUsers)
             console.log("buttonList: ", this.state.buttonList)
             console.groupEnd();
+            let users = this.state.currentUsers;
             switch (data.info) {
                 case 'login-noticed':
                     if (userSender === this.props.user) {
                         console.log("Login noticed from you");
                         break;
                     } else {
-                        let users = this.state.currentUsers;
                         console.log("this.state.currentUsers.includes((userSender))", (!(this.state.currentUsers.includes((userSender)))))
                         if (!(this.state.currentUsers.includes((userSender)))) {
                             console.log("users: ", users);
                             console.log("userSender: ", userSender);
                             users.push(userSender);
                             console.log("users after : ", users);
-                            const buttonList = this.getNewButtonList(userSender);
+                            const buttonList = this.getNewButtonList(userSender, "add");
                             this.setState({
                                 currentUsers: users,
                                 buttonList: buttonList,
                                 numbersOfPlayers: users.length + 1
                             });
                         }
-
-
                     }
                     break;
+                case 'logout-noticed':
+                    if (userSender === this.props.user) {
+                        console.log("Logout noticed from you");
+                        break;
+                    } else {
+                        const logoutIndex = users.indexOf(userSender);
+                        if (logoutIndex > -1) {
+                            console.log("LOGOUT: users: ", users);
+                            users.splice(logoutIndex, 1);
+                            console.log("LOGOUT: updatedUsers: ", users);
+                            const buttonList = this.getNewButtonList(userSender, "add");
+                            this.setState({
+                                currentUsers: users,
+                                buttonList: buttonList,
+                                numbersOfPlayers: users.length + 1
+                            });
+                        }
+                        break;
+                    }
                 default:
                     console.error("communication message error");
             }
@@ -174,24 +191,39 @@ class Lobby extends React.Component {
         this.setState({buttonList: inputList});
     }
 
-    getNewButtonList = (name) => {
-        console.group("getNewButtonList");
-        console.log("name: ", name)
-
-        const newState = {
-            [name]: {
-                "inviteButtonValue": "Invite",
-                "chatButtonValue": "Chat"
-            }
-        }
-        console.log("newState: ", newState)
+    getNewButtonList = (name, strategy) => {
         let list = this.state.buttonList;
-        console.log("list: ", list)
-        list.push(newState)
-        console.log("pushedlist: ", list)
-        console.groupEnd();
-        return list;
+        if (strategy === "add") {
+            const newState = {
+                [name]: {
+                    "inviteButtonValue": "Invite",
+                    "chatButtonValue": "Chat"
+                }
+            }
+            console.group("getNewButtonList");
+            console.log("name: ", name)
+            console.log("newState: ", newState)
+            console.log("list: ", list)
+            list.push(newState)
+            console.log("pushedlist: ", list)
+            console.groupEnd();
+            return list;
+        } else if (strategy === "remove") {
+            console.group("getNewButtonList/remove");
+            console.log("list: ", list)
+            for (let i = 0; i < list.length; i++) {
+                if (name in list[i]) {
+                    list.splice(i, 1);
+                    console.log("updatedList: ", list)
+                    console.groupEnd();
+                    return list
+                }
+            }
+        } else {
+            console.warn("getNewButtonList warning")
+        }
     }
+
 
     getActiveUsers() {
         return fetch('http://localhost:8000/api-auth/active_users/', {
@@ -299,6 +331,14 @@ class Lobby extends React.Component {
         }
     }
 
+    prepareLogout = () => {
+        this.communicationGlobalSocket.send(JSON.stringify({
+            'userSender': this.props.user,
+            'info': "logout-noticed"
+        }));
+
+        this.props.handleLogout();
+    }
 
     render() {
         let currentUsersList = this.state.currentUsers;
@@ -316,7 +356,7 @@ class Lobby extends React.Component {
                         layout
                     </button>
                     <button className="btn btn-sm btn-success margin-top-zero"
-                            onClick={this.props.handleLogout}>Logout
+                            onClick={this.prepareLogout}>Logout
                     </button>
                 </div>
                 <div className="offset-from-border">
