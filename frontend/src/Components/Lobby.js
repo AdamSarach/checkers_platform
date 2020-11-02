@@ -142,10 +142,13 @@ class Lobby extends React.Component {
                     } else {
                         const logoutIndex = users.indexOf(userSender);
                         if (logoutIndex > -1) {
-                            console.log("LOGOUT: users: ", users);
+                            console.group("LOGOUT");
+                            console.log("users: ", users);
                             users.splice(logoutIndex, 1);
-                            console.log("LOGOUT: updatedUsers: ", users);
-                            const buttonList = this.getNewButtonList(userSender, "add");
+                            console.log("updatedUsers: ", users);
+                            const buttonList = this.getNewButtonList(userSender, "remove");
+                            console.log("button list: ", buttonList)
+                            console.groupEnd();
                             this.setState({
                                 currentUsers: users,
                                 buttonList: buttonList,
