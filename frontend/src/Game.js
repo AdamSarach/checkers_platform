@@ -2,20 +2,14 @@ import React from 'react';
 import {returnPlayerName} from './utils.js';
 import {ReactCheckers} from './ReactCheckers.js';
 import Board from './Board.js';
-// import { Router } from 'react-router-dom'
-// import {Opponent} from './Opponent.js';
 
 
 export class Game extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.columns = this.setColumns();
-
         this.ReactCheckers = new ReactCheckers(this.columns);
-        // this.Opponent = new Opponent(this.columns);
-
         this.state = {
             players: 2,
             history: [{
@@ -31,6 +25,8 @@ export class Game extends React.Component {
             turn: '',
             gameStatus: ((this.props.isFirstPlayer) ? "Move your piece" : "Wait for opponent move"),
             winnerInfo: null,
+            newGameRequest: false,
+            isGameBlocked: false
         }
     }
 
@@ -38,61 +34,213 @@ export class Game extends React.Component {
         this.assignTurn();
 
         //Game Socket  ->>>>>
-        // const gameName = (this.state.turn) ? `${this.props.opponent}+${this.props.user}` : `${this.props.user}+${this.props.opponent}`;
-        const gameName = this.props.user
-        console.log("game name:", gameName)
+        const enemy = this.props.user
         this.gameSocket = new WebSocket(
             'ws://'
             + window.location.host
             + '/ws/game/'
-            + gameName
+            + enemy
             + '/'
         );
 
         this.gameSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
-            const game = data.game_state;
-            // this.setState({gameStatus: this.adjustGameStatus()})
-            let history = this.state.history;
-            history.push(data.history);
-            this.setState({
-                'history': history,
-                'activePiece': null,
-                'moves': game.moves,
-                'jumpKills': game.jumpKills,
-                'hasJumped': game.hasJumped,
-                'stepNumber': game.stepNumber,
-                'winner': game.winner,
-                'turn': data.turn
-            })
-            this.adjustGameStatus(data.history)
-            if (game.winner !== null) {
-                this.setWinnerInfo(game.winner);
+            console.group("GameMessage")
+            console.log("message received");
+            console.log("DATA", data);
+            if ('button_message' in data) {
+                console.log("button_message: ", data.button_message);
+                switch (data['button_message']) {
+                    case "giveUp":
+                        this.turnGiveUpButton(false);
+                        this.turnLobbyButton(true);
+                        this.turnPlayAgainButton(true);
+                        this.shouldGameBlocked(true);
+                        this.setState({gameStatus: "Opponent has given up. You win!"})
+                        break;
+                    case "lobby":
+                        this.turnGiveUpButton(false);
+                        this.turnLobbyButton(true);
+                        this.turnPlayAgainButton(false);
+                        this.setState({gameStatus: "Opponent has has moved into lobby."})
+                        break;
+                    case "newGame":
+                        this.turnGiveUpButton(false);
+                        this.turnLobbyButton(false);
+                        this.turnPlayAgainButton(false);
+                        this.setState({
+                            newGameRequest: true
+                        })
+                        break;
+                }
+            } else if ("yes_no_message" in data) {
+                console.log("yes_no_button received");
+                if (data.yes_no_message === true) {
+                    this.getInitialState()
+                } else {
+                    this.turnLobbyButton(true);
+                    this.turnPlayAgainButton(true);
+                }
+            } else {
+                console.log("normal state received");
+                console.groupEnd();
+                const game = data.game_state;
+                let history = this.state.history;
+                history.push(data.history);
+                this.setState({
+                    'history': history,
+                    'activePiece': null,
+                    'moves': game.moves,
+                    'jumpKills': game.jumpKills,
+                    'hasJumped': game.hasJumped,
+                    'stepNumber': game.stepNumber,
+                    'winner': game.winner,
+                    'turn': data.turn
+                })
+                this.adjustGameStatus(data.history);
+                if (game.winner !== null) {
+                    this.setWinnerInfo(game.winner);
+                }
             }
+
         }
 
         this.gameSocket.onclose = function (e) {
-            console.error('Communication socket closed unexpectedly');
+            console.error('Game socket closed unexpectedly');
         };
         //<<<<- Game Socket
     }
 
-    handleGiveUpButton = () => {
-        // console.log("Message: Player has given up.")
-    }
-
-    assignTurn = () => {
-        console.log("this.props.isFirstPlayer: ", this.props.isFirstPlayer)
-        if (this.props.isFirstPlayer === true) {
-            this.state.turn = true
+    turnGiveUpButton = (buttonState) => {
+        const giveUpButton = document.getElementById("giveUpButton");
+        if (buttonState === true) {
+            giveUpButton.className = "btn btn-sm btn-success";
         } else {
-            this.state.turn = false
+            giveUpButton.className = "btn btn-sm btn-success disabled";
         }
     }
 
-    playAgainButton = () => {
-        // console.log("Message: Player would like to play again.")
+    turnLobbyButton = (buttonState) => {
+        const lobbyButton = document.getElementById("lobbyButton");
+        if (buttonState === true) {
+            lobbyButton.className = "btn btn-sm btn-success";
+        } else {
+            lobbyButton.className = "btn btn-sm btn-success disabled";
+        }
     }
+
+    turnPlayAgainButton = (buttonState) => {
+        const playAgainButton = document.getElementById("playAgainButton");
+        if (buttonState === true) {
+            playAgainButton.className = "btn btn-sm btn-success";
+        } else {
+            playAgainButton.className = "btn btn-sm btn-success disabled";
+        }
+    }
+
+    handleGiveUpButton = () => {
+        this.turnGiveUpButton(false);
+        this.turnLobbyButton(true);
+        this.turnPlayAgainButton(true);
+        this.shouldGameBlocked(true);
+        this.setState({gameStatus: "You have given up!"})
+        this.sendButtonMessage('giveUp');
+    }
+
+    goToLobbyButton = () => {
+        this.sendButtonMessage('lobby');
+        try {
+            this.gameSocket.close()
+        } catch (error) {
+            console.log("Game ended properly")
+        }
+        fetch('http://localhost:8000/api-auth/out_game/', {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${this.props.getTokenFromLocal}`,
+                            'Content-Length': 0
+                        },
+                    });
+        this.props.goToLobby();
+    }
+
+    playAgainButton = () => {
+        console.group("playAgainbutton")
+        console.log("before turn state")
+        this.turnPlayAgainButton(false);
+        console.log("after turn state / before socket send")
+        this.sendButtonMessage('newGame');
+        console.log("after socket send")
+        console.groupEnd()
+    }
+
+    sendButtonMessage = (strategy) => {
+        console.log("direct before socket send")
+        this.gameSocket.send(JSON.stringify({
+            'userSender': this.props.user,
+            'user': this.props.opponent,
+            'buttonMessage': strategy
+        }));
+        console.log("direct after socket send")
+    }
+
+    getInitialState = () => {
+        this.turnGiveUpButton(true);
+        this.turnLobbyButton(false);
+        this.turnPlayAgainButton(false);
+        this.setState({
+            players: 2,
+            history: [{
+                boardState: this.createBoard(),
+                currentPlayer: true,
+            }],
+            activePiece: null,
+            moves: [],
+            jumpKills: null,
+            hasJumped: null,
+            stepNumber: 0,
+            winner: null,
+            turn: '',
+            gameStatus: ((this.props.isFirstPlayer) ? "Move your piece" : "Wait for opponent move"),
+            winnerInfo: null,
+            newGameRequest: false,
+            isGameBlocked: false
+        })
+
+
+    }
+
+    handleNewGame = (strategy) => {
+        this.gameSocket.send(JSON.stringify({
+            'userSender': this.props.user,
+            'user': this.props.opponent,
+            'yesNoButton': strategy
+        }));
+        this.setState({
+            newGameRequest: false
+        })
+    }
+
+    yesButtonClick = () => {
+        this.getInitialState();
+        this.handleNewGame(true);
+    }
+
+    noButtonClick = () => {
+        this.turnLobbyButton(true);
+        this.turnPlayAgainButton(true);
+        this.handleNewGame(false);
+    }
+
+    shouldGameBlocked = (strategy) => {
+        this.setState({isGameBlocked: strategy})
+    }
+
+
+    assignTurn = () => {
+        this.props.isFirstPlayer ? this.setState({turn: true}) : this.setState({turn: false})
+    }
+
 
     setColumns() {
         const columns = {};
@@ -110,49 +258,37 @@ export class Game extends React.Component {
     }
 
     createBoard() {
-
         let board = {};
-
         for (let key in this.columns) {
-
             if (this.columns.hasOwnProperty(key)) {
                 for (let n = 1; n <= 8; ++n) {
-
                     let row = key + n;
                     board[row] = null;
                 }
             }
         }
-
         board = this.initPlayers(board);
-
         return board;
     }
 
     initPlayers(board) {
         const player1 = ['a8', 'c8', 'e8', 'g8', 'b7', 'd7', 'f7', 'i7', 'a6', 'c6', 'e6', 'g6',];
         const player2 = ['b3', 'd3', 'f3', 'i3', 'a2', 'c2', 'e2', 'g2', 'b1', 'd1', 'f1', 'i1',];
-
         let self = this;
-
         player1.forEach(function (i) {
             board[i] = self.createPiece(i, 'player1');
         });
-
         player2.forEach(function (i) {
             board[i] = self.createPiece(i, 'player2');
         });
-
         return board;
     }
 
     createPiece(location, player) {
         let piece = {};
-
         piece.player = player;
         piece.location = location;
         piece.isKing = false;
-
         return piece;
     }
 
@@ -164,19 +300,16 @@ export class Game extends React.Component {
     handleClick(coordinates) {
 
         if (this.state.turn === false && this.state.moves.length === 0) {
-            // if (this.state.moves.length >= 0) {
             return console.log("Turn raised");
-            // }
-
         }
 
-
-        const isWinner = !!(this.state.winner)
-        if (isWinner) {
-        }
         if (this.state.winner !== null) {
             this.setWinnerInfo(this.state.winner);
             return console.log("Winner raised");
+        }
+
+        if (this.state.isGameBlocked === true) {
+            return;
         }
 
         const currentState = this.getCurrentState();
@@ -294,10 +427,9 @@ export class Game extends React.Component {
     }
 
     setWinnerInfo = (winner) => {
-        const playAgainButton = document.getElementById("playAgainButton");
-        playAgainButton.className = "btn btn-sm btn-success";
-        const giveUpButton = document.getElementById("giveUpButton");
-        giveUpButton.className = "btn btn-sm btn-success disabled";
+        this.turnGiveUpButton(false);
+        this.turnLobbyButton(true);
+        this.turnPlayAgainButton(true);
 
         if (winner === 'player1pieces' || winner === 'player1moves') {
             this.setState({winnerInfo: this.props.isFirstPlayer ? "You win!" : `${this.props.opponent} wins!`})
@@ -313,22 +445,17 @@ export class Game extends React.Component {
             const whoPlays = history.currentPlayer;
             if (this.props.isFirstPlayer) {
                 if (!!whoPlays) {
-                    console.log("Setstate 'your move'")
                     this.setState({gameStatus: "Your move"});
                 } else {
-                    console.log("Setstate 'opponents move'")
                     this.setState({gameStatus: `${this.props.opponent}'s move`});
                 }
             } else {
                 if (!!whoPlays) {
-                    console.log("Setstate 'opponents move'")
                     this.setState({gameStatus: `${this.props.opponent}'s move`});
                 } else {
-                    console.log("Setstate 'your move'")
                     this.setState({gameStatus: "Your move"});
                 }
             }
-
         } catch (error) {
             console.log(error);
             return "Start"
@@ -356,12 +483,13 @@ export class Game extends React.Component {
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button className="btn btn-sm btn-success" onClick={() => this.props.goToLobby()}>Exit to
+                        <button id="lobbyButton" className="btn btn-sm btn-success disabled"
+                                onClick={() => this.goToLobbyButton()}>Exit to
                             lobby
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button id="playAgainButton" className="btn btn-sm btn-success disabled"
+                        <button id="playAgainButton" className="btn btn-sm btn-success"
                                 onClick={this.playAgainButton}>Ask to play
                             again
                         </button>
@@ -370,6 +498,27 @@ export class Game extends React.Component {
                 <div>
                     You are playing against {this.props.opponent}
                 </div>
+                <div>
+                    {this.state.newGameRequest &&
+                    <div style={{flex: 7}}>
+                        Opponent wants to play again
+                        <button id="yes-button"
+                                className="btn btn-sm btn-outline-success"
+                                onClick={(e) => {
+                                    this.yesButtonClick(e)
+                                }}
+                        >Yes</button>
+                        <button id="no-button"
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={(e) => {
+                                    this.noButtonClick(e)
+                                }}
+                        >No
+                        </button>
+                    </div>}
+                </div>
+
+
                 <div className="reactCheckers">
                     <div className="game-status" id="game-status">
                         {this.state.winnerInfo || gameStatus}

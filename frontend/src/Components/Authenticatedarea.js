@@ -10,6 +10,7 @@ class Authenticatedarea extends React.Component {
             displayedScreen: 'lobby',
             opponentPlayer: '"Unknown Player"',
             isFirstPlayer: false,
+            inGame: false
         }
     }
 
@@ -61,7 +62,7 @@ class Authenticatedarea extends React.Component {
     }
 
     goToLobby = () => {
-        this.setState({displayScreen: 'lobby'})
+        this.setState({displayedScreen: 'lobby'})
     }
 
     makeFirstPlayer= () => {

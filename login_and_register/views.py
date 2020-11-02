@@ -14,18 +14,6 @@ from rest_framework.permissions import *
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
-#
-# class NewU(APIView):
-#     def post(self, validated_data):
-#
-#     def post(self, request, format=None):
-#         serializer = SnippetSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class NewUserAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserCreationSerializer
@@ -108,9 +96,42 @@ def get_offline(request):
     if user == request.user:
         user = User.objects.get(username=request.user)
         user.profile.is_online = False
+        user.profile.in_game = False
         user.profile.save()
         return Response(status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+def make_in_game(request):
+
+    # try:
+    user = get_username_by_token(request)
+    # except:
+    #     return Response({'message': "Token couldn't be verified."})
+    user.profile.in_game = True
+    user.profile.save()
+    return Response({'is player in game?': user.profile.is_online})
+
+
+@api_view(['POST'])
+def make_out_game(request):
+
+    # try:
+    user = get_username_by_token(request)
+    # except:
+    #     return Response({'message': "Token couldn't be verified."})
+    user.profile.in_game = False
+    user.profile.save()
+    return Response({'is player in game?': user.profile.is_online})
+
+
+@api_view(['GET'])
+def get_in_game_users(request):
+    # response_list = []
+    users_current = User.objects.filter(profile__in_game=True)
+    user_list = {"game_users": []}
+    for user in users_current:
+        user_list["game_users"].append(user.username)
+    return Response(user_list, status=status.HTTP_200_OK)

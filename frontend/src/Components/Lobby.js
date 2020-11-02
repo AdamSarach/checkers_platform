@@ -18,14 +18,29 @@ class Lobby extends React.Component {
     async componentDidMount() {
         try {
             const activeUsersResponse = await this.getActiveUsers();
-            if (activeUsersResponse.ok) {
+            const gameUsersResponse = await this.getInGameUsers();
+            if (activeUsersResponse.ok && gameUsersResponse.ok) {
                 let json = await activeUsersResponse.json()
                 let userList = json["active_users"];
+                let gameJson = await gameUsersResponse.json()
+                let gameUserList = gameJson["game_users"];
+                let players =userList.length
+                console.log("ISONLINE: ", userList);
+                console.log("INGAME: ", gameUserList);
+                if (gameUserList.length > 0) {
+                    for (let j = 0; j < gameUserList.length; j++) {
+                        let index = userList.indexOf(gameUserList[j]);
+                        if (index > (-1)) {
+                            userList.splice(index, 1);
+                        }
+                    }
+                }
+
                 let listWithoutClientName = userList.filter(person => person !== this.props.user);
                 console.log("listWithoutClientName", listWithoutClientName);
                 this.setState({
                     currentUsers: listWithoutClientName,
-                    numbersOfPlayers: userList.length
+                    numbersOfPlayers: players
                 });
             }
         } catch (error) {
@@ -85,6 +100,13 @@ class Lobby extends React.Component {
                     console.log("game accepted!")
                     this.props.setOpponent(userSender);
                     this.props.makeFirstPlayer();
+                    fetch('http://localhost:8000/api-auth/in_game/', {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${this.props.getTokenFromLocal}`,
+                            'Content-Length': 0
+                        },
+                    });
                     this.props.playGame();
                     break;
                 default:
@@ -236,6 +258,14 @@ class Lobby extends React.Component {
         })
     };
 
+    getInGameUsers() {
+        return fetch('http://localhost:8000/api-auth/game_users/', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+    };
+
 
     clickTab = (e) => {
         if (e.key === 'Enter') {
@@ -265,6 +295,13 @@ class Lobby extends React.Component {
         let id = e.target.id;
         const name = id.substring(id.indexOf('-') + 1)
         if (button === "Accept") {
+            fetch('http://localhost:8000/api-auth/in_game/', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${this.props.getTokenFromLocal()}`,
+                    'Content-Length': 0
+                },
+            });
             this.communicationSocket.send(JSON.stringify({
                 'userSender': this.props.user,
                 'user': name,

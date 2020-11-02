@@ -7,6 +7,7 @@ import Registerpage from './Components/Registerpage'
 import Authenticatedarea from './Components/Authenticatedarea'
 // import Lobby from './Components/Lobby'
 import {Game} from './Game'
+
 class App extends React.Component {
 
     state = {
@@ -52,7 +53,6 @@ class App extends React.Component {
                 status = res.status;
                 res.json()
                     .then((res) => {
-                            // console.log(res.body);
                             if (status === 200) {
                                 localStorage.setItem('token', res['access']);
                                 localStorage.setItem('token-refresh', res['refresh']);
@@ -62,14 +62,32 @@ class App extends React.Component {
                                         Authorization: `Bearer ${this.getTokenFromLocal()}`
                                     }
                                 })
-                                    .then(() =>
-                                        this.setState({
-                                            logged_in: true,
-                                            displayedForm: 'authenticatedArea',
-                                            username: data.username
-                                        }))
-                            }
-                            else {
+                                    .then(() => {
+                                            this.setState({
+                                                logged_in: true,
+                                                displayedForm: 'authenticatedArea',
+                                                username: data.username
+                                            });
+                                            fetch('http://localhost:8000/api-auth/out_game/', {
+                                                method: 'POST',
+                                                headers: {
+                                                    Authorization: `Bearer ${this.getTokenFromLocal()}`,
+                                                    'Content-Length': 0
+                                                },
+                                            })
+                                                .then(resp => {
+                                                    let confirmationStatus = resp.status;
+                                                    resp.json()
+                                                        .then(resp => {
+                                                            if (confirmationStatus = 200) {
+                                                                console.log("User logged in and out of game")
+                                                            }
+                                                        })
+                                                });
+
+                                        }
+                                    )
+                            } else {
                                 this.setState({
                                     infoMessage: "Provide valid credentials",
                                 });
@@ -77,7 +95,6 @@ class App extends React.Component {
                         }
                     )
             })
-
     };
 
 
@@ -110,14 +127,13 @@ class App extends React.Component {
     }
 
     handleLogout = () => {
-        var status;
         fetch('http://localhost:8000/api-auth/get_offline/', {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${this.getTokenFromLocal()}`
             },
         })
-            .then(res => {
+            .then(() => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('token-refresh');
                 this.setState({
@@ -162,10 +178,10 @@ class App extends React.Component {
                 />;
             case 'authenticatedArea':
                 return <Authenticatedarea displayForm={this.displayForm}
-                              logged_in={this.state.logged_in}
-                              user={this.state.username}
-                              handleLogout={this.handleLogout}
-                              getTokenFromLocal={this.getTokenFromLocal}/>;
+                                          logged_in={this.state.logged_in}
+                                          user={this.state.username}
+                                          handleLogout={this.handleLogout}
+                                          getTokenFromLocal={this.getTokenFromLocal}/>;
             case 'game':
                 return <Game displayForm={this.displayForm}
                              logged_in={this.state.logged_in}
