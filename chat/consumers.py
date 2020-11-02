@@ -1,4 +1,3 @@
-
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -29,7 +28,6 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         user = text_data_json['user']
-
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -80,8 +78,6 @@ class CommunicationConsumer(WebsocketConsumer):
             user_sender = text_data_json['userSender']
             receiver = text_data_json['user']
             info = text_data_json['info']
-        # message = text_data_json['data']['message']
-        # receiver = text_data_json['receiver']
         receiver_group_name = 'communication_%s' % receiver
 
         # Send message to room group
@@ -91,23 +87,18 @@ class CommunicationConsumer(WebsocketConsumer):
                 'type': 'communication_message',
                 'user_sender': user_sender,
                 'info': info
-                # 'receiver': receiver
             }
         )
 
     # Receive message from room group
     def communication_message(self, event):
-        # message = event['message']
         user_sender = event['user_sender']
-        # receiver = event['receiver']
         info = event['info']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            # 'message': message,
             'user_sender': user_sender,
             'info': info
-            # 'receiver': receiver
         }))
 
 
@@ -158,6 +149,7 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
             'info': info
         }))
 
+
 class GameConsumer(WebsocketConsumer):
     def connect(self):
         self.game_name = self.scope['url_route']['kwargs']['game_name']
@@ -183,23 +175,48 @@ class GameConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         user_sender = text_data_json['userSender']
         receiver = text_data_json['user']
-        game_state = text_data_json['gameState']
-        # history = json.dumps(game_state['history'])
-        history = (game_state['history'])
-        turn = text_data_json['turn']
         receiver_group_name = 'game_%s' % receiver
+        if "buttonMessage" in text_data_json:
+            button_message = text_data_json['buttonMessage']
 
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            receiver_group_name,
-            {
-                'type': 'game_message',
-                'user_sender': user_sender,
-                'game_state': game_state,
-                'turn': turn,
-                'history': history
-            }
-        )
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                receiver_group_name,
+                {
+                    'type': 'button_message',
+                    'user_sender': user_sender,
+                    'button_message': button_message,
+                }
+            )
+        elif 'yesNoButton' in text_data_json:
+            yes_no_message = text_data_json['yesNoButton']
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                receiver_group_name,
+                {
+                    'type': 'yesno_message',
+                    'user_sender': user_sender,
+                    'yes_no_message': yes_no_message,
+                }
+            )
+
+        else:
+            game_state = text_data_json['gameState']
+            history = (game_state['history'])
+            turn = text_data_json['turn']
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                receiver_group_name,
+                {
+                    'type': 'game_message',
+                    'user_sender': user_sender,
+                    'game_state': game_state,
+                    'turn': turn,
+                    'history': history
+                }
+            )
 
     # Receive message from room group
     def game_message(self, event):
@@ -216,5 +233,25 @@ class GameConsumer(WebsocketConsumer):
             'history': history
         }))
 
+    # Receive message from room group - request for new game
+    def button_message(self, event):
+        user_sender = event['user_sender']
+        button_message = event['button_message']
 
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'user_sender': user_sender,
+            'button_message': button_message
 
+        }))
+
+    def yesno_message(self, event):
+        user_sender = event['user_sender']
+        yes_no_message = event['yes_no_message']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'user_sender': user_sender,
+            'yes_no_message': yes_no_message
+
+        }))
