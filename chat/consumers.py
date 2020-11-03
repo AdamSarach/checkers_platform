@@ -124,19 +124,32 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        user_sender = text_data_json['userSender']
-        info = text_data_json['info']
         receiver_group_name = 'communication-global'
+        if "ignoredConsumers" in text_data_json:
+            ignored_consumers = text_data_json['ignoredConsumers']
 
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            receiver_group_name,
-            {
-                'type': 'communication_global_message',
-                'user_sender': user_sender,
-                'info': info
-            }
-        )
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                receiver_group_name,
+                {
+                    'type': 'db_message',
+                    'ignored_consumers': ignored_consumers,
+                }
+            )
+
+        else:
+            user_sender = text_data_json['userSender']
+            info = text_data_json['info']
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                receiver_group_name,
+                {
+                    'type': 'communication_global_message',
+                    'user_sender': user_sender,
+                    'info': info
+                }
+            )
 
     # Receive message from room group
     def communication_global_message(self, event):
@@ -147,6 +160,15 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'user_sender': user_sender,
             'info': info
+        }))
+
+    # Receive message from room group
+    def db_message(self, event):
+        ignored_consumers = event['ignored_consumers']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'ignored_consumers': ignored_consumers
         }))
 
 

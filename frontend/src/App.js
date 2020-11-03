@@ -1,17 +1,15 @@
 import React from 'react';
-import ReactDOM from "react-dom"
 import './App.scss';
 import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Authenticatedarea from './Components/Authenticatedarea'
-// import Lobby from './Components/Lobby'
+
 import {Game} from './Game'
 
 class App extends React.Component {
 
     state = {
-        // Change displayedForm for tests
         displayedForm: 'mainpage',
         logged_in: false,
         username: '',
@@ -80,7 +78,7 @@ class App extends React.Component {
                                                     resp.json()
                                                         .then(resp => {
                                                             if (confirmationStatus = 200) {
-                                                                console.log("User logged in and out of game")
+                                                                console.log("User signed in and moved into lobby")
                                                             }
                                                         })
                                                 });
@@ -199,12 +197,6 @@ class App extends React.Component {
             <div>
                 {form}
             </div>
-            // <div className="website-all">
-            //     <div className="container d-flex align-items-center">
-            //         {form}
-            // {/*    </div>*/}
-            // {/*</div>*/}
-
         )
     }
 }
