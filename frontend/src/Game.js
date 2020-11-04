@@ -26,7 +26,8 @@ export class Game extends React.Component {
             gameStatus: ((this.props.isFirstPlayer) ? "Move your piece" : "Wait for opponent move"),
             winnerInfo: null,
             newGameRequest: false,
-            isGameBlocked: false
+            isGameBlocked: false,
+            isOpponentInGame: false
         }
     }
 
@@ -62,7 +63,10 @@ export class Game extends React.Component {
                         this.turnGiveUpButton(false);
                         this.turnLobbyButton(true);
                         this.turnPlayAgainButton(false);
-                        this.setState({gameStatus: "Opponent has has moved into lobby."})
+                        this.setState({
+                            gameStatus: "Opponent has has moved into lobby.",
+                            isOpponentInGame: false
+                        })
                         break;
                     case "newGame":
                         this.turnGiveUpButton(false);
@@ -154,13 +158,10 @@ export class Game extends React.Component {
         } catch (error) {
             console.log("Game ended properly")
         }
-        fetch('http://localhost:8000/api-auth/out_game/', {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${this.props.getTokenFromLocal}`,
-                            'Content-Length': 0
-                        },
-                    });
+        this.props.setGameDB("out")
+            .then(() => {
+                this.informLobbyGamePlayers([this.props.user], "lobby")
+            })
         this.props.goToLobby();
     }
 
@@ -234,6 +235,13 @@ export class Game extends React.Component {
 
     shouldGameBlocked = (strategy) => {
         this.setState({isGameBlocked: strategy})
+    }
+
+    informLobbyGamePlayers = (ignoredConsumers, mode) => {
+        this.communicationGlobalSocket.send(JSON.stringify({
+            'ignoredConsumers': ignoredConsumers,
+            'mode': mode
+        }));
     }
 
 
@@ -489,7 +497,7 @@ export class Game extends React.Component {
                         </button>
                     </div>
                     <div style={{flex: 3}}>
-                        <button id="playAgainButton" className="btn btn-sm btn-success"
+                        <button id="playAgainButton" className="btn btn-sm btn-success disabled"
                                 onClick={this.playAgainButton}>Ask to play
                             again
                         </button>

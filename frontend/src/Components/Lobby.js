@@ -16,36 +16,26 @@ class Lobby extends React.Component {
     }
 
     async componentDidMount() {
-        try {
-            const activeUsersResponse = await this.getActiveUsers();
-            const gameUsersResponse = await this.getInGameUsers();
-            if (activeUsersResponse.ok && gameUsersResponse.ok) {
-                let json = await activeUsersResponse.json()
-                let userList = json["active_users"];
-                let gameJson = await gameUsersResponse.json()
-                let gameUserList = gameJson["game_users"];
-                let players =userList.length
-                console.log("ISONLINE: ", userList);
-                console.log("INGAME: ", gameUserList);
-                if (gameUserList.length > 0) {
-                    for (let j = 0; j < gameUserList.length; j++) {
-                        let index = userList.indexOf(gameUserList[j]);
-                        if (index > (-1)) {
-                            userList.splice(index, 1);
-                        }
-                    }
-                }
+        // try {
+        const onlineUsersResponse = await this.getActiveUsers();
+        console.group("DIDMOUNT");
 
-                let listWithoutClientName = userList.filter(person => person !== this.props.user);
-                console.log("listWithoutClientName", listWithoutClientName);
-                this.setState({
-                    currentUsers: listWithoutClientName,
-                    numbersOfPlayers: players
-                });
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        console.log(onlineUsersResponse)
+        const gameUsersResponse = await this.getInGameUsers();
+        console.log(gameUsersResponse)
+
+        // if (onlineUsersResponse.ok && gameUsersResponse.ok) {
+        //     let onlinePlayersJson = await onlineUsersResponse.json()
+        //     let gamePlayersJson = await gameUsersResponse.json()
+        console.log("responses ok")
+        const lobbyState = await this.getPlayersInLobby(onlineUsersResponse, gameUsersResponse);
+        console.log("lobby state", lobbyState)
+        const lobbyUpdated = await this.updateLobbyState(lobbyState.userList, lobbyState.numberOfPlayers)
+        // }
+        // } catch (error) {
+        //     console.log(error);
+        // }
+
         this.produceButtonValues(this.state.currentUsers);
 
         //Individual Communication Socket ->>>>>
@@ -79,12 +69,12 @@ class Lobby extends React.Component {
                 case 'reject':
                     let sentInvitations = this.state.sentInvitations;
                     let buttonList = this.state.buttonList;
-                    console.log("Sent invs: ", sentInvitations);
-                    console.log("Reject sent from: ", userSender);
+                    // console.log("Sent invs: ", sentInvitations);
+                    // console.log("Reject sent from: ", userSender);
                     const sendIndex = sentInvitations.indexOf(userSender);
                     if (sendIndex > -1) {
                         sentInvitations.splice(sendIndex, 1);
-                        console.log("Sent invs: ", sentInvitations);
+                        // console.log("Sent invs: ", sentInvitations);
                         this.setState({sentInvitations: sentInvitations});
                         for (let i = 0; i < buttonList.length; i++) {
                             if (userSender in buttonList[i]) {
@@ -100,13 +90,10 @@ class Lobby extends React.Component {
                     console.log("game accepted!")
                     this.props.setOpponent(userSender);
                     this.props.makeFirstPlayer();
-                    fetch('http://localhost:8000/api-auth/in_game/', {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${this.props.getTokenFromLocal}`,
-                            'Content-Length': 0
-                        },
-                    });
+                    this.props.setGameDB("in")
+                        .then(() => {
+                            this.informLobbyGamePlayers([this.props.user, userSender], "notlobby")
+                        })
                     this.props.playGame();
                     break;
                 default:
@@ -129,59 +116,70 @@ class Lobby extends React.Component {
         );
 
         this.communicationGlobalSocket.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            const userSender = data.user_sender;
-            console.group("check state before update of PlayerList");
-            console.log("currentUsers: ", this.state.currentUsers)
-            console.log("buttonList: ", this.state.buttonList)
-            console.groupEnd();
-            let users = this.state.currentUsers;
-            switch (data.info) {
-                case 'login-noticed':
-                    if (userSender === this.props.user) {
-                        console.log("Login noticed from you");
-                        break;
-                    } else {
-                        console.log("this.state.currentUsers.includes((userSender))", (!(this.state.currentUsers.includes((userSender)))))
-                        if (!(this.state.currentUsers.includes((userSender)))) {
-                            console.log("users: ", users);
-                            console.log("userSender: ", userSender);
-                            users.push(userSender);
-                            console.log("users after : ", users);
-                            const buttonList = this.getNewButtonList(userSender, "add");
-                            this.setState({
-                                currentUsers: users,
-                                buttonList: buttonList,
-                                numbersOfPlayers: users.length + 1
-                            });
-                        }
-                    }
-                    break;
-                case 'logout-noticed':
-                    if (userSender === this.props.user) {
-                        console.log("Logout noticed from you");
-                        break;
-                    } else {
-                        const logoutIndex = users.indexOf(userSender);
-                        if (logoutIndex > -1) {
-                            console.group("LOGOUT");
-                            console.log("users: ", users);
-                            users.splice(logoutIndex, 1);
-                            console.log("updatedUsers: ", users);
-                            const buttonList = this.getNewButtonList(userSender, "remove");
-                            console.log("button list: ", buttonList)
-                            console.groupEnd();
-                            this.setState({
-                                currentUsers: users,
-                                buttonList: buttonList,
-                                numbersOfPlayers: users.length + 1
-                            });
-                        }
-                        break;
-                    }
-                default:
-                    console.error("communication message error");
+            if (this.props.displayedScreen === "game") {
+                return;
             }
+            const data = JSON.parse(e.data);
+            console.log("global socket data", data)
+
+            if ('ignored_consumers' in data) {
+                if (!(data.ignored_consumers.includes(this.props.user))) {
+                    this.getOnlineAndGamers()
+                        .then(([online, gamers]) => {
+                            console.log("online: ", online)
+                            console.log("gamers: ", gamers)
+                            const newLobbyState = this.getPlayersInLobby(online, gamers);
+                            console.log("newLobbyState", newLobbyState)
+                            console.log("Data mode is: ", data.mode)
+                            const newButtons = this.getNewButtonList(data.ignored_consumers, data.mode)
+                            console.log("newButtons: ", newButtons)
+                            const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers, newButtons)
+                            console.log("newLobbyUpdated", newLobbyUpdated)
+                        })
+
+                }
+
+            } else {
+                const userSender = data.user_sender;
+                let users = this.state.currentUsers;
+                switch (data.info) {
+                    case 'login-noticed':
+                        if (userSender === this.props.user) {
+                            break;
+                        } else {
+                            if (!(this.state.currentUsers.includes((userSender)))) {
+                                users.push(userSender);
+                                const buttonList = this.getNewButtonList([userSender], "lobby");
+                                this.setState({
+                                    currentUsers: users,
+                                    buttonList: buttonList,
+                                    numbersOfPlayers: users.length + 1
+                                });
+                            }
+                        }
+                        break;
+                    case 'logout-noticed':
+                        if (userSender === this.props.user) {
+                            console.log("Logout noticed from you");
+                            break;
+                        } else {
+                            const logoutIndex = users.indexOf(userSender);
+                            if (logoutIndex > -1) {
+                                users.splice(logoutIndex, 1);
+                                const buttonList = this.getNewButtonList([userSender], "notlobby");
+                                this.setState({
+                                    currentUsers: users,
+                                    buttonList: buttonList,
+                                    numbersOfPlayers: users.length + 1
+                                });
+                            }
+                            break;
+                        }
+                    default:
+                        console.error("communication message error");
+                }
+            }
+
 
         };
 
@@ -198,9 +196,63 @@ class Lobby extends React.Component {
 
     }
 
+    informLobbyGamePlayers = (ignoredConsumers, mode) => {
+        this.communicationGlobalSocket.send(JSON.stringify({
+            'ignoredConsumers': ignoredConsumers,
+            'mode': mode
+        }));
+    }
+
+    updateLobbyState = (lobbyList, number, buttonList) => {
+        if (typeof buttonList === 'undefined') {
+            this.setState({
+                currentUsers: lobbyList,
+                numbersOfPlayers: number
+            });
+        } else {
+            this.setState({
+                currentUsers: lobbyList,
+                numbersOfPlayers: number,
+                buttonList: buttonList
+            });
+        }
+
+    }
+
+
+    getPlayersInLobby = (onlinePlayersJson, gamePlayersJson) => {
+        // let json = onlinePlayers.json()
+        //     .then(() => {
+        console.group("getPlayers in lobby");
+        // console.log(json);
+        // let gameJson = inGamePlayers.json()
+        //     .then(() => {
+        //         console.log(gameJson)
+        let userList = onlinePlayersJson["active_users"];
+        let gameUserList = gamePlayersJson["game_users"];
+        const number = userList.length
+        console.log("ISONLINE: ", userList);
+        console.log("INGAME: ", gameUserList);
+        const filteredList = this.subtractLists(userList, gameUserList)
+        console.log("SUBTRACTED: ", filteredList);
+        let lobbyList = filteredList.filter(person => person !== this.props.user);
+        // console.log("listWithoutClientName", lobbyList);
+        const output = {
+            "userList": lobbyList,
+            "numberOfPlayers": number
+        };
+        console.log(output)
+        return output
+        //         })
+        // })
+    }
+
+
+    subtractLists = (mainList, subtractList) => {
+        return mainList.filter(user => !subtractList.includes(user))
+    }
+
     produceButtonValues = (currentUsersList) => {
-        console.group("IN: produceButtonValues");
-        console.log("currentUsersList", currentUsersList);
         let inputList = currentUsersList
             .map((nickname) => {
                     return ({
@@ -211,39 +263,33 @@ class Lobby extends React.Component {
                     })
                 }
             );
-        console.log("listToProduce ButtonList", inputList);
-        console.groupEnd();
         this.setState({buttonList: inputList});
     }
 
-    getNewButtonList = (name, strategy) => {
+    getNewButtonList = (names, strategy) => {
         let list = this.state.buttonList;
-        if (strategy === "add") {
-            const newState = {
-                [name]: {
-                    "inviteButtonValue": "Invite",
-                    "chatButtonValue": "Chat"
+        if (strategy === "lobby") {
+            for (const name of names) {
+                let newState = {
+                    [name]: {
+                        "inviteButtonValue": "Invite",
+                        "chatButtonValue": "Chat"
+                    }
                 }
+                list.push(newState)
             }
-            console.group("getNewButtonList");
-            console.log("name: ", name)
-            console.log("newState: ", newState)
-            console.log("list: ", list)
-            list.push(newState)
-            console.log("pushedlist: ", list)
-            console.groupEnd();
             return list;
-        } else if (strategy === "remove") {
-            console.group("getNewButtonList/remove");
-            console.log("list: ", list)
-            for (let i = 0; i < list.length; i++) {
-                if (name in list[i]) {
-                    list.splice(i, 1);
-                    console.log("updatedList: ", list)
-                    console.groupEnd();
-                    return list
+
+        } else if (strategy === "notlobby") {
+            for (const name of names) {
+                for (let i = 0; i < list.length; i++) {
+                    if (name in list[i]) {
+                        list.splice(i, 1);
+                    }
                 }
             }
+            return list;
+
         } else {
             console.warn("getNewButtonList warning")
         }
@@ -256,6 +302,7 @@ class Lobby extends React.Component {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         })
+            .then((response) => response.json())
     };
 
     getInGameUsers() {
@@ -264,7 +311,13 @@ class Lobby extends React.Component {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         })
+            .then((response) => response.json())
     };
+
+
+    getOnlineAndGamers = () => {
+        return Promise.all([this.getActiveUsers(), this.getInGameUsers()])
+    }
 
 
     clickTab = (e) => {
@@ -275,7 +328,6 @@ class Lobby extends React.Component {
     };
 
     handleCommunicationMessage = (e) => {
-        console.log("Communication window, handlechatmessage: " + this.props.user);
         const element = document.getElementById("communication-message-input");
         const message = element.value;
         this.communicationSocket.send(JSON.stringify({
@@ -295,13 +347,7 @@ class Lobby extends React.Component {
         let id = e.target.id;
         const name = id.substring(id.indexOf('-') + 1)
         if (button === "Accept") {
-            fetch('http://localhost:8000/api-auth/in_game/', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${this.props.getTokenFromLocal()}`,
-                    'Content-Length': 0
-                },
-            });
+            this.props.setGameDB("in");
             this.communicationSocket.send(JSON.stringify({
                 'userSender': this.props.user,
                 'user': name,
