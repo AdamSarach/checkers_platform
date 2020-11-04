@@ -160,19 +160,15 @@ export class Game extends React.Component {
         }
         this.props.setGameDB("out")
             .then(() => {
-                this.informLobbyGamePlayers([this.props.user], "lobby")
+                this.props.goToLobby();
             })
-        this.props.goToLobby();
     }
 
     playAgainButton = () => {
-        console.group("playAgainbutton")
-        console.log("before turn state")
+        console.log("You want to play again")
         this.turnPlayAgainButton(false);
-        console.log("after turn state / before socket send")
         this.sendButtonMessage('newGame');
-        console.log("after socket send")
-        console.groupEnd()
+
     }
 
     sendButtonMessage = (strategy) => {
@@ -235,13 +231,6 @@ export class Game extends React.Component {
 
     shouldGameBlocked = (strategy) => {
         this.setState({isGameBlocked: strategy})
-    }
-
-    informLobbyGamePlayers = (ignoredConsumers, mode) => {
-        this.communicationGlobalSocket.send(JSON.stringify({
-            'ignoredConsumers': ignoredConsumers,
-            'mode': mode
-        }));
     }
 
 

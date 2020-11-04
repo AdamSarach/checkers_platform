@@ -16,27 +16,18 @@ class Lobby extends React.Component {
     }
 
     async componentDidMount() {
-        // try {
-        const onlineUsersResponse = await this.getActiveUsers();
-        console.group("DIDMOUNT");
 
-        console.log(onlineUsersResponse)
-        const gameUsersResponse = await this.getInGameUsers();
-        console.log(gameUsersResponse)
+        try {
+            const onlineUsersResponse = await this.getActiveUsers();
+            const gameUsersResponse = await this.getInGameUsers();
+            const lobbyState = await this.getPlayersInLobby(onlineUsersResponse, gameUsersResponse);
+            const buttons = await this.produceButtonValues(lobbyState.userList);
+            const lobbyUpdated = await this.updateLobbyState(lobbyState.userList, lobbyState.numberOfPlayers, buttons)
+        } catch (error) {
+            console.warn(error);
+        }
 
-        // if (onlineUsersResponse.ok && gameUsersResponse.ok) {
-        //     let onlinePlayersJson = await onlineUsersResponse.json()
-        //     let gamePlayersJson = await gameUsersResponse.json()
-        console.log("responses ok")
-        const lobbyState = await this.getPlayersInLobby(onlineUsersResponse, gameUsersResponse);
-        console.log("lobby state", lobbyState)
-        const lobbyUpdated = await this.updateLobbyState(lobbyState.userList, lobbyState.numberOfPlayers)
-        // }
-        // } catch (error) {
-        //     console.log(error);
-        // }
-
-        this.produceButtonValues(this.state.currentUsers);
+        // this.produceButtonValues(this.state.currentUsers);
 
         //Individual Communication Socket ->>>>>
         const communicationRoomName = this.props.user;
@@ -120,21 +111,21 @@ class Lobby extends React.Component {
                 return;
             }
             const data = JSON.parse(e.data);
-            console.log("global socket data", data)
 
             if ('ignored_consumers' in data) {
+                console.group("TO CHECK...")
+                console.log("ignored consumers received")
                 if (!(data.ignored_consumers.includes(this.props.user))) {
                     this.getOnlineAndGamers()
                         .then(([online, gamers]) => {
                             console.log("online: ", online)
                             console.log("gamers: ", gamers)
                             const newLobbyState = this.getPlayersInLobby(online, gamers);
-                            console.log("newLobbyState", newLobbyState)
-                            console.log("Data mode is: ", data.mode)
+                            console.log("new lobby state: ", newLobbyState)
                             const newButtons = this.getNewButtonList(data.ignored_consumers, data.mode)
                             console.log("newButtons: ", newButtons)
+                            console.groupEnd()
                             const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers, newButtons)
-                            console.log("newLobbyUpdated", newLobbyUpdated)
                         })
 
                 }
@@ -186,15 +177,33 @@ class Lobby extends React.Component {
         this.communicationGlobalSocket.onclose = function (e) {
             console.error('Communication Global Socket closed unexpectedly');
         };
-        //<<<<-Communication Socket
 
 
-        this.communicationGlobalSocket.onopen = () => this.communicationGlobalSocket.send(JSON.stringify({
-            'userSender': this.props.user,
-            'info': "login-noticed"
-        }));
+        this.communicationGlobalSocket.onopen = () => {
+            if (this.props.finishedGameRecently === true) {
+                console.log("FROM GAME TO LOBBY")
+                this.informLobbyGamePlayers([this.props.user], "lobby");
+                this.props.finishedGameRecentlyProp(false);
+            } else {
+                this.communicationGlobalSocket.send(JSON.stringify({
+                    'userSender': this.props.user,
+                    'info': "login-noticed"
+                }));
+            }
 
+        }
+        //<<<<-CommunicationGlobal Socket
     }
+
+
+    updateLobbyState = (lobbyList, number, buttonList) => {
+        this.setState({
+            currentUsers: lobbyList,
+            numbersOfPlayers: number,
+            buttonList: buttonList
+        });
+    }
+
 
     informLobbyGamePlayers = (ignoredConsumers, mode) => {
         this.communicationGlobalSocket.send(JSON.stringify({
@@ -203,57 +212,24 @@ class Lobby extends React.Component {
         }));
     }
 
-    updateLobbyState = (lobbyList, number, buttonList) => {
-        if (typeof buttonList === 'undefined') {
-            this.setState({
-                currentUsers: lobbyList,
-                numbersOfPlayers: number
-            });
-        } else {
-            this.setState({
-                currentUsers: lobbyList,
-                numbersOfPlayers: number,
-                buttonList: buttonList
-            });
-        }
-
-    }
-
-
     getPlayersInLobby = (onlinePlayersJson, gamePlayersJson) => {
-        // let json = onlinePlayers.json()
-        //     .then(() => {
-        console.group("getPlayers in lobby");
-        // console.log(json);
-        // let gameJson = inGamePlayers.json()
-        //     .then(() => {
-        //         console.log(gameJson)
         let userList = onlinePlayersJson["active_users"];
         let gameUserList = gamePlayersJson["game_users"];
         const number = userList.length
-        console.log("ISONLINE: ", userList);
-        console.log("INGAME: ", gameUserList);
         const filteredList = this.subtractLists(userList, gameUserList)
-        console.log("SUBTRACTED: ", filteredList);
         let lobbyList = filteredList.filter(person => person !== this.props.user);
-        // console.log("listWithoutClientName", lobbyList);
-        const output = {
+        return {
             "userList": lobbyList,
             "numberOfPlayers": number
         };
-        console.log(output)
-        return output
-        //         })
-        // })
     }
-
 
     subtractLists = (mainList, subtractList) => {
         return mainList.filter(user => !subtractList.includes(user))
     }
 
     produceButtonValues = (currentUsersList) => {
-        let inputList = currentUsersList
+        return currentUsersList
             .map((nickname) => {
                     return ({
                         [nickname]: {
@@ -263,7 +239,6 @@ class Lobby extends React.Component {
                     })
                 }
             );
-        this.setState({buttonList: inputList});
     }
 
     getNewButtonList = (names, strategy) => {
@@ -357,7 +332,7 @@ class Lobby extends React.Component {
             }));
             this.props.setOpponent(name);
             this.props.playGame();
-            console.log("game accepted!")
+            console.log("Game is starting!")
         } else if (button === "Reject") {
             const receivedInvitations = this.state.receivedInvitations;
             const index = receivedInvitations.indexOf(name);
@@ -394,9 +369,7 @@ class Lobby extends React.Component {
                         'user': name,
                         'info': "invite"
                     }));
-                    console.log(`Message has been sent to communicationSocket:                         
-                        'userSender': ${this.props.user},
-                        'user': ${name}`)
+                    console.log(`Invitation sent to : ${this.props.user}`)
                     break;
                 } else {
                     buttonList[i][name].inviteButtonValue = "Invite";
@@ -424,7 +397,11 @@ class Lobby extends React.Component {
             'userSender': this.props.user,
             'info': "logout-noticed"
         }));
-
+        try {
+            this.communicationGlobalSocket.close()
+        } catch (error) {
+            console.log("Chat ended properly")
+        }
         this.props.handleLogout();
     }
 
