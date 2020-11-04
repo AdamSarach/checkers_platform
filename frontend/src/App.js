@@ -40,7 +40,8 @@ class App extends React.Component {
     makeAuthentication = (e, data) => {
         e.preventDefault();
         var status;
-        fetch('http://localhost:8000/api/token/', {
+        const tokenUrl = 'http://' + window.location.host + '/api/token/'
+        fetch(tokenUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -54,7 +55,8 @@ class App extends React.Component {
                             if (status === 200) {
                                 localStorage.setItem('token', res['access']);
                                 localStorage.setItem('token-refresh', res['refresh']);
-                                fetch('http://localhost:8000/api-auth/get_online/', {
+                                const loginUrl = 'http://' + window.location.host + '/api-auth/get_online/'
+                                fetch(loginUrl, {
                                     method: 'GET',
                                     headers: {
                                         Authorization: `Bearer ${this.getTokenFromLocal()}`
@@ -66,7 +68,8 @@ class App extends React.Component {
                                                 displayedForm: 'authenticatedArea',
                                                 username: data.username
                                             });
-                                            fetch('http://localhost:8000/api-auth/out_game/', {
+                                            const outGameUrl = 'http://' + window.location.host + '/api-auth/out_game/'
+                                            fetch(outGameUrl, {
                                                 method: 'POST',
                                                 headers: {
                                                     Authorization: `Bearer ${this.getTokenFromLocal()}`,
@@ -95,11 +98,32 @@ class App extends React.Component {
             })
     };
 
+    fetchData = (path, method = "GET", token, content ) => {
+        const url = 'http://' + window.location.host + path
+        if (token === true) {
+            return fetch(url, {
+            method: method,
+            headers: {
+                Authorization: `Bearer ${this.getTokenFromLocal()}`
+            },
+        })
+        } else {
+            return fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(content)
+        })
+        }
+
+    }
 
     handleSignup = (e, data) => {
         e.preventDefault();
         var status;
-        fetch('http://localhost:8000/api-auth/new_user/', {
+        const createUserUrl = 'http://' + window.location.host + '/api-auth/new_user/'
+        fetch(createUserUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -125,7 +149,8 @@ class App extends React.Component {
     }
 
     handleLogout = () => {
-        fetch('http://localhost:8000/api-auth/get_offline/', {
+        const logoutUrl = 'http://' + window.location.host + '/api-auth/get_offline/'
+        fetch(logoutUrl, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${this.getTokenFromLocal()}`

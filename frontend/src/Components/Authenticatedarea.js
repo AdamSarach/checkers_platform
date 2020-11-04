@@ -74,7 +74,8 @@ class Authenticatedarea extends React.Component {
 
     setGameDB = (mode) => {
         // in or out
-        const url = (mode === "in") ? 'http://localhost:8000/api-auth/in_game/' : 'http://localhost:8000/api-auth/out_game/'
+        const partUrl = 'http://' + window.location.host + '/api-auth/'
+        const url = (mode === "in") ? (partUrl + 'in_game/') : (partUrl + 'out_game/')
         return fetch(url, {
             method: 'POST',
             headers: {

@@ -297,7 +297,8 @@ class Lobby extends React.Component {
 
 
     getActiveUsers() {
-        return fetch('http://localhost:8000/api-auth/active_users/', {
+        const url = 'http://' + window.location.host + '/api-auth/active_users/'
+        return fetch(url, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -306,7 +307,8 @@ class Lobby extends React.Component {
     };
 
     getInGameUsers() {
-        return fetch('http://localhost:8000/api-auth/game_users/', {
+        const url = 'http://' + window.location.host + '/api-auth/game_users/'
+        return fetch(url, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
