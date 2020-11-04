@@ -12,6 +12,7 @@ An application allows users to play checkers with others. You need to be registe
 :heavy_multiplication_x: Tests: pyTest  
 :heavy_multiplication_x: Virtualization: Docker  
 :heavy_multiplication_x: Deployment: AWS  
+:heavy_multiplication_x: Websocket database: Redis
 
 #### Links
 [Game Rules](https://www.downtownrochestermn.com/_files/docs/checkers-instructions.pdf)
@@ -21,8 +22,8 @@ An application allows users to play checkers with others. You need to be registe
 #### Project integration
 - [X] Set up Django Project
 - [X] Set up React App
-- [ ] Set up Websocket Protocol
-- [ ] Database Connection
+- [X] Set up Websockets Protocol
+- [X] Database Connection
 - [ ] Dockerize project
 - [ ] Deploy
 
@@ -34,23 +35,23 @@ An application allows users to play checkers with others. You need to be registe
     - [X] *Game rules included
 - [ ] Login Page
    - [ ] Graphics
-   - [ ] Form Handling
-   - [ ] Lobby Redirection after successful login
+   - [X] Form Handling
+   - [X] Lobby Redirection after successful login
 - [ ] Register Page
    - [ ] Graphics
-   - [ ] Form Handling
-   - [ ] Lobby Redirection after successful register
+   - [X] Form Handling
+   - [X] Lobby Redirection after successful register
 - [ ] Lobby
    - [ ] Graphics
-   - [ ] *Lobby chat
-   - [ ] Logged in players list
-   - [ ] Logout handling
+   - [X] *Lobby chat
+   - [X] Logged in players list
+   - [X] Logout handling
    - [ ] *Display platform statistics (in game/ logged in)
    - [ ] Launch game mechanism
 - [ ] Game
     - [ ] Chat Between Players
     - [ ] Game Rules Implementation
-    - [ ] Checkers board graphics
+    - [X] Checkers board graphics
     - [ ] Integration between rules and graphics
     - [ ] Give up/Quit Button
     - [ ] Passing and win/lose/draw notifications 

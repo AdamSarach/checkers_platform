@@ -35,17 +35,25 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'chat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
+    'rest_framework',
+    'corsheaders',
+    'login_and_register.apps.LoginAndRegisterConfig',
+    'lobby.apps.LobbyConfig',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    # 'lobby.middleware.ActiveUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +72,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'frontend/build'),
+            os.path.join(BASE_DIR, 'login_and_register/templates/login_and_register'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -137,4 +146,64 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend/build/static'),
+    os.path.join(BASE_DIR, 'assets/'),
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# For testing purpose only
+# CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
+
+# # JWT_AUTH = {
+# #     'JWT_RESPONSE_PAYLOAD_HANDLER': 'checkers.utils.my_jwt_response_handler'
+# # }
+#
+#
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_SECURE = True
+# SESSION_SAVE_EVERY_REQUEST = True
+#
+# # CACHES = {
+# #     'default': {
+# #         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+# #         'LOCATION': '127.0.0.1:11211',
+# #     }
+# # }
+#
+# # Number of seconds of inactivity before a user is marked offline
+# USER_ONLINE_TIMEOUT = 300
+# # Number of seconds that we will keep track of inactive users for before
+# # their last seen is removed from the cache
+# USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+}
+
+# Channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
