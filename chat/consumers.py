@@ -127,6 +127,7 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
         receiver_group_name = 'communication-global'
         if "ignoredConsumers" in text_data_json:
             ignored_consumers = text_data_json['ignoredConsumers']
+            mode = text_data_json['mode']
 
             # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
@@ -134,6 +135,7 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
                 {
                     'type': 'db_message',
                     'ignored_consumers': ignored_consumers,
+                    'mode': mode
                 }
             )
 
@@ -165,10 +167,12 @@ class CommunicationGlobalConsumer(WebsocketConsumer):
     # Receive message from room group
     def db_message(self, event):
         ignored_consumers = event['ignored_consumers']
+        mode = event['mode']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            'ignored_consumers': ignored_consumers
+            'ignored_consumers': ignored_consumers,
+            'mode': mode
         }))
 
 

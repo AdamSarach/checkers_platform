@@ -17,21 +17,21 @@ class Lobby extends React.Component {
 
     async componentDidMount() {
         // try {
-            const onlineUsersResponse = await this.getActiveUsers();
-            console.group("DIDMOUNT");
+        const onlineUsersResponse = await this.getActiveUsers();
+        console.group("DIDMOUNT");
 
-            console.log(onlineUsersResponse)
-            const gameUsersResponse = await this.getInGameUsers();
-            console.log(gameUsersResponse)
+        console.log(onlineUsersResponse)
+        const gameUsersResponse = await this.getInGameUsers();
+        console.log(gameUsersResponse)
 
-            // if (onlineUsersResponse.ok && gameUsersResponse.ok) {
-            //     let onlinePlayersJson = await onlineUsersResponse.json()
-            //     let gamePlayersJson = await gameUsersResponse.json()
-                console.log("responses ok")
-                const lobbyState = await this.getPlayersInLobby(onlineUsersResponse , gameUsersResponse);
-                console.log("lobby state", lobbyState)
-                const lobbyUpdated = await this.updateLobbyState(lobbyState.userList, lobbyState.numberOfPlayers)
-            // }
+        // if (onlineUsersResponse.ok && gameUsersResponse.ok) {
+        //     let onlinePlayersJson = await onlineUsersResponse.json()
+        //     let gamePlayersJson = await gameUsersResponse.json()
+        console.log("responses ok")
+        const lobbyState = await this.getPlayersInLobby(onlineUsersResponse, gameUsersResponse);
+        console.log("lobby state", lobbyState)
+        const lobbyUpdated = await this.updateLobbyState(lobbyState.userList, lobbyState.numberOfPlayers)
+        // }
         // } catch (error) {
         //     console.log(error);
         // }
@@ -90,10 +90,9 @@ class Lobby extends React.Component {
                     console.log("game accepted!")
                     this.props.setOpponent(userSender);
                     this.props.makeFirstPlayer();
-                    this.setInGameDB()
+                    this.props.setGameDB("in")
                         .then(() => {
-                            this.informLobbyGamePlayers([this.props.user, userSender])
-
+                            this.informLobbyGamePlayers([this.props.user, userSender], "notlobby")
                         })
                     this.props.playGame();
                     break;
@@ -117,31 +116,26 @@ class Lobby extends React.Component {
         );
 
         this.communicationGlobalSocket.onmessage = (e) => {
+            if (this.props.displayedScreen === "game") {
+                return;
+            }
             const data = JSON.parse(e.data);
             console.log("global socket data", data)
+
             if ('ignored_consumers' in data) {
                 if (!(data.ignored_consumers.includes(this.props.user))) {
-                    // let onlineUsersResponse = this.getActiveUsers();
-                    // let gameUsersResponse = this.getInGameUsers();
                     this.getOnlineAndGamers()
                         .then(([online, gamers]) => {
                             console.log("online: ", online)
                             console.log("gamers: ", gamers)
                             const newLobbyState = this.getPlayersInLobby(online, gamers);
                             console.log("newLobbyState", newLobbyState)
-                            const newButtons = this.updateButtons(newLobbyState.userList)
-                            const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers)
+                            console.log("Data mode is: ", data.mode)
+                            const newButtons = this.getNewButtonList(data.ignored_consumers, data.mode)
+                            console.log("newButtons: ", newButtons)
+                            const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers, newButtons)
                             console.log("newLobbyUpdated", newLobbyUpdated)
                         })
-                    // if (onlineUsersResponse.ok && gameUsersResponse.ok) {
-                    //     let onlinePlayersJson = onlineUsersResponse.json()
-                    //     let gamePlayersJson = gameUsersResponse.json()
-                        // console.log("active users in ignored consumers: ", activeUsersResponse)
-                    // console.log("onlineusers: ", onlineUsersResponse);
-                    // console.log("gameusers: ", gameUsersResponse);
-                    // // const newLobbyState = this.getPlayersInLobby(onlineUsersResponse, gameUsersResponse);
-                    // const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers)
-                    // }
 
                 }
 
@@ -155,7 +149,7 @@ class Lobby extends React.Component {
                         } else {
                             if (!(this.state.currentUsers.includes((userSender)))) {
                                 users.push(userSender);
-                                const buttonList = this.getNewButtonList(userSender, "add");
+                                const buttonList = this.getNewButtonList([userSender], "lobby");
                                 this.setState({
                                     currentUsers: users,
                                     buttonList: buttonList,
@@ -172,7 +166,7 @@ class Lobby extends React.Component {
                             const logoutIndex = users.indexOf(userSender);
                             if (logoutIndex > -1) {
                                 users.splice(logoutIndex, 1);
-                                const buttonList = this.getNewButtonList(userSender, "remove");
+                                const buttonList = this.getNewButtonList([userSender], "notlobby");
                                 this.setState({
                                     currentUsers: users,
                                     buttonList: buttonList,
@@ -202,56 +196,55 @@ class Lobby extends React.Component {
 
     }
 
-    informLobbyGamePlayers = (ignoredConsumers) => {
+    informLobbyGamePlayers = (ignoredConsumers, mode) => {
         this.communicationGlobalSocket.send(JSON.stringify({
             'ignoredConsumers': ignoredConsumers,
+            'mode': mode
         }));
     }
 
-    updateLobbyState = (lobbyList, number) => {
-        this.setState({
-            currentUsers: lobbyList,
-            numbersOfPlayers: number
-        });
-    }
-
-    updateButtons = (list) => {
-        let buttons = this.state.buttonList;
-        for (let i = 0; i < buttons.length; i++) {
-            if (list.includes(buttons[i]) ) {
-                continue
-            } else {
-            //    add to buttons
-            }
+    updateLobbyState = (lobbyList, number, buttonList) => {
+        if (typeof buttonList === 'undefined') {
+            this.setState({
+                currentUsers: lobbyList,
+                numbersOfPlayers: number
+            });
+        } else {
+            this.setState({
+                currentUsers: lobbyList,
+                numbersOfPlayers: number,
+                buttonList: buttonList
+            });
         }
-}
+
+    }
 
 
     getPlayersInLobby = (onlinePlayersJson, gamePlayersJson) => {
         // let json = onlinePlayers.json()
         //     .then(() => {
-                console.group("getPlayers in lobby");
-                // console.log(json);
-                // let gameJson = inGamePlayers.json()
-                //     .then(() => {
-                //         console.log(gameJson)
-                        let userList = onlinePlayersJson["active_users"];
-                        let gameUserList = gamePlayersJson["game_users"];
-                        const number = userList.length
-                        console.log("ISONLINE: ", userList);
-                        console.log("INGAME: ", gameUserList);
-                        const filteredList = this.subtractLists(userList, gameUserList)
-                        console.log("SUBTRACTED: ", filteredList);
-                        let lobbyList = filteredList.filter(person => person !== this.props.user);
-                        // console.log("listWithoutClientName", lobbyList);
-                        const output = {
-                            "userList": lobbyList,
-                            "numberOfPlayers": number
-                        };
-                        console.log(output)
-                        return output
-            //         })
-            // })
+        console.group("getPlayers in lobby");
+        // console.log(json);
+        // let gameJson = inGamePlayers.json()
+        //     .then(() => {
+        //         console.log(gameJson)
+        let userList = onlinePlayersJson["active_users"];
+        let gameUserList = gamePlayersJson["game_users"];
+        const number = userList.length
+        console.log("ISONLINE: ", userList);
+        console.log("INGAME: ", gameUserList);
+        const filteredList = this.subtractLists(userList, gameUserList)
+        console.log("SUBTRACTED: ", filteredList);
+        let lobbyList = filteredList.filter(person => person !== this.props.user);
+        // console.log("listWithoutClientName", lobbyList);
+        const output = {
+            "userList": lobbyList,
+            "numberOfPlayers": number
+        };
+        console.log(output)
+        return output
+        //         })
+        // })
     }
 
 
@@ -273,24 +266,30 @@ class Lobby extends React.Component {
         this.setState({buttonList: inputList});
     }
 
-    getNewButtonList = (name, strategy) => {
+    getNewButtonList = (names, strategy) => {
         let list = this.state.buttonList;
-        if (strategy === "add") {
-            const newState = {
-                [name]: {
-                    "inviteButtonValue": "Invite",
-                    "chatButtonValue": "Chat"
+        if (strategy === "lobby") {
+            for (const name of names) {
+                let newState = {
+                    [name]: {
+                        "inviteButtonValue": "Invite",
+                        "chatButtonValue": "Chat"
+                    }
                 }
+                list.push(newState)
             }
-            list.push(newState)
             return list;
-        } else if (strategy === "remove") {
-            for (let i = 0; i < list.length; i++) {
-                if (name in list[i]) {
-                    list.splice(i, 1);
-                    return list
+
+        } else if (strategy === "notlobby") {
+            for (const name of names) {
+                for (let i = 0; i < list.length; i++) {
+                    if (name in list[i]) {
+                        list.splice(i, 1);
+                    }
                 }
             }
+            return list;
+
         } else {
             console.warn("getNewButtonList warning")
         }
@@ -312,13 +311,13 @@ class Lobby extends React.Component {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         })
-        .then((response) => response.json())
+            .then((response) => response.json())
     };
 
 
-    getOnlineAndGamers = () =>{
-  return Promise.all([this.getActiveUsers(), this.getInGameUsers()])
-}
+    getOnlineAndGamers = () => {
+        return Promise.all([this.getActiveUsers(), this.getInGameUsers()])
+    }
 
 
     clickTab = (e) => {
@@ -342,23 +341,13 @@ class Lobby extends React.Component {
         element.value = '';
     }
 
-    setInGameDB = () => {
-         return fetch('http://localhost:8000/api-auth/in_game/', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${this.props.getTokenFromLocal()}`,
-                'Content-Length': 0
-            },
-        });
-    }
-
     acceptOrRejectInvitation = (e) => {
         e.preventDefault();
         const button = e.target.textContent;
         let id = e.target.id;
         const name = id.substring(id.indexOf('-') + 1)
         if (button === "Accept") {
-            this.setInGameDB();
+            this.props.setGameDB("in");
             this.communicationSocket.send(JSON.stringify({
                 'userSender': this.props.user,
                 'user': name,

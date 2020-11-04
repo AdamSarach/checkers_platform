@@ -28,6 +28,7 @@ class Authenticatedarea extends React.Component {
                     handleLogout={this.props.handleLogout}
                     getTokenFromLocal={this.props.getTokenFromLocal}
                     makeFirstPlayer = {this.makeFirstPlayer}
+                    setGameDB = {this.setGameDB}
                 />;
             case 'game':
                 return <Game displayedScreen={this.displayedScreen}
@@ -37,6 +38,7 @@ class Authenticatedarea extends React.Component {
                              user={this.props.user}
                              getTokenFromLocal={this.getTokenFromLocal}
                              isFirstPlayer={this.state.isFirstPlayer}
+                             setGameDB = {this.setGameDB}
                 />;
             default:
                 return <Lobby
@@ -49,6 +51,7 @@ class Authenticatedarea extends React.Component {
                     handleLogout={this.props.handleLogout}
                     getTokenFromLocal={this.props.getTokenFromLocal}
                     makeFirstPlayer = {this.makeFirstPlayer}
+                    setGameDB = {this.setGameDB}
                 />;
         }
     }
@@ -67,6 +70,18 @@ class Authenticatedarea extends React.Component {
 
     makeFirstPlayer= () => {
         this.setState({isFirstPlayer: true})
+    }
+
+    setGameDB = (mode) => {
+        // in or out
+        const url = (mode === "in") ? 'http://localhost:8000/api-auth/in_game/' : 'http://localhost:8000/api-auth/out_game/'
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${this.props.getTokenFromLocal()}`,
+                'Content-Length': 0
+            },
+        });
     }
 
     render() {
