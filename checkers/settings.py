@@ -53,7 +53,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    # 'lobby.middleware.ActiveUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -168,28 +167,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
 ]
-
-# # JWT_AUTH = {
-# #     'JWT_RESPONSE_PAYLOAD_HANDLER': 'checkers.utils.my_jwt_response_handler'
-# # }
-#
-#
-# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# SESSION_COOKIE_SECURE = True
-# SESSION_SAVE_EVERY_REQUEST = True
-#
-# # CACHES = {
-# #     'default': {
-# #         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-# #         'LOCATION': '127.0.0.1:11211',
-# #     }
-# # }
-#
-# # Number of seconds of inactivity before a user is marked offline
-# USER_ONLINE_TIMEOUT = 300
-# # Number of seconds that we will keep track of inactive users for before
-# # their last seen is removed from the cache
-# USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 
 
 from datetime import timedelta

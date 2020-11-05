@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.scss';
+import './basicArea.scss';
 import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Authenticatedarea from './Components/Authenticatedarea'
-
-import {Game} from './Game'
+import {Game} from './Components/Game'
 
 class App extends React.Component {
 
@@ -168,7 +168,7 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div>
+            <div className="main-form" style={{display: "grid", placeItems: "center"}}>
                 {form}
             </div>
         )

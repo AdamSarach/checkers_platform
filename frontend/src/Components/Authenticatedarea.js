@@ -1,6 +1,6 @@
 import React from "react";
 import Lobby from './Lobby'
-import {Game} from "../Game";
+import {Game} from "./Game";
 
 
 class Authenticatedarea extends React.Component {

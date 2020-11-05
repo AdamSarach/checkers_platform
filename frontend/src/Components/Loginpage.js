@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-
+import '../basicArea.scss'
 
 class Loginpage extends React.Component {
     constructor(props) {

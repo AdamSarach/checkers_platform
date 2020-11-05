@@ -182,14 +182,13 @@ class Lobby extends React.Component {
         this.communicationGlobalSocket.onopen = () => {
             if (this.props.finishedGameRecently === true) {
                 console.log("FROM GAME TO LOBBY")
-                this.informLobbyGamePlayers([this.props.user], "lobby");
                 this.props.finishedGameRecentlyProp(false);
-            } else {
-                this.communicationGlobalSocket.send(JSON.stringify({
-                    'userSender': this.props.user,
-                    'info': "login-noticed"
-                }));
             }
+            ;
+            this.communicationGlobalSocket.send(JSON.stringify({
+                'userSender': this.props.user,
+                'info': "login-noticed"
+            }));
 
         }
         //<<<<-CommunicationGlobal Socket
@@ -297,27 +296,6 @@ class Lobby extends React.Component {
     }
 
 
-    clickTab = (e) => {
-        if (e.key === 'Enter') {
-            this.handleCommunicationMessage();
-            // document.getElementById("chat-message-submit").click();
-        }
-    };
-
-    handleCommunicationMessage = (e) => {
-        const element = document.getElementById("communication-message-input");
-        const message = element.value;
-        this.communicationSocket.send(JSON.stringify({
-            'data': {
-                'message': message,
-                'state': ''
-            },
-            'userSender': this.props.user,
-            'receiver': 'sara'
-        }));
-        element.value = '';
-    }
-
     acceptOrRejectInvitation = (e) => {
         e.preventDefault();
         const button = e.target.textContent;
@@ -408,6 +386,7 @@ class Lobby extends React.Component {
     render() {
         let currentUsersList = this.state.currentUsers;
         const people = this.state.receivedInvitations;
+
         return (
             <div className="website-styles center-main-container lobby-page">
                 <div>
@@ -415,27 +394,19 @@ class Lobby extends React.Component {
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Please log out and log in again...'}
                     </h3>
                 </div>
-                <div className="flex-wrapper button-group-padding btn-group margin-top-zero">
-                    <button className="btn btn-sm btn-success margin-top-zero"
-                            onClick={() => this.props.playGame()}>Look at gameboard
-                        layout
-                    </button>
-                    <button className="btn btn-sm btn-success margin-top-zero"
+                <div>
+                    <div className="offset-from-border">
+                        Active players: {this.state.numbersOfPlayers}
+                    </div>
+                    <button className="btn btn-sm btn-secondary margin-top-zero close-to-right"
                             onClick={this.prepareLogout}>Logout
                     </button>
+
                 </div>
-                <div className="offset-from-border">
-                    Active players: {this.state.numbersOfPlayers}
-                </div>
+
+
                 <div>
                     <div id="user-list" className="div-scrollable">
-                        {/*Todo - check if any other players are online*/}
-                        {/*if ({this.state.numbersOfPlayers <2}) {*/}
-                        {/*        <div key={index} className="current-users flex-wrapper task-wrapper">*/}
-                        {/*                <div style={{flex: 7}}>*/}
-                        {/*                    <span>currentUsersList[0]</span>*/}
-                        {/*                </div>*/}
-                        {/*    } else*/}
                         {currentUsersList
                             .map((person, index) => (
                                 <div key={index} className="current-users flex-wrapper task-wrapper">
@@ -473,11 +444,6 @@ class Lobby extends React.Component {
                                         </button>
                                     </div>
                                     }
-                                    {/*<div style={{flex: 1}}>*/}
-                                    {/*    <button id={"chatButton-" + index}*/}
-                                    {/*            className="btn btn-sm btn-outline-dark">Chat*/}
-                                    {/*    </button>*/}
-                                    {/*</div>*/}
                                 </div>
                             ))}
 

@@ -1,4 +1,5 @@
 import React from "react";
+import '../basicArea.scss'
 
 class Registerpage extends React.Component {
     constructor(props) {
