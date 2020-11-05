@@ -71,7 +71,7 @@ class Chatwindow extends React.Component {
                                size="40"
                                onKeyPress={this.clickEnter}
                                style={{flex: 7}}
-                               placeholder="Write something..."
+                               placeholder="Press enter to send a message..."
                         />
                         <br/>
                         {/*<input*/}

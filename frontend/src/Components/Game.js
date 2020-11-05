@@ -1,8 +1,8 @@
 import React from 'react';
-import {returnPlayerName} from './utils.js';
+import {returnPlayerName} from './static/utils.js';
 import {ReactCheckers} from './ReactCheckers.js';
 import Board from './Board.js';
-
+import './styles/Game.scss';
 
 export class Game extends React.Component {
 
@@ -160,19 +160,15 @@ export class Game extends React.Component {
         }
         this.props.setGameDB("out")
             .then(() => {
-                this.informLobbyGamePlayers([this.props.user], "lobby")
+                this.props.goToLobby();
             })
-        this.props.goToLobby();
     }
 
     playAgainButton = () => {
-        console.group("playAgainbutton")
-        console.log("before turn state")
+        console.log("You want to play again")
         this.turnPlayAgainButton(false);
-        console.log("after turn state / before socket send")
         this.sendButtonMessage('newGame');
-        console.log("after socket send")
-        console.groupEnd()
+
     }
 
     sendButtonMessage = (strategy) => {
@@ -235,13 +231,6 @@ export class Game extends React.Component {
 
     shouldGameBlocked = (strategy) => {
         this.setState({isGameBlocked: strategy})
-    }
-
-    informLobbyGamePlayers = (ignoredConsumers, mode) => {
-        this.communicationGlobalSocket.send(JSON.stringify({
-            'ignoredConsumers': ignoredConsumers,
-            'mode': mode
-        }));
     }
 
 
@@ -487,6 +476,7 @@ export class Game extends React.Component {
                 <div className="flex-wrapper border-padding btn-group">
                     <div style={{flex: 3}}>
                         <button id="giveUpButton" className="btn btn-sm btn-success"
+                                data-toggle="tooltip" data-placement="bottom" title="You will lose if you give up"
                                 onClick={this.handleGiveUpButton}>Give up
                         </button>
                     </div>
@@ -503,32 +493,42 @@ export class Game extends React.Component {
                         </button>
                     </div>
                 </div>
-                <div>
-                    You are playing against {this.props.opponent}
-                </div>
+
                 <div>
                     {this.state.newGameRequest &&
                     <div style={{flex: 7}}>
-                        Opponent wants to play again
-                        <button id="yes-button"
-                                className="btn btn-sm btn-outline-success"
+                        <div className="centered">
+                            Opponent wants to play again
+                        </div>
+                        <div>
+                            <button id="yes-button"
+                                className="btn btn-sm btn-success"
                                 onClick={(e) => {
                                     this.yesButtonClick(e)
                                 }}
                         >Yes</button>
                         <button id="no-button"
-                                className="btn btn-sm btn-outline-danger"
+                                className="btn btn-sm btn-danger"
                                 onClick={(e) => {
                                     this.noButtonClick(e)
                                 }}
                         >No
                         </button>
+                        </div>
+
                     </div>}
                 </div>
-
-
+                <div style={{
+                    color: '#cd3532', fontWeight: 'bold', display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '32px',
+                    marginBottom: '8px'
+                }}>
+                    {this.props.isFirstPlayer ? <span>You</span> : <span>{this.props.opponent}</span>}
+                </div>
                 <div className="reactCheckers">
-                    <div className="game-status" id="game-status">
+                    <div className="game-status" id="game-status" style={{borderColor: this.setBorderColor()}}>
                         {this.state.winnerInfo || gameStatus}
                     </div>
                     <div className="game-board" style={{borderColor: this.setBorderColor()}}>
@@ -543,6 +543,15 @@ export class Game extends React.Component {
                     </div>
                 </div>
 
+                <div style={{
+                    color: '#0c9d94', fontWeight: 'bold', display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '32px',
+                    marginTop: '16px'
+                }}>
+                    {this.props.isFirstPlayer ? <span>{this.props.opponent}</span> : <span>You</span>}
+                </div>
             </div>
 
         );

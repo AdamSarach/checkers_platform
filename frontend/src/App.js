@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.scss';
+import './basicArea.scss';
 import Mainpage from './Components/Mainpage'
 import Loginpage from './Components/Loginpage'
 import Registerpage from './Components/Registerpage'
 import Authenticatedarea from './Components/Authenticatedarea'
-
-import {Game} from './Game'
+import {Game} from './Components/Game'
 
 class App extends React.Component {
 
@@ -24,124 +24,98 @@ class App extends React.Component {
         )
     }
 
-    // makeAuthentication = () => {
-    //     this.createAccessToken()
-    //         .then( () => this.loginWithToken());
-    // }
-    //
-    // loginWithToken = () => {
-    //     fetch('http://localhost:8000/api-auth/get_online/', {
-    //                             headers: {
-    //                             Authorization: `Bearer ${this.getTokenFromLocal()}`
-    //                             }}
-    //     )}
-
-    // createAccessToken = (e, data) => {
     makeAuthentication = (e, data) => {
         e.preventDefault();
-        var status;
-        fetch('http://localhost:8000/api/token/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
+        const fetchTokenResponse = this.fetchData('/api/token/', "POST", false, data)
             .then(res => {
-                status = res.status;
-                res.json()
-                    .then((res) => {
-                            if (status === 200) {
+                if (res.ok) {
+                    res.json()
+                        .then((res) => {
                                 localStorage.setItem('token', res['access']);
                                 localStorage.setItem('token-refresh', res['refresh']);
-                                fetch('http://localhost:8000/api-auth/get_online/', {
-                                    method: 'GET',
-                                    headers: {
-                                        Authorization: `Bearer ${this.getTokenFromLocal()}`
-                                    }
-                                })
+                                const fetchLoginResponse = this.fetchData('/api-auth/get_online/', "GET", true)
                                     .then(() => {
-                                            this.setState({
-                                                logged_in: true,
-                                                displayedForm: 'authenticatedArea',
-                                                username: data.username
-                                            });
-                                            fetch('http://localhost:8000/api-auth/out_game/', {
-                                                method: 'POST',
-                                                headers: {
-                                                    Authorization: `Bearer ${this.getTokenFromLocal()}`,
-                                                    'Content-Length': 0
-                                                },
-                                            })
-                                                .then(resp => {
-                                                    let confirmationStatus = resp.status;
-                                                    resp.json()
-                                                        .then(resp => {
-                                                            if (confirmationStatus = 200) {
-                                                                console.log("User signed in and moved into lobby")
-                                                            }
-                                                        })
+                                            this.updateAuthState(true, data.username, 'authenticatedArea')
+                                            const fetchOutGameResponse = this.fetchData('/api-auth/out_game/', "POST", true)
+                                                .then((response) => {
+                                                    if (!(response.ok)) {
+                                                        console.warn("OutGame warning")
+                                                    } else {
+                                                        console.log("Authentication completed.")
+                                                    }
                                                 });
 
                                         }
                                     )
-                            } else {
-                                this.setState({
-                                    infoMessage: "Provide valid credentials",
-                                });
                             }
-                        }
-                    )
+                        )
+
+                } else {
+                    this.setState({
+                        infoMessage: "Provide valid credentials",
+                    });
+                }
             })
     };
 
+    fetchData = (path, method = "GET", token, content) => {
+        const url = 'http://' + window.location.host + path
+        if (token === true) {
+            return fetch(url, {
+                method: method,
+                headers: {
+                    Authorization: `Bearer ${this.getTokenFromLocal()}`
+                },
+            })
+        } else {
+            return fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(content)
+            })
+        }
+
+    }
 
     handleSignup = (e, data) => {
         e.preventDefault();
-        var status;
-        fetch('http://localhost:8000/api-auth/new_user/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => {
-                status = res.status;
-                res.json().then(res => {
-                        if (status === 201) {
-                            this.setState({
-                                infoMessage: "User has been registered. Please log in.",
-                                displayedForm: 'login',
-                            });
-                        } else {
-                            this.setState({
-                                infoMessage: res['username'],
-                            });
-                        }
-                    }
-                )
+        const fetchNewUserResponse = this.fetchData('/api-auth/new_user/', "POST", false, data)
+            .then((res) => {
+                if (res.ok) {
+                    res.json().then(res => {
+                        this.setState({
+                            infoMessage: "User has been registered. Please log in.",
+                            displayedForm: 'login',
+                        })
+                    });
+                } else {
+                    res.json().then(res => {
+                        this.setState({
+                            infoMessage: res['username'],
+                        })
+                    });
+                }
             });
     }
 
     handleLogout = () => {
-        fetch('http://localhost:8000/api-auth/get_offline/', {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${this.getTokenFromLocal()}`
-            },
-        })
+        const fetchLogoutResponse = this.fetchData('/api-auth/get_offline/', "GET", true)
             .then(() => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('token-refresh');
-                this.setState({
-                    logged_in: false,
-                    username: '',
-                    displayedForm: 'mainpage',
-                });
+                this.updateAuthState(false, '', 'mainpage')
             });
     }
 
+    updateAuthState = (isLoggedIn, username, displayedForm) => {
+        this.setState({
+            logged_in: isLoggedIn,
+            username: username,
+            displayedForm: displayedForm
+        });
+    }
 
     displayForm = form => {
         this.setState({
@@ -194,7 +168,7 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div>
+            <div className="main-form" style={{display: "grid", placeItems: "center"}}>
                 {form}
             </div>
         )
