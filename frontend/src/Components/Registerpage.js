@@ -11,6 +11,10 @@ class Registerpage extends React.Component {
         password: '',
     };
 
+    componentDidMount() {
+        this.props.resetInfoMessage();
+    }
+
     onFormChange = e => {
         const name = e.target.name;
         const value = e.target.value;
@@ -19,7 +23,7 @@ class Registerpage extends React.Component {
             newState[name] = value;
             return newState;
         });
-        if (this.props.infoMessage !== ''){
+        if (this.props.infoMessage !== '') {
             this.props.resetInfoMessage();
         }
     };
@@ -28,7 +32,7 @@ class Registerpage extends React.Component {
         return (
             <div className="website-styles center-main-container register-page">
                 <div>
-                    <h3 className="badge-success centered title">Register page</h3>
+                    <h1><span className="badge badge-dark title-header">Register page</span></h1>
                 </div>
                 <div>
                     <form className="register-form" onSubmit={e => this.props.handleSignup(e, this.state)}>
@@ -47,14 +51,15 @@ class Registerpage extends React.Component {
                             value={this.state.password}
                             onChange={this.onFormChange}
                         />
-                        <input className="btn btn-success" type="submit" value="Sign Up"/>
+                        <input className="btn btn-dark" type="submit" value="Sign Up"/>
+                        <div className="white-block general-info">
+                            <span className="red-info">{this.props.errorMessage}</span>
+                        </div>
                     </form>
                 </div>
-                <div>
-                    {this.props.infoMessage}
-                </div>
-                <div>
-                    <p className="centered">Already have an account?
+
+                <div className={ (this.props.screenWidth <= 767) ? "centered close-to-bottom" : "centered"}>
+                    <p >Already have an account?
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('login')
                         }> Sign in </span>

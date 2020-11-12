@@ -20,18 +20,22 @@ class Loginpage extends React.Component {
             newState[name] = value;
             return newState;
         });
-        if (this.props.infoMessage !== ''){
+        if (this.props.infoMessage !== '') {
+            this.props.resetInfoMessage();
+        }
+        if (this.props.errorMessage !== '') {
             this.props.resetInfoMessage();
         }
     };
+
     render() {
         return (
             <div className="website-styles center-main-container login-page">
                 <div>
-                    <h3 className="badge-success centered title">Login page</h3>
+                    <h1><span className="badge badge-dark title-header">Login page</span></h1>
                 </div>
                 <div>
-                    <form className="login-form" onSubmit= {e => this.props.makeAuthentication(e, this.state)}>
+                    <form className="login-form" onSubmit={e => this.props.makeAuthentication(e, this.state)}>
                         <label htmlFor="username">Username</label>
                         <input
                             type="text"
@@ -46,12 +50,14 @@ class Loginpage extends React.Component {
                             value={this.state.password}
                             onChange={this.onFormChange}
                         />
-                        <input type="submit" className="btn btn-success" value="Sign In"/>
+                        <input type="submit" className="btn btn-dark" value="Sign In"/>
+                        <div className="white-block general-info">
+                            <span className="green-info">{this.props.infoMessage}</span>
+                            <span className="red-info">{this.props.errorMessage}</span>
+                        </div>
                     </form>
                 </div>
-                <div>
-                    {this.props.infoMessage}
-                </div>
+
                 <div>
                     <p className="centered">Don't have an account?
                         <span className="span-link" onClick={() =>

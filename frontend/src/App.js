@@ -14,18 +14,33 @@ class App extends React.Component {
         logged_in: false,
         username: '',
         infoMessage: '',
+        errorMessage: '',
         initialView: true,
         token: '',
+        screenWidth: 0,
+        screenHeight: 0
     }
 
     onResetInfoMessage = () => {
         this.setState(
-            {'infoMessage': ''}
+            {
+                'infoMessage': '',
+                'errorMessage': ''
+            }
         )
+    }
+
+    componentDidMount() {
+        this.updateWindowDimensions();
+    }
+
+    updateWindowDimensions = () => {
+        this.setState({screenWidth: window.innerWidth, screenHeight: window.innerHeight});
     }
 
     makeAuthentication = (e, data) => {
         e.preventDefault();
+        this.onResetInfoMessage();
         const fetchTokenResponse = this.fetchData('/api/token/', "POST", false, data)
             .then(res => {
                 if (res.ok) {
@@ -52,7 +67,7 @@ class App extends React.Component {
 
                 } else {
                     this.setState({
-                        infoMessage: "Provide valid credentials",
+                        errorMessage: "Provide valid credentials",
                     });
                 }
             })
@@ -93,7 +108,7 @@ class App extends React.Component {
                 } else {
                     res.json().then(res => {
                         this.setState({
-                            infoMessage: res['username'],
+                            errorMessage: res['username'],
                         })
                     });
                 }
@@ -131,34 +146,47 @@ class App extends React.Component {
                 return <Loginpage makeAuthentication={this.makeAuthentication}
                                   logged_in={this.state.logged_in}
                                   infoMessage={this.state.infoMessage}
+                                  errorMessage={this.state.errorMessage}
                                   resetInfoMessage={this.onResetInfoMessage}
                                   onFormChange={this.onFormChange}
                                   displayForm={this.displayForm}
+                                  screenWidth={this.state.screenWidth}
+                                  screenHeight={this.state.screenHeight}
                 />;
             case 'signup':
                 return <Registerpage handleSignup={this.handleSignup}
                                      logged_in={this.state.logged_in}
                                      resetInfoMessage={this.onResetInfoMessage}
-                                     infoMessage={this.state.infoMessage}
+                                     errorMessage={this.state.errorMessage}
                                      onFormChange={this.onFormChange}
                                      displayForm={this.displayForm}
+                                     screenWidth={this.state.screenWidth}
+                                     screenHeight={this.state.screenHeight}
                 />;
             case 'mainpage':
                 return <Mainpage showLoginPage={this.showLoginPage}
                                  logged_in={this.state.logged_in}
                                  displayForm={this.displayForm}
+                                 screenWidth={this.state.screenWidth}
+                                 screenHeight={this.state.screenHeight}
                 />;
             case 'authenticatedArea':
                 return <Authenticatedarea displayForm={this.displayForm}
                                           logged_in={this.state.logged_in}
                                           user={this.state.username}
                                           handleLogout={this.handleLogout}
-                                          getTokenFromLocal={this.getTokenFromLocal}/>;
+                                          getTokenFromLocal={this.getTokenFromLocal}
+                                          screenWidth={this.state.screenWidth}
+                                          screenHeight={this.state.screenHeight}
+                />;
             case 'game':
                 return <Game displayForm={this.displayForm}
                              logged_in={this.state.logged_in}
                              user={this.state.username}
-                             getTokenFromLocal={this.getTokenFromLocal}/>;
+                             getTokenFromLocal={this.getTokenFromLocal}
+                             screenWidth={this.state.screenWidth}
+                             screenHeight={this.state.screenHeight}
+                />;
         }
     }
 
@@ -168,7 +196,7 @@ class App extends React.Component {
         let form = this.chooseLayout();
 
         return (
-            <div className="main-form" style={{display: "grid", placeItems: "center"}}>
+            <div className="main-form">
                 {form}
             </div>
         )
