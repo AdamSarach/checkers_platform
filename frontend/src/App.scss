@@ -23,9 +23,7 @@
 
 //LOBBY PAGE>>>>>
 
-#user-list {
-  border-bottom: 5px solid $color-dark;
-}
+
 
 
 @media screen and (max-width: 600px) {
@@ -131,10 +129,22 @@ input {
   padding-bottom: 2px;
 }
 
-.div-scrollable {
+.current-users {
+  justify-content: space-between;
+}
 
+#user-list {
+  border-bottom: 5px solid $color-dark;
+  font-weight: bold;
+}
+
+.div-scrollable {
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.last-button{
+  width: 70px;
 }
 
 .border-padding-larger {

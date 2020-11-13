@@ -11,7 +11,8 @@ const chatSocket = new WebSocket(
 
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
-    document.getElementById("chat-log").value += (data.user + ": " + data.message + '\n');
+    document.getElementById("chat-log").value += (data.user + ":  " + data.message + '\n');
+    // document.getElementById("chat-log").innerHTML += (<span style={{fontWeight: "bold"}}> data.user + ":  " </span>+ data.message + '\n');
     const chatarea = document.getElementById('chat-log');
     chatarea.scrollTop = chatarea.scrollHeight;
 };

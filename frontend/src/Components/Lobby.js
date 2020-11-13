@@ -424,23 +424,23 @@ class Lobby extends React.Component {
                     <div id="user-list" className="div-scrollable" style={{maxHeight: maxMainHeight}}>
                         {currentUsersList
                             .map((person, index) => (
-                                <div key={index} className="current-users flex-wrapper task-wrapper" style={{justifyContent: "space-between"}}>
-                                    <div style={{flex: 7}}>
+                                <div key={index} className="flex-wrapper task-wrapper current-users">
+                                    <div style={{flex: 1}}>
                                         <span>{person}</span>
                                     </div>
                                     {people.includes(person) &&
                                     <React.Fragment>
-                                        <div style={{flex: 1}}>
+                                        <div style={{flex: 0}}>
                                             <button id={index + "_acceptButton-" + person}
-                                                    className="btn btn-sm btn-outline-success"
+                                                    className="btn btn-sm btn-outline-success last-button"
                                                     onClick={(e) => {
                                                         this.acceptOrRejectInvitation(e)
                                                     }}>Accept
                                             </button>
                                         </div>
-                                        <div style={{flex: 1}}>
+                                        <div style={{flex: 0}}>
                                             <button id={index + "_rejectButton-" + person}
-                                                    className="btn btn-sm btn-outline-danger"
+                                                    className="btn btn-sm btn-outline-danger last-button"
                                                     onClick={(e) => {
                                                         this.acceptOrRejectInvitation(e)
                                                     }}>Reject
@@ -449,9 +449,9 @@ class Lobby extends React.Component {
                                     </React.Fragment>
                                     }
                                     {!people.includes(person) &&
-                                    <div style={{flex: 1}}>
+                                    <div style={{flex: 0}} className="last-button">
                                         <button id={index + "_invitationButton-" + person}
-                                                className="btn btn-sm btn-outline-dark"
+                                                className="btn btn-sm btn-outline-dark last-button"
                                                 onClick={(e) => {
                                                     this.handleInvitation(e)
                                                 }}
