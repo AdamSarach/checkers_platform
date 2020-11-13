@@ -59,33 +59,26 @@ class Chatwindow extends React.Component {
     render() {
 
         return (
-            <div>
-                <div id="chat-window">
-                    <textarea className="border-padding border-padding-larger" id="chat-log" cols="40" rows="4"
+                <React.Fragment>
+                    <textarea id="chat-log" rows="4"
                               disabled></textarea>
+                    <input id="chat-message-input"
+                           type="text"
+                           onKeyPress={this.clickEnter}
+                           placeholder="Press enter to send a message..."
+                    />
                     <br/>
-                    <div className="flex-wrapper">
-                        <input className="pull-left border-padding border-padding-larger border-padding-lastitem"
-                               id="chat-message-input"
-                               type="text"
-                               size="40"
-                               onKeyPress={this.clickEnter}
-                               style={{flex: 7}}
-                               placeholder="Press enter to send a message..."
-                        />
-                        <br/>
-                        {/*<input*/}
-                        {/*    className="pull-right"*/}
-                        {/*    id="chat-message-submit"*/}
-                        {/*    type="button"*/}
-                        {/*    value="Send"*/}
-                        {/*    onClick={this.handleChatMessage}*/}
-                        {/*    style={{flex: 1}}*/}
-                        {/*/>*/}
-                    </div>
-                </div>
 
-            </div>
+                    {/*<input*/}
+                    {/*    className="pull-right"*/}
+                    {/*    id="chat-message-submit"*/}
+                    {/*    type="button"*/}
+                    {/*    value="Send"*/}
+                    {/*    onClick={this.handleChatMessage}*/}
+                    {/*    style={{flex: 1}}*/}
+                    {/*/>*/}
+                </React.Fragment>
+
         )
     }
 }

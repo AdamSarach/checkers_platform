@@ -58,8 +58,8 @@ class Registerpage extends React.Component {
                     </form>
                 </div>
 
-                <div className={ (this.props.screenWidth <= 767) ? "centered close-to-bottom" : "centered"}>
-                    <p >Already have an account?
+                <div className={ (this.props.screenWidth <= 767) ? "centered close-to-bottom bottom-container" : "centered"}>
+                    <p>Already have an account?
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('login')
                         }> Sign in </span>

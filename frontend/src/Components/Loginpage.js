@@ -58,8 +58,8 @@ class Loginpage extends React.Component {
                     </form>
                 </div>
 
-                <div>
-                    <p className="centered">Don't have an account?
+                <div className={ (this.props.screenWidth <= 767) ? "centered close-to-bottom bottom-container" : "centered"}>
+                    <p>Don't have an account?
                         <span className="span-link" onClick={() =>
                             this.props.displayForm('signup')
                         }> Register </span>

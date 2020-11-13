@@ -13,7 +13,7 @@
 .website-styles {
   background-color: $color-default;
   border-radius: 20px;
-  border: 0px solid $color-success;
+  border: 0px solid $color-dark;
 
   @media (max-width: 767px) {
     border-radius: 0px;
@@ -24,22 +24,9 @@
 //LOBBY PAGE>>>>>
 
 #user-list {
-  border-top: 5px solid $color-success;
-  border-bottom: 5px solid $color-success;
+  border-bottom: 5px solid $color-dark;
 }
 
-#chat-message-input {
-  width: 80%;
-}
-
-#chat-message-submit {
-  width: 20%;
-}
-
-#chat-log {
-  resize: none;
-  color: black;
-}
 
 @media screen and (max-width: 600px) {
   .div-scrollable {
@@ -81,6 +68,15 @@
   align-items: center;
   justify-content: center;
   border-radius: 20px 20px 0px 0px;
+  cursor: initial;
+}
+
+.lobby-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0px 0px 0px 0px;
   cursor: initial;
 }
 
@@ -136,44 +132,55 @@ input {
 }
 
 .div-scrollable {
-  max-height: 400px;
+
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-.border-padding {
-  margin: 5px;
-  padding: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
 }
 
 .border-padding-larger {
   margin: 0px 10px 0px 10px;
 }
 
-.border-padding-lastitem {
-  margin: 0px 10px 10px 10px;
+#chat-log {
 }
+
+#chat-log, #chat-message-input {
+  display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+#chat-log {
+  resize: none;
+  color: black;
+}
+
+
+
 
 .task-wrapper:hover {
   background-color: #F0F0F0;
 }
 
-.offset-from-border {
-  margin: 5px;
+.active-players-number {
   padding-left: 20px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: larger;
 }
 
-.margin-top-zero {
-  margin-top: 0px;
-}
 
 .close-to-right {
+  font-weight: bold;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 html, body, .main-form, #app, #app > div {
@@ -224,8 +231,11 @@ html, body, .main-form, #app, #app > div {
 
 
 .lobby-page {
+  height: 90%;
   height: 90vh;
-  min-width: 40vw;
+  width: 40%;
+  width: 40vw;
+  position:relative;
 
 
   @media (max-width: 767px) {
@@ -273,6 +283,7 @@ html, body, .main-form, #app, #app > div {
     width: 100vw;
     height: 100%;
     height: 100vh;
+    position: relative;
 
     .title-header {
       border-radius: 0px 0px 0px 0px;
@@ -316,7 +327,27 @@ html, body, .main-form, #app, #app > div {
 
 //<<<<<MAIN STYLES
 
+.bottom-container {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+}
 
-close-to-bottom {
+.close-to-bottom {
   margin-top: 200px;
+}
+
+.under-header {
+  background-color: $color-dark;
+  margin-top: 0px;
+  border: 0px solid $color-dark;
+  border-radius: 20px 20px 0px 0px;
+}
+
+.chat-zone {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
 }

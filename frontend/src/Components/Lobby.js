@@ -11,7 +11,8 @@ class Lobby extends React.Component {
             buttonList: [],
             sentInvitations: [],
             receivedInvitations: [],
-            opponentPlayer: ''
+            opponentPlayer: '',
+            mainHeight: 900
         }
     }
 
@@ -192,6 +193,17 @@ class Lobby extends React.Component {
 
         }
         //<<<<-CommunicationGlobal Socket
+
+        this.setState({
+            mainHeight: this.calculateUserListHeight()
+        })
+    }
+
+    calculateUserListHeight = () => {
+        const lobbySize = document.getElementById('lobby-all').clientHeight;
+        const headerSize = document.getElementById('lobby-header').clientHeight;
+        const chatSize = document.getElementById('lobby-chat').clientHeight;
+        return lobbySize - (headerSize + chatSize);
     }
 
 
@@ -386,30 +398,33 @@ class Lobby extends React.Component {
     render() {
         let currentUsersList = this.state.currentUsers;
         const people = this.state.receivedInvitations;
+        const maxMainHeight = this.state.mainHeight;
 
         return (
-            <div className="website-styles center-main-container lobby-page">
-                <div>
-                    <h3 className="badge-success centered title">
+            <div className="website-styles center-main-container lobby-page" id="lobby-all">
+                <div className="under-header" id="lobby-header">
+                    <div>
+                        <h1><span className="badge badge-dark title-header">
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Please log out and log in again...'}
-                    </h3>
-                </div>
-                <div>
-                    <div className="offset-from-border">
-                        Active players: {this.state.numbersOfPlayers}
+                        </span></h1>
                     </div>
-                    <button className="btn btn-sm btn-secondary margin-top-zero close-to-right"
-                            onClick={this.prepareLogout}>Logout
-                    </button>
-
+                    <div className="flex-wrapper">
+                        <div style={{flex: 7}} className="active-players-number">
+                            Active players: {this.state.numbersOfPlayers}
+                        </div>
+                        <button style={{flex: 1}} className="btn btn-sm btn-secondary close-to-right"
+                                onClick={this.prepareLogout}>Logout
+                        </button>
+                    </div>
+                    <div>
+                        <h2><span className="badge badge-dark lobby-header">Lobby</span></h2>
+                    </div>
                 </div>
-
-
-                <div>
-                    <div id="user-list" className="div-scrollable">
+                <div id="lobby-main">
+                    <div id="user-list" className="div-scrollable" style={{maxHeight: maxMainHeight}}>
                         {currentUsersList
                             .map((person, index) => (
-                                <div key={index} className="current-users flex-wrapper task-wrapper">
+                                <div key={index} className="current-users flex-wrapper task-wrapper" style={{justifyContent: "space-between"}}>
                                     <div style={{flex: 7}}>
                                         <span>{person}</span>
                                     </div>
@@ -449,9 +464,10 @@ class Lobby extends React.Component {
 
                     </div>
                 </div>
-                <div>
+                <div className="chat-zone" id="lobby-chat">
                     <Chatwindow
                         user={this.props.user}
+                        screenWidth={this.props.screenWidth}
                     />
                 </div>
             </div>
