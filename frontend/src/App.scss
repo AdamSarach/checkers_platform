@@ -152,6 +152,9 @@ input {
 }
 
 #chat-log {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 115px;
 }
 
 #chat-log, #chat-message-input {

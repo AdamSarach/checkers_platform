@@ -61,8 +61,7 @@ class Chatwindow extends React.Component {
 
         return (
                 <React.Fragment>
-                    <textarea id="chat-log" rows="4"
-                              disabled></textarea>
+                    <div id="chat-log" disabled></div>
                     <input id="chat-message-input"
                            type="text"
                            onKeyPress={this.clickEnter}
