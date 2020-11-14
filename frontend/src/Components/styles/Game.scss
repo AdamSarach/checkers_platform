@@ -15,7 +15,7 @@ $board-size: (8 * $square-size + 2 * $border-thickness) px;
 .game-status {
     display: block;
     padding: 5px;
-    background-color: #fff;
+    background-color: wheat;
     border: 5px solid #deb887;
     width: 55%;
     max-width: 500px;
@@ -59,7 +59,7 @@ $board-size: (8 * $square-size + 2 * $border-thickness) px;
 }
 
 .square.black {
-    background-color: #262626;
+    background-color: #484848;
 }
 
 .square.player1 {

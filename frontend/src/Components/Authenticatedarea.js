@@ -99,6 +99,10 @@ class Authenticatedarea extends React.Component {
     render() {
         let screen = this.chooseScreen();
 
+        // if(!this.props.user) {
+        //   return null;
+        // }
+
         return (
             <React.Fragment>
                 {screen}

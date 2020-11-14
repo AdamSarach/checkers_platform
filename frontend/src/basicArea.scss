@@ -12,6 +12,10 @@
   width: 80%;
   padding-left: 10px;
   padding-right: 10px;
+
+  @media (max-width: 767px) {
+    margin-top: 50px;
+  }
 }
 
 //<<<<<LOGIN AND REGISTER PAGE

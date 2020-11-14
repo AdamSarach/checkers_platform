@@ -13,7 +13,7 @@
 .website-styles {
   background-color: $color-default;
   border-radius: 20px;
-  border: 0px solid $color-success;
+  border: 0px solid $color-dark;
 
   @media (max-width: 767px) {
     border-radius: 0px;
@@ -23,23 +23,6 @@
 
 //LOBBY PAGE>>>>>
 
-#user-list {
-  border-top: 5px solid $color-success;
-  border-bottom: 5px solid $color-success;
-}
-
-#chat-message-input {
-  width: 80%;
-}
-
-#chat-message-submit {
-  width: 20%;
-}
-
-#chat-log {
-  resize: none;
-  color: black;
-}
 
 @media screen and (max-width: 600px) {
   .div-scrollable {
@@ -81,6 +64,15 @@
   align-items: center;
   justify-content: center;
   border-radius: 20px 20px 0px 0px;
+  cursor: initial;
+}
+
+.lobby-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0px 0px 0px 0px;
   cursor: initial;
 }
 
@@ -135,45 +127,81 @@ input {
   padding-bottom: 2px;
 }
 
+.current-users {
+  justify-content: space-between;
+}
+
+#user-list {
+  border-bottom: 5px solid $color-dark;
+  font-weight: bold;
+}
+
 .div-scrollable {
-  max-height: 400px;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.border-padding {
-  margin: 5px;
-  padding: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+.last-button {
+  width: 70px;
+}
+
+.logout-button {
+  width: 100px;
 }
 
 .border-padding-larger {
   margin: 0px 10px 0px 10px;
 }
 
-.border-padding-lastitem {
-  margin: 0px 10px 10px 10px;
+#chat-log {
+  background-color: white;
+  height: 115px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: left;
+
+
+}
+
+#chat-log, #chat-message-input {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+#chat-log {
+  resize: none;
+  color: black;
+}
+
+.chat-message {
+  padding-left: 5px;
+  margin: 0;
+}
+
+.bolded {
+  font-weight: bold;
 }
 
 .task-wrapper:hover {
   background-color: #F0F0F0;
 }
 
-.offset-from-border {
-  margin: 5px;
+.active-players-number {
   padding-left: 20px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: larger;
 }
 
-.margin-top-zero {
-  margin-top: 0px;
-}
 
 .close-to-right {
+  font-weight: bold;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 html, body, .main-form, #app, #app > div {
@@ -184,10 +212,6 @@ html, body, .main-form, #app, #app > div {
   margin: auto;
   display: grid;
   place-items: center;
-}
-
-.mainpage-buttons {
-
 }
 
 
@@ -224,8 +248,11 @@ html, body, .main-form, #app, #app > div {
 
 
 .lobby-page {
+  height: 90%;
   height: 90vh;
-  min-width: 40vw;
+  width: 40%;
+  width: 40vw;
+  position: relative;
 
 
   @media (max-width: 767px) {
@@ -264,7 +291,6 @@ html, body, .main-form, #app, #app > div {
 }
 
 
-
 .login-page, .register-page {
   width: 40vw;
 
@@ -273,6 +299,7 @@ html, body, .main-form, #app, #app > div {
     width: 100vw;
     height: 100%;
     height: 100vh;
+    position: relative;
 
     .title-header {
       border-radius: 0px 0px 0px 0px;
@@ -311,12 +338,96 @@ html, body, .main-form, #app, #app > div {
 
 .green-info {
   color: $color-success;
+}
 
+.left-padding {
+  padding-left: 5px;
+}
+
+.chat-message-style {
+  word-wrap: break-word;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 //<<<<<MAIN STYLES
 
+.bottom-container {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+}
 
-close-to-bottom {
-  margin-top: 200px;
+.close-to-bottom {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.subheader {
+  padding: 10px 25px 10px 10px;
+  margin-bottom: 10px;
+}
+
+.under-header {
+  background-color: $color-dark;
+  margin-top: 0px;
+  border: 0px solid $color-dark;
+  border-radius: 20px 20px 0px 0px;
+}
+
+.chat-zone {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+}
+
+.game-buttons {
+  justify-content: center;
+  margin-top: 10px;
+}
+
+
+.pop-up {
+  position: fixed;
+  z-index: 1;
+  width: 300px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  margin-top: -100px; /* Negative half of height. */
+  margin-left: -150px;
+  //margin: auto;
+  //display: grid;
+  //place-items: center;
+  //z-index: 1;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.pop-up-content {
+  margin: 20px;
+  //position: absolute;
+}
+
+.pop-up-title {
+  padding: 15px;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+#yes-button, #no-button {
+  font-weight: bold;
+  margin: 5px;
+}
+
+.yes-no-button {
+  justify-content: center;
+}
+
+.button-area{
+  margin-left: auto;
+  margin-right: auto;
 }
