@@ -12,7 +12,7 @@ class App extends React.Component {
     state = {
         displayedForm: 'mainpage',
         logged_in: false,
-        username: '',
+        username: null,
         infoMessage: '',
         errorMessage: '',
         initialView: true,
@@ -171,6 +171,9 @@ class App extends React.Component {
                                  screenHeight={this.state.screenHeight}
                 />;
             case 'authenticatedArea':
+                // if (!this.state.user) {
+                //     return null;
+                // }
                 return <Authenticatedarea displayForm={this.displayForm}
                                           logged_in={this.state.logged_in}
                                           user={this.state.username}
@@ -194,6 +197,7 @@ class App extends React.Component {
 
     render() {
         let form = this.chooseLayout();
+
 
         return (
             <div className="main-form">

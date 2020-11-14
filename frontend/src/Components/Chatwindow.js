@@ -1,4 +1,5 @@
 import React from "react";
+import DOMPurify from 'dompurify'
 
 const roomName = 'all';
 const chatSocket = new WebSocket(
@@ -11,21 +12,21 @@ const chatSocket = new WebSocket(
 
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
-    console.log("got message");
-    console.log(data.user + ":  " + data.message + '\n');
-    var outerDiv = document.getElementById("chat-log")
-    var innerDiv = document.createElement('div');
-    innerDiv.className = 'chat-message';
-    innerDiv.textContent= "hey";
-    outerDiv.appendChild(innerDiv);
-// The variable iDiv is still good... Just append to it.
-
-    // document.getElementById("chat-log").append(<div className="chat-message">Hello there</div>)
-
-    // data.user + ":  " + data.message + `&#10`);
-    // document.getElementById("chat-log").innerHTML += (<span style={{fontWeight: "bold"}}> data.user + ":  " </span>+ data.message + '\n');
-    const chatarea = document.getElementById('chat-log');
-    chatarea.scrollTop = chatarea.scrollHeight;
+    const outerDiv = document.getElementById("chat-log")
+    let number =  outerDiv.childElementCount
+    console.log(number);
+    if (number > 150) {
+        let spans = outerDiv.getElementsByTagName('span'); // Get HTMLCollection of elements with the li tag name.
+        outerDiv.removeChild(spans[0]);
+        let lineBreaks = outerDiv.getElementsByTagName('br'); // Get HTMLCollection of elements with the li tag name.
+        outerDiv.removeChild(lineBreaks[0]);
+    }
+    const sanitizedName = DOMPurify.sanitize(data.user);
+    const sanitizedMessage = DOMPurify.sanitize(data.message);
+    const name = sanitizedName + ":  ";
+    const insertData = "<span class='chat-message-style'><span class='bolded'>" + name + "</span>" + sanitizedMessage + "</span><br>"
+    outerDiv.innerHTML += insertData;
+    outerDiv.scrollTop = outerDiv.scrollHeight;
 };
 
 chatSocket.onclose = function (e) {
@@ -38,9 +39,7 @@ class Chatwindow extends React.Component {
         super(props);
     }
 
-    componentDidMount() {
 
-    }
 
     onResetInfoMessage = () => {
         this.setState(
@@ -56,40 +55,44 @@ class Chatwindow extends React.Component {
 
 
     handleChatMessage = (e) => {
-        console.log("Chat window, handlechatmessage: " + this.props.user);
         const element = document.getElementById("chat-message-input");
         const message = element.value;
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'user': this.props.user,
+        if (message.length > 1000) {
+            alert("Too long message, you can use maximum of 1000 chars per message")
+        } else {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'user': this.props.user,
 
-        }));
-        element.value = '';
+            }));
+            element.value = '';
+        }
+
     }
 
 
     render() {
 
         return (
-                <React.Fragment>
-                    <div id="chat-log" disabled><div className="chat-message">Hello</div><div className="chat-message">Hello</div><br/>
-                    </div>
-                    <input id="chat-message-input"
-                           type="text"
-                           onKeyPress={this.clickEnter}
-                           placeholder="Press enter to send a message..."
-                    />
-                    <br/>
+            <React.Fragment>
+                <div id="chat-log" disabled><span className="chat-message-style" style={{fontWeight: "bold", color: "blue"}}>// Its a chat. You can find here opponent to play //</span><br/>
+                </div>
+                <input id="chat-message-input"
+                       type="text"
+                       onKeyPress={this.clickEnter}
+                       placeholder="Press enter to send a message..."
+                />
+                <br/>
 
-                    {/*<input*/}
-                    {/*    className="pull-right"*/}
-                    {/*    id="chat-message-submit"*/}
-                    {/*    type="button"*/}
-                    {/*    value="Send"*/}
-                    {/*    onClick={this.handleChatMessage}*/}
-                    {/*    style={{flex: 1}}*/}
-                    {/*/>*/}
-                </React.Fragment>
+                {/*<input*/}
+                {/*    className="pull-right"*/}
+                {/*    id="chat-message-submit"*/}
+                {/*    type="button"*/}
+                {/*    value="Send"*/}
+                {/*    onClick={this.handleChatMessage}*/}
+                {/*    style={{flex: 1}}*/}
+                {/*/>*/}
+            </React.Fragment>
 
         )
     }

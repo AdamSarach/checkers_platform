@@ -203,7 +203,7 @@ class Lobby extends React.Component {
         const lobbySize = document.getElementById('lobby-all').clientHeight;
         const headerSize = document.getElementById('lobby-header').clientHeight;
         const chatSize = document.getElementById('lobby-chat').clientHeight;
-        return lobbySize - (headerSize + chatSize);
+        return lobbySize - (headerSize + chatSize + 5);
     }
 
 
@@ -400,6 +400,11 @@ class Lobby extends React.Component {
         const people = this.state.receivedInvitations;
         const maxMainHeight = this.state.mainHeight;
 
+        //pass data do chatwindow when available
+        // if(!this.props.user) {
+        //   return null;
+        // }
+
         return (
             <div className="website-styles center-main-container lobby-page" id="lobby-all">
                 <div className="under-header" id="lobby-header">
@@ -408,16 +413,13 @@ class Lobby extends React.Component {
                         {this.props.logged_in ? `Hello, ${this.props.user}` : 'Please log out and log in again...'}
                         </span></h1>
                     </div>
-                    <div className="flex-wrapper">
-                        <div style={{flex: 7}} className="active-players-number">
+                    <div className="flex-wrapper subheader">
+                        <div style={{flex: 1}} className="active-players-number">
                             Active players: {this.state.numbersOfPlayers}
                         </div>
-                        <button style={{flex: 1}} className="btn btn-sm btn-secondary close-to-right"
+                        <button style={{flex: 0}} className="btn btn-sm btn-danger logout-button"
                                 onClick={this.prepareLogout}>Logout
                         </button>
-                    </div>
-                    <div>
-                        <h2><span className="badge badge-dark lobby-header">Lobby</span></h2>
                     </div>
                 </div>
                 <div id="lobby-main">
@@ -467,7 +469,6 @@ class Lobby extends React.Component {
                 <div className="chat-zone" id="lobby-chat">
                     <Chatwindow
                         user={this.props.user}
-                        screenWidth={this.props.screenWidth}
                     />
                 </div>
             </div>

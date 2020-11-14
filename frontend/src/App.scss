@@ -24,8 +24,6 @@
 //LOBBY PAGE>>>>>
 
 
-
-
 @media screen and (max-width: 600px) {
   .div-scrollable {
     max-height: 200px;
@@ -143,8 +141,12 @@ input {
   overflow-y: auto;
 }
 
-.last-button{
+.last-button {
   width: 70px;
+}
+
+.logout-button {
+  width: 100px;
 }
 
 .border-padding-larger {
@@ -152,12 +154,11 @@ input {
 }
 
 #chat-log {
-  background-color:white;
+  background-color: white;
   height: 115px;
   overflow-x: hidden;
   overflow-y: auto;
   text-align: left;
-
 
 
 }
@@ -179,7 +180,9 @@ input {
   margin: 0;
 }
 
-
+.bolded {
+  font-weight: bold;
+}
 
 .task-wrapper:hover {
   background-color: #F0F0F0;
@@ -209,10 +212,6 @@ html, body, .main-form, #app, #app > div {
   margin: auto;
   display: grid;
   place-items: center;
-}
-
-.mainpage-buttons {
-
 }
 
 
@@ -253,7 +252,7 @@ html, body, .main-form, #app, #app > div {
   height: 90vh;
   width: 40%;
   width: 40vw;
-  position:relative;
+  position: relative;
 
 
   @media (max-width: 767px) {
@@ -290,7 +289,6 @@ html, body, .main-form, #app, #app > div {
   }
 
 }
-
 
 
 .login-page, .register-page {
@@ -340,7 +338,16 @@ html, body, .main-form, #app, #app > div {
 
 .green-info {
   color: $color-success;
+}
 
+.left-padding {
+  padding-left: 5px;
+}
+
+.chat-message-style {
+  word-wrap: break-word;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 //<<<<<MAIN STYLES
@@ -353,7 +360,13 @@ html, body, .main-form, #app, #app > div {
 }
 
 .close-to-bottom {
-  margin-top: 200px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.subheader {
+  padding: 10px 25px 10px 10px;
+  margin-bottom: 10px;
 }
 
 .under-header {
@@ -368,4 +381,53 @@ html, body, .main-form, #app, #app > div {
   bottom: 0px;
   left: 0;
   right: 0;
+}
+
+.game-buttons {
+  justify-content: center;
+  margin-top: 10px;
+}
+
+
+.pop-up {
+  position: fixed;
+  z-index: 1;
+  width: 300px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  margin-top: -100px; /* Negative half of height. */
+  margin-left: -150px;
+  //margin: auto;
+  //display: grid;
+  //place-items: center;
+  //z-index: 1;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.pop-up-content {
+  margin: 20px;
+  //position: absolute;
+}
+
+.pop-up-title {
+  padding: 15px;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+#yes-button, #no-button {
+  font-weight: bold;
+  margin: 5px;
+}
+
+.yes-no-button {
+  justify-content: center;
+}
+
+.button-area{
+  margin-left: auto;
+  margin-right: auto;
 }
