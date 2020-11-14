@@ -83,8 +83,6 @@ export class Game extends React.Component {
                 }
 
 
-
-
             } else if ("yes_no_message" in data) {
                 console.log("yes_no_button received");
                 if (data.yes_no_message === true) {
@@ -177,6 +175,7 @@ export class Game extends React.Component {
         console.log("Play Again Button Clicked")
         this.turnPlayAgainButton(false);
         this.sendButtonMessage('newGame');
+        this.setState({gameStatus: "Request has been sent"})
 
     }
 
@@ -502,13 +501,7 @@ export class Game extends React.Component {
                         </button>
                     </div>
                 </div>
-                <div style={{
-                    color: '#cd3532', fontWeight: 'bold', display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '32px',
-                    marginBottom: '8px'
-                }}>
+                <div className="first-player-text">
                     {this.props.isFirstPlayer ? <span>You</span> : <span>{this.props.opponent}</span>}
                 </div>
                 <div className="reactCheckers">
@@ -527,19 +520,13 @@ export class Game extends React.Component {
                     </div>
                 </div>
 
-                <div style={{
-                    color: '#0c9d94', fontWeight: 'bold', display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '32px',
-                    marginTop: '16px'
-                }}>
+                <div className="second-player-text">
                     {this.props.isFirstPlayer ? <span>{this.props.opponent}</span> : <span>You</span>}
                 </div>
                 <React.Fragment>
                     {this.state.newGameRequest &&
                     <GamePopUp noButton={this.noButtonClick}
-                                yesButton={this.yesButtonClick}
+                               yesButton={this.yesButtonClick}
                     />}
                 </React.Fragment>
             </div>
