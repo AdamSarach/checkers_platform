@@ -1,134 +1,594 @@
+@import './../../colors';
+@import './../../scales';
+
 $square-size: 65px;
 $border-thickness: 10px;
-$board-size: (8 * $square-size + 2 * $border-thickness) px;
+$board-size: (8 * $square-size + 2 * $border-thickness);
+
+
+$square-landscape-600: $factor-600 * 70px;
+$square-landscape-720: $factor-720 * 70px;
+$square-landscape-768: $factor-768 * 70px;
+$square-landscape-800: $factor-800 * 70px;
+$square-landscape-834: $factor-834 * 70px;
+$square-landscape-900: 70px;
+$square-landscape-1050: $factor-1050 * 70px;
+$square-landscape-1080: $factor-1080 * 70px;
+$square-landscape-1440: $factor-1440 * 70px;
+
+
+$square-portrait-540: $factor-540-portrait * 80px;
+$square-portrait-640: $factor-640-portrait * 80px;
+$square-portrait-720: 80px;
+$square-portrait-750: $factor-750-portrait * 80px;
+$square-portrait-1080: $factor-1080-portrait * 80px;
+$square-portrait-1125: $factor-1125-portrait * 80px;
+$square-portrait-1440: $factor-1440-portrait * 80px;
+
+
+.game-page {
+  width: 60%;
+  width: 60vw;
+  height: 90%;
+  height: 90vh;
+
+
+  @media (max-width: 1500px) and (orientation: portrait) {
+    width: 100%;
+    width: 100vw;
+    height: 100%;
+    height: 100vh;
+  }
+
+}
 
 .game-board {
-    display: inline-block;
-    border: 10px solid #008b8b;
-    margin: 0 auto;
-    position: relative;
-    max-width: 540px;
-        display: flex;
-    justify-content: center;
+  border: 10px solid black;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .game-status {
-    display: block;
-    padding: 5px;
-    background-color: wheat;
-    border: 5px solid #deb887;
-    width: 55%;
-    max-width: 500px;
-    font-size: 30px;
-    position: relative;
-    top: 15px;
-    z-index: 3;
-    margin: 0 auto;
+  display: block;
+  padding: 5px;
+  background-color: wheat;
+  border: 5px solid #deb887;
+  width: 55%;
+  font-size: 30px;
+  position: relative;
+  top: 15px;
+  z-index: 3;
+  margin: 0 auto;
+  text-align: center;
+  text-align: -moz-center;
+  text-align: -webkit-center;
+
+
+  @media screen and (min-width: 500px) and (orientation: landscape) {
+    width: ($board-size -40px);
+  }
+
 }
 
 
 .board-col {
-    display: inline-block;
-    max-width: 65px;
+  display: inline-block;
+  max-width: $square-size;
 }
 
 .square {
-    background: no-repeat #fff;
-    border: none;
-    height: 65px;
-    width: 65px;
-    padding: 5px;
-    background-origin: content-box;
-    background-size: contain;
+  background: no-repeat #fff;
+  border: none;
+  height: $square-size;
+  width: $square-size;
+  padding: 5px;
+  background-origin: content-box;
+  background-size: contain;
+}
+
+.first-player-text, .second-player-text {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
 }
 
 .isActive {
-    background-color: wheat;
+  background-color: wheat;
 }
 
 .square.movable.player1-move {
-    background-color: #ff6347;
+  background-color: $color-available-moves-1;
 }
 
 .square.movable.player2-move {
-    background-color: #7fffd4;
+  background-color: $color-available-moves-2;
 }
 
 .square.player1, .square.player2, .square.movable {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .square.black {
-    background-color: #484848;
+  background-color: $color-square-dark;
 }
 
 .square.player1 {
-    background-image: url("img/red-pawn.png");
+  background-image: url("img/red-pawn.png");
 }
+
 .square.player2 {
-    background-image: url("img/blue-pawn.png");
+  background-image: url("img/blue-pawn.png");
 }
+
 .square.player1.king {
-    background-image: url("img/red-king.png");
+  background-image: url("img/red-king.png");
 }
+
 .square.player2.king {
-    background-image: url("img/blue-king.png");
+  background-image: url("img/blue-king.png");
 }
 
-@media only screen and (max-width: 700px) {
 
-    .board-col {
-        max-width: 60px;
-    }
-    .square {
-        height: 60px;
-        width: 60px;
-    }
+@media screen and (min-height: 600px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-600 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-600;
+  }
+  .square {
+    height: $square-landscape-600;
+    width: $square-landscape-600;
+  }
+  .game-board {
+    width: (8 * $square-landscape-600 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-600);
+  }
+  .game-status {
+    font-size: (30px * $factor-600);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-600);
+  }
 }
 
-@media only screen and (max-width: 520px) {
+@media screen and (min-height: 720px) and (orientation: landscape) {
 
-    .board-col {
-        max-width: 50px;
-    }
-    .square {
-        height: 50px;
-        width: 50px;
-    }
+  .game-page {
+    width: (8 * $square-landscape-720 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-720;
+  }
+  .square {
+    height: $square-landscape-720;
+    width: $square-landscape-720;
+  }
+  .game-board {
+    width: (8 * $square-landscape-720 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-720);
+  }
+  .game-status {
+    font-size: (30px * $factor-720);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-720);
+  }
 }
 
-@media only screen and (max-width: 440px) {
+@media screen and (min-height: 768px) and (orientation: landscape) {
 
-    .board-col {
-        max-width: 40px;
-    }
-    .square {
-        height: 40px;
-        width: 40px;
-    }
+  .game-page {
+    width: (8 * $square-landscape-768 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-768;
+  }
+  .square {
+    height: $square-landscape-768;
+    width: $square-landscape-768;
+  }
+  .game-board {
+    width: (8 * $square-landscape-768 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-768);
+  }
+  .game-status {
+    font-size: (30px * $factor-768);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-768);
+  }
 }
 
-@media only screen and (max-width: 370px) {
+@media screen and (min-height: 800px) and (orientation: landscape) {
 
-    .board-col {
-        max-width: 35px;
-    }
-    .square {
-        height: 35px;
-        width: 35px;
-    }
+  .game-page {
+    width: (8 * $square-landscape-800 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-800;
+  }
+  .square {
+    height: $square-landscape-800;
+    width: $square-landscape-800;
+  }
+  .game-board {
+    width: (8 * $square-landscape-800 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-800);
+  }
+  .game-status {
+    font-size: (30px* $factor-800);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px* $factor-800);
+  }
 }
+
+@media screen and (min-height: 834px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-834 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-834;
+  }
+  .square {
+    height: $square-landscape-834;
+    width: $square-landscape-834;
+  }
+  .game-board {
+    width: (8 * $square-landscape-834 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-834);
+  }
+  .game-status {
+    font-size: (30px * $factor-834);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-834);
+  }
+}
+
+@media screen and (min-height: 900px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-900 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-900;
+  }
+  .square {
+    height: $square-landscape-900;
+    width: $square-landscape-900;
+  }
+  .game-board {
+    width: (8 * $square-landscape-900 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-900);
+  }
+  .game-status {
+    font-size: (30px * $factor-900);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-900);
+  }
+}
+
+@media screen and (min-height: 1050px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-1050 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-1050;
+  }
+  .square {
+    height: $square-landscape-1050;
+    width: $square-landscape-1050;
+  }
+  .game-board {
+    width: (8 * $square-landscape-1050 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-1050);
+  }
+  .game-status {
+    font-size: (30px * $factor-1050);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-1050);
+  }
+}
+
+@media screen and (min-height: 1080px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-1080 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-1080;
+  }
+  .square {
+    height: $square-landscape-1080;
+    width: $square-landscape-1080;
+  }
+  .game-board {
+    width: (8 * $square-landscape-1080 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-1080);
+  }
+  .game-status {
+    font-size: (30px * $factor-1080);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px * $factor-1080);
+  }
+}
+
+@media screen and (min-height: 1440px) and (orientation: landscape) {
+
+  .game-page {
+    width: (8 * $square-landscape-1440 + 2 * $border-thickness + 40);
+  }
+  .board-col {
+    max-width: $square-landscape-1440;
+  }
+  .square {
+    height: $square-landscape-1440;
+    width: $square-landscape-1440;
+  }
+  .game-board {
+    width: (8 * $square-landscape-1440 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (32px * $factor-1440);
+  }
+  .game-status {
+    font-size: (30px* $factor-1440);
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (24px* $factor-1440);
+  }
+}
+
+//PORTRAIT MOBILE
+@media screen and (orientation: portrait) {
+  .game-page{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-buttons {
+    margin-top: 30px;
+    flex-grow: 0;
+  }
+  .game-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+
+@media screen and (max-width: 1440px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-1440;
+  }
+  .square {
+    height: $square-portrait-1440;
+    width: $square-portrait-1440;
+  }
+  .game-board {
+    width: (8 * $square-portrait-1440 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-1440-portrait);
+  }
+  .game-status {
+    font-size: (50px* $factor-1440-portrait);
+    width: (8 * $square-portrait-1440 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px* $factor-1440-portrait);
+  }
+}
+
+@media screen and (max-width: 1125px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-1125;
+  }
+  .square {
+    height: $square-portrait-1125;
+    width: $square-portrait-1125;
+  }
+  .game-board {
+    width: (8 * $square-portrait-1125 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-1125-portrait);
+  }
+  .game-status {
+    font-size: (50px* $factor-1125-portrait);
+    width: (8 * $square-portrait-1125 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px* $factor-1125-portrait);
+  }
+}
+
+@media screen and (max-width: 1080px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-1080;
+  }
+  .square {
+    height: $square-portrait-1080;
+    width: $square-portrait-1080;
+  }
+  .game-board {
+    width: (8 * $square-portrait-1080 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-1080-portrait);
+  }
+  .game-status {
+    font-size: (50px* $factor-1080-portrait);
+    width: (8 * $square-portrait-1080 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px* $factor-1080-portrait);
+  }
+}
+
+@media screen and (max-width: 750px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-750;
+  }
+  .square {
+    height: $square-portrait-750;
+    width: $square-portrait-750;
+  }
+  .game-board {
+    width: (8 * $square-portrait-750 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-750-portrait);
+  }
+  .game-status {
+    font-size: (50px* $factor-750-portrait);
+    width: (8 * $square-portrait-750 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px* $factor-750-portrait);
+  }
+}
+
+@media screen and (max-width: 720px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-720;
+  }
+  .square {
+    height: $square-portrait-720;
+    width: $square-portrait-720;
+  }
+  .game-board {
+    width: (8 * $square-portrait-720 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-720-portrait);
+  }
+  .game-status {
+    font-size: (50px * $factor-720-portrait);
+    width: (8 * $square-portrait-1440 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px * $factor-720-portrait);
+  }
+}
+
+@media screen and (max-width: 640px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-640;
+  }
+  .square {
+    height: $square-portrait-640;
+    width: $square-portrait-640;
+  }
+  .game-board {
+    width: (8 * $square-portrait-640 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-640-portrait);
+  }
+  .game-status {
+    font-size: (50px * $factor-640-portrait);
+    width: (8 * $square-portrait-640 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px * $factor-640-portrait);
+  }
+}
+
+@media screen and (max-width: 540px) and (orientation: portrait) {
+
+  .board-col {
+    max-width: $square-portrait-540;
+  }
+  .square {
+    height: $square-portrait-540;
+    width: $square-portrait-540;
+  }
+  .game-board {
+    width: (8 * $square-portrait-540 + 2 * $border-thickness);
+  }
+  .first-player-text, .second-player-text {
+    font-size: (50px * $factor-540-portrait);
+  }
+  .game-status {
+    font-size: (50px * $factor-540-portrait);
+    width: (8 * $square-portrait-540 + 2 * $border-thickness - 40)
+  }
+  #giveUpButton, #lobbyButton, #playAgainButton {
+    font-size: (32px * $factor-540-portrait);
+  }
+}
+
 
 body {
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  monospace;
+}
+
+
+.first-player-text {
+  color: $color-player1-pieces;
+  margin-bottom: -8px
+}
+
+.second-player-text {
+  color: $color-player2-pieces;
+  margin-top: 8px
+}
+
+#giveUpButton {
+  border-radius: 10px 0 0 10px;
+}
+
+#lobbyButton {
+  border-radius: 0;
+}
+
+#playAgainButton {
+  border-radius: 0 10px 10px 0;
 }

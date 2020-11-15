@@ -26,22 +26,17 @@ export default class Board extends React.Component {
     render() {
         let boardRender = [];
         let columnsRender = [];
-
         const moves = this.props.moves;
 
         for (let coordinates in this.props.boardState) {
-
             if (!this.props.boardState.hasOwnProperty(coordinates)) {
                 continue;
             }
 
             const col = utils.getColAsInt(this.props.columns, coordinates);
             const row = utils.getRowAsInt(coordinates);
-
             const currentPlayer = utils.returnPlayerName(this.props.currentPlayer);
-
             const colorClass  = ( (utils.isOdd(col) && utils.isOdd(row)) || (!utils.isOdd(col) && !(utils.isOdd(row)) ) ) ? 'white' : 'black';
-
             let squareClasses = [];
 
             squareClasses.push(coordinates);
@@ -65,7 +60,6 @@ export default class Board extends React.Component {
             }
 
             squareClasses = squareClasses.join(' ');
-
             columnsRender.push(this.renderSquare(coordinates, squareClasses, this.props.boardState[coordinates]));
 
             if (columnsRender.length >= 8) {
