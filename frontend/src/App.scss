@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'scales';
 
 .website-all {
   height: 100vh;
@@ -279,21 +280,7 @@ html, body, .main-form, #app, #app > div {
   //}
 }
 
-.game-page {
-  width: 60%;
-  width: 60vw;
-  height: 90%;
-  height: 90vh;
 
-
-  @media (max-width: 1500px) and (orientation: portrait) {
-    width: 100%;
-    width: 100vw;
-    height: 100%;
-    height: 100vh;
-  }
-
-}
 
 
 .login-page, .register-page {
@@ -432,4 +419,13 @@ html, body, .main-form, #app, #app > div {
 .button-area{
   margin-left: auto;
   margin-right: auto;
+}
+
+.main-page, .login-page, .register-page {
+
+  @media screen and (orientation: portrait) {
+      display: flex;
+      flex-direction: column;
+
+  }
 }

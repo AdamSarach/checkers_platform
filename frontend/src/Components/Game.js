@@ -67,7 +67,8 @@ export class Game extends React.Component {
                         this.turnPlayAgainButton(false);
                         this.setState({
                             gameStatus: "Opponent has has moved into lobby.",
-                            isOpponentInGame: false
+                            isOpponentInGame: false,
+                            newGameRequest: false
                         })
                         break;
                     case "newGame":
@@ -75,10 +76,9 @@ export class Game extends React.Component {
                         this.turnGiveUpButton(false);
                         this.turnLobbyButton(false);
                         this.turnPlayAgainButton(false);
-                        console.log(this.state.newGameRequest);
                         this.setState({
                             newGameRequest: true
-                        }, () => console.log(this.state.newGameRequest))
+                        })
                         break;
                 }
 
@@ -149,6 +149,10 @@ export class Game extends React.Component {
     }
 
     handleGiveUpButton = () => {
+        const giveUpButton = document.getElementById("giveUpButton");
+        if (giveUpButton.classList.contains("disabled")) {
+            return;
+        }
         console.log("Give Up Button Clicked")
         this.turnGiveUpButton(false);
         this.turnLobbyButton(true);
@@ -159,6 +163,10 @@ export class Game extends React.Component {
     }
 
     goToLobbyButton = () => {
+        const lobbyButton = document.getElementById("lobbyButton");
+        if (lobbyButton.classList.contains("disabled")) {
+            return;
+        }
         this.sendButtonMessage('lobby');
         try {
             this.gameSocket.close()
@@ -172,6 +180,10 @@ export class Game extends React.Component {
     }
 
     playAgainButton = () => {
+        const playAgainButton = document.getElementById("playAgainButton");
+        if (playAgainButton.classList.contains("disabled")) {
+            return;
+        }
         console.log("Play Again Button Clicked")
         this.turnPlayAgainButton(false);
         this.sendButtonMessage('newGame');
@@ -501,35 +513,40 @@ export class Game extends React.Component {
                         </button>
                     </div>
                 </div>
-                <div className="first-player-text">
-                    {this.props.isFirstPlayer ? <span>You</span> : <span>{this.props.opponent}</span>}
-                </div>
-                <div className="reactCheckers">
-                    <div className="game-status" id="game-status" style={{borderColor: this.setBorderColor()}}>
-                        {this.state.winnerInfo || gameStatus}
-                    </div>
-                    <div className="game-board" style={{borderColor: this.setBorderColor()}}>
-                        <Board
-                            boardState={boardState}
-                            currentPlayer={currentPlayer}
-                            activePiece={activePiece}
-                            moves={moves}
-                            columns={columns}
-                            onClick={(coordinates) => this.handleClick(coordinates)}
-                        />
-                    </div>
+
+                   <div className="game-area">
+                        <div className="first-player-text">
+                            {this.props.isFirstPlayer ? <span>You</span> : <span>{this.props.opponent}</span>}
+                        </div>
+                        <div className="reactCheckers">
+                            <div className="game-status" id="game-status" style={{borderColor: this.setBorderColor()}}>
+                                {this.state.winnerInfo || gameStatus}
+                            </div>
+                            <div className="game-board" style={{borderColor: this.setBorderColor()}}>
+                                <Board
+                                    boardState={boardState}
+                                    currentPlayer={currentPlayer}
+                                    activePiece={activePiece}
+                                    moves={moves}
+                                    columns={columns}
+                                    onClick={(coordinates) => this.handleClick(coordinates)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="second-player-text">
+                            {this.props.isFirstPlayer ? <span>{this.props.opponent}</span> : <span>You</span>}
+                        </div>
+                        <React.Fragment>
+                            {this.state.newGameRequest &&
+                            <GamePopUp noButton={this.noButtonClick}
+                                       yesButton={this.yesButtonClick}
+                            />}
+                        </React.Fragment>
                 </div>
 
-                <div className="second-player-text">
-                    {this.props.isFirstPlayer ? <span>{this.props.opponent}</span> : <span>You</span>}
-                </div>
-                <React.Fragment>
-                    {this.state.newGameRequest &&
-                    <GamePopUp noButton={this.noButtonClick}
-                               yesButton={this.yesButtonClick}
-                    />}
-                </React.Fragment>
             </div>
+
 
         );
     }
