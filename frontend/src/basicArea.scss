@@ -1,0 +1,36 @@
+@import 'colors';
+
+
+
+
+//LOGIN & REGISTER PAGE>>>>>
+
+.login-form, .register-form {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  @media (max-width: 767px) {
+    margin-top: 50px;
+  }
+}
+
+//<<<<<LOGIN AND REGISTER PAGE
+
+//MAIN PAGE>>>>>ou
+
+img {
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin: auto;
+  padding: 10px;
+}
+
+
+//<<<<<MAIN PAGE
+
+

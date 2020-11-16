@@ -18,7 +18,7 @@ class TestRegisterUser(APITestCase):
         response = self.client.post(self.url, data={'username': username, 'password': password}, format='json')
         self.assertEqual(response.status_code, 201)
 
-    def test_create_invalid(self):
+    def test_create_duplicated_user(self):
         password = 'mypassword'
         username = 'my_test_user_1'
         my_user1 = User.objects.create_user(username=username, password=password)
@@ -44,7 +44,6 @@ class TestUserList(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_userlist(self):
-
         password = 'mypassword'
         username = 'my_test_user_1'
         username2 = 'my_test_user_2'
@@ -62,9 +61,8 @@ class TestUserList(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-class TestNameByToken(APITestCase):
-    def test_get(self):
-
+class TestToken(APITestCase):
+    def test_recognize_token(self):
         password = 'mypassword'
         username = 'my_test_user_1'
         my_user1 = User.objects.create_user(username=username, password=password)
@@ -112,3 +110,36 @@ class TestActiveUsers(APITestCase):
         user = User.objects.get(username=username)
         self.assertEqual(user.profile.is_online, False)
 
+
+class TestUserFields(APITestCase):
+    def test_user_in_game(self):
+        password = 'mypassword'
+        username = 'my_test_user_1'
+        my_user1 = User.objects.create_user(username=username, password=password)
+        self.url_token = reverse('token')
+        self.user_token_emp = self.client.post(
+            self.url_token,
+            data={'username': username, 'password': password}).data['access']
+        self.user_header = 'Bearer ' + self.user_token_emp
+        self.url = reverse('in-game')
+        user = User.objects.get(username=username)
+        user.profile.in_game = False
+        user.profile.save()
+        response = self.client.post(self.url, HTTP_AUTHORIZATION=self.user_header)
+        self.assertEqual(response.data['is player in game?'], True)
+
+    def test_user_out_game(self):
+        password = 'mypassword'
+        username = 'my_test_user_1'
+        my_user1 = User.objects.create_user(username=username, password=password)
+        self.url_token = reverse('token')
+        self.user_token_emp = self.client.post(
+            self.url_token,
+            data={'username': username, 'password': password}).data['access']
+        self.user_header = 'Bearer ' + self.user_token_emp
+        self.url = reverse('out-game')
+        user = User.objects.get(username=username)
+        user.profile.in_game = True
+        user.profile.save()
+        response = self.client.post(self.url, HTTP_AUTHORIZATION=self.user_header)
+        self.assertEqual(response.data['is player in game?'], False)
