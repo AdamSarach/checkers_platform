@@ -66,16 +66,6 @@ def get_active_users(request):
 
 
 @api_view(['GET'])
-@permission_classes([])
-def get_active_users_unsafe(request):
-    """To be deleted in production"""
-    response_list = []
-    users_current = User.objects.filter(profile__is_online=True)
-    serializer = UserSerializer(users_current, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
 def get_online(request):
 
     # try:
@@ -112,7 +102,7 @@ def make_in_game(request):
     #     return Response({'message': "Token couldn't be verified."})
     user.profile.in_game = True
     user.profile.save()
-    return Response({'is player in game?': user.profile.is_online})
+    return Response({'is player in game?': user.profile.in_game})
 
 
 @api_view(['POST'])
@@ -124,7 +114,7 @@ def make_out_game(request):
     #     return Response({'message': "Token couldn't be verified."})
     user.profile.in_game = False
     user.profile.save()
-    return Response({'is player in game?': user.profile.is_online})
+    return Response({'is player in game?': user.profile.in_game})
 
 
 @api_view(['GET'])
