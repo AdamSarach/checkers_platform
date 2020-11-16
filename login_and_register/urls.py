@@ -13,7 +13,6 @@ urlpatterns = [
     path('in_game/', make_in_game, name='in-game'),
     path('out_game/', make_out_game, name='out-game'),
     path('all_users/', UserList.as_view(), name='get-all-users'),
-    path('all_users_unsafe/', UserListUnsafe.as_view(), name='get-all-users-unsafe'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('game_users/', get_in_game_users, name='game-users'),
 ]
