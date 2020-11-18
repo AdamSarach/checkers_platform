@@ -2,6 +2,8 @@
 import React from "react";
 import '../basicArea.scss'
 
+console.log("v 1.1.2");
+
 class Mainpage extends React.Component {
     constructor(props) {
         super(props);

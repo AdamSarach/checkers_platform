@@ -5,42 +5,28 @@ $square-size: 65px;
 $border-thickness: 10px;
 $board-size: (8 * $square-size + 2 * $border-thickness);
 
+$square-landscape-base: 70px;
 
-$square-landscape-600: $factor-600 * 70px;
-$square-landscape-720: $factor-720 * 70px;
-$square-landscape-768: $factor-768 * 70px;
-$square-landscape-800: $factor-800 * 70px;
-$square-landscape-834: $factor-834 * 70px;
-$square-landscape-900: 70px;
-$square-landscape-1050: $factor-1050 * 70px;
-$square-landscape-1080: $factor-1080 * 70px;
-$square-landscape-1440: $factor-1440 * 70px;
+$square-landscape-600: $factor-600 * $square-landscape-base;
+$square-landscape-720: $factor-720 * $square-landscape-base;
+$square-landscape-768: $factor-768 * $square-landscape-base;
+$square-landscape-800: $factor-800 * $square-landscape-base;
+$square-landscape-834: $factor-834 * $square-landscape-base;
+$square-landscape-900: $square-landscape-base;
+$square-landscape-1050: $factor-1050 * $square-landscape-base;
+$square-landscape-1080: $factor-1080 * $square-landscape-base;
+$square-landscape-1440: $factor-1440 * $square-landscape-base;
 
+$square-portrait-base: 70px;
 
-$square-portrait-540: $factor-540-portrait * 80px;
-$square-portrait-640: $factor-640-portrait * 80px;
-$square-portrait-720: 80px;
-$square-portrait-750: $factor-750-portrait * 80px;
-$square-portrait-1080: $factor-1080-portrait * 80px;
-$square-portrait-1125: $factor-1125-portrait * 80px;
-$square-portrait-1440: $factor-1440-portrait * 80px;
+$square-portrait-540: $factor-540-portrait * $square-portrait-base;
+$square-portrait-640: $factor-640-portrait * $square-portrait-base;
+$square-portrait-720: $square-portrait-base;
+$square-portrait-750: $factor-750-portrait * $square-portrait-base;
+$square-portrait-1080: $factor-1080-portrait * $square-portrait-base;
+$square-portrait-1125: $factor-1125-portrait * $square-portrait-base;
+$square-portrait-1440: $factor-1440-portrait * $square-portrait-base;
 
-
-.game-page {
-  width: 60%;
-  width: 60vw;
-  height: 90%;
-  height: 90vh;
-
-
-  @media (max-width: 1500px) and (orientation: portrait) {
-    width: 100%;
-    width: 100vw;
-    height: 100%;
-    height: 100vh;
-  }
-
-}
 
 .game-board {
   border: 10px solid black;
@@ -65,11 +51,6 @@ $square-portrait-1440: $factor-1440-portrait * 80px;
   text-align: -moz-center;
   text-align: -webkit-center;
 
-
-  @media screen and (min-width: 500px) and (orientation: landscape) {
-    width: ($board-size -40px);
-  }
-
 }
 
 
@@ -79,7 +60,7 @@ $square-portrait-1440: $factor-1440-portrait * 80px;
 }
 
 .square {
-  background: no-repeat #fff;
+  background: no-repeat #e5e5e5;
   border: none;
   height: $square-size;
   width: $square-size;
@@ -130,6 +111,20 @@ $square-portrait-1440: $factor-1440-portrait * 80px;
 
 .square.player2.king {
   background-image: url("img/blue-king.png");
+}
+
+
+@media screen and (orientation: landscape) {
+  .game-page {
+    width: 60%;
+    width: 60vw;
+    height: 90%;
+    height: 90vh;
+  }
+
+  .game-status{
+    width: 60%;
+  }
 }
 
 
@@ -369,7 +364,9 @@ $square-portrait-1440: $factor-1440-portrait * 80px;
 
 //PORTRAIT MOBILE
 @media screen and (orientation: portrait) {
-  .game-page{
+  .game-page {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -501,7 +498,7 @@ $square-portrait-1440: $factor-1440-portrait * 80px;
   }
   .game-status {
     font-size: (50px * $factor-720-portrait);
-    width: (8 * $square-portrait-1440 + 2 * $border-thickness - 40)
+    width: (8 * $square-portrait-720 + 2 * $border-thickness - 40)
   }
   #giveUpButton, #lobbyButton, #playAgainButton {
     font-size: (32px * $factor-720-portrait);

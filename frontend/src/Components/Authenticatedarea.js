@@ -20,7 +20,7 @@ class Authenticatedarea extends React.Component {
         switch (this.state.displayedScreen) {
             case 'lobby':
                 return <Lobby
-                    displayedScreen={this.props.displayedScreen}
+                    displayedScreen={this.state.displayedScreen}
                     displayForm={this.props.displayForm}
                     setOpponent={this.setOpponent}
                     logged_in={this.props.logged_in}
@@ -34,7 +34,7 @@ class Authenticatedarea extends React.Component {
                     finishedGameRecentlyProp = {this.finishedGameRecentlyProp}
                 />;
             case 'game':
-                return <Game displayedScreen={this.displayedScreen}
+                return <Game displayedScreen={this.state.displayedScreen}
                              displayForm={this.props.displayForm}
                              opponent={this.state.opponentPlayer}
                              goToLobby={this.goToLobby}
@@ -45,7 +45,7 @@ class Authenticatedarea extends React.Component {
                 />;
             default:
                 return <Lobby
-                    displayedScreen={this.props.displayedScreen}
+                    displayedScreen={this.state.displayedScreen}
                     displayForm={this.props.displayForm}
                     setOpponent={this.setOpponent}
                     logged_in={this.props.logged_in}
