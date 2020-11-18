@@ -28,7 +28,6 @@ class Lobby extends React.Component {
             console.warn(error);
         }
 
-        // this.produceButtonValues(this.state.currentUsers);
 
         //Individual Communication Socket ->>>>>
         const communicationRoomName = this.props.user;
@@ -42,7 +41,6 @@ class Lobby extends React.Component {
 
         this.communicationSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
-            // console.log(Object.keys(data));
             const userSender = data.user_sender;
             let receivedInvitations = this.state.receivedInvitations;
 
@@ -61,12 +59,9 @@ class Lobby extends React.Component {
                 case 'reject':
                     let sentInvitations = this.state.sentInvitations;
                     let buttonList = this.state.buttonList;
-                    // console.log("Sent invs: ", sentInvitations);
-                    // console.log("Reject sent from: ", userSender);
                     const sendIndex = sentInvitations.indexOf(userSender);
                     if (sendIndex > -1) {
                         sentInvitations.splice(sendIndex, 1);
-                        // console.log("Sent invs: ", sentInvitations);
                         this.setState({sentInvitations: sentInvitations});
                         for (let i = 0; i < buttonList.length; i++) {
                             if (userSender in buttonList[i]) {
@@ -79,7 +74,6 @@ class Lobby extends React.Component {
                     console.warn("Communication message: Player not seen in online list")
                     break;
                 case 'accept':
-                    console.log("game accepted!")
                     this.props.setOpponent(userSender);
                     this.props.makeFirstPlayer();
                     this.props.setGameDB("in")
@@ -114,18 +108,11 @@ class Lobby extends React.Component {
             const data = JSON.parse(e.data);
 
             if ('ignored_consumers' in data) {
-                console.group("TO CHECK...")
-                console.log("ignored consumers received")
                 if (!(data.ignored_consumers.includes(this.props.user))) {
                     this.getOnlineAndGamers()
                         .then(([online, gamers]) => {
-                            console.log("online: ", online)
-                            console.log("gamers: ", gamers)
                             const newLobbyState = this.getPlayersInLobby(online, gamers);
-                            console.log("new lobby state: ", newLobbyState)
                             const newButtons = this.getNewButtonList(data.ignored_consumers, data.mode)
-                            console.log("newButtons: ", newButtons)
-                            console.groupEnd()
                             const newLobbyUpdated = this.updateLobbyState(newLobbyState.userList, newLobbyState.numberOfPlayers, newButtons)
                         })
 
@@ -152,7 +139,7 @@ class Lobby extends React.Component {
                         break;
                     case 'logout-noticed':
                         if (userSender === this.props.user) {
-                            console.log("Logout noticed from you");
+                            console.log("Logout noticed.");
                             break;
                         } else {
                             const logoutIndex = users.indexOf(userSender);
@@ -322,7 +309,7 @@ class Lobby extends React.Component {
             }));
             this.props.setOpponent(name);
             this.props.playGame();
-            console.log("Game is starting!")
+            console.log("Game initialization")
         } else if (button === "Reject") {
             const receivedInvitations = this.state.receivedInvitations;
             const index = receivedInvitations.indexOf(name);
@@ -373,7 +360,7 @@ class Lobby extends React.Component {
                             'info': "cancel"
                         }));
                     } else {
-                        console.warn("Warning regarding invitation handling");
+                        console.warn("Warning - invitation handling");
                     }
                     this.setState({buttonList: buttonList});
                     break;
@@ -457,7 +444,7 @@ class Lobby extends React.Component {
                                                 onClick={(e) => {
                                                     this.handleInvitation(e)
                                                 }}
-                                        >{(this.state.buttonList.length > 1) ? this.state.buttonList[index][person].inviteButtonValue : "Wassup"}
+                                        >{(this.state.buttonList.length > 0) ? this.state.buttonList[index][person].inviteButtonValue : "Wassup"}
                                         </button>
                                     </div>
                                     }
@@ -469,6 +456,7 @@ class Lobby extends React.Component {
                 <div className="chat-zone" id="lobby-chat">
                     <Chatwindow
                         user={this.props.user}
+                        displayedScreen = {this.props.displayedScreen}
                     />
                 </div>
             </div>

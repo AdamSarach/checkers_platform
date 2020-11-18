@@ -14,7 +14,6 @@ chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     const outerDiv = document.getElementById("chat-log")
     let number =  outerDiv.childElementCount
-    console.log(number);
     if (number > 150) {
         let spans = outerDiv.getElementsByTagName('span'); // Get HTMLCollection of elements with the li tag name.
         outerDiv.removeChild(spans[0]);
