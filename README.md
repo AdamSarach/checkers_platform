@@ -8,12 +8,12 @@ An application allows users to play checkers with others. You need to be registe
   
     
 :heavy_multiplication_x: Environment: Python 3.8  
-:heavy_multiplication_x: Backend: Django 3.1 (+ Django Rest Framework + Django Channels)
-:heavy_multiplication_x: Frontend: React
-:heavy_multiplication_x: Frontend: SASS (scss)
+:heavy_multiplication_x: Backend: Django 3.1 (+ Django Rest Framework + Django Channels)  
+:heavy_multiplication_x: Frontend: React  
+:heavy_multiplication_x: Frontend: SASS (scss)  
 :heavy_multiplication_x: Data Base: PostreSQL  
 :heavy_multiplication_x: Deployment: AWS  
-:heavy_multiplication_x: channel layer for Websockets: Redis
+:heavy_multiplication_x: channel layer for Websockets: Redis  
 
 #### Development
 
@@ -24,6 +24,7 @@ pipenv install
 
 You need Redis to enable Websockets (invitations, chat, button click which affect other players view)
 Docker command:
+
 ```
 $ docker run -p 6379:6379 -d redis:5
 ```
@@ -37,6 +38,8 @@ Run Django project(in django main level directory):
 ```
 $ python manage.py runserver
 ```
+
+To run project you need secret key and db access data which are injected by django-decouple
 
 #### Project integration
 - [X] Set up Django Project
