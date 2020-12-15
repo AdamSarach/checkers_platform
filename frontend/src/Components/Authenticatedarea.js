@@ -1,6 +1,6 @@
 import React from "react";
 import Lobby from './Lobby'
-import {Game} from "../Game";
+import {Game} from "./Game";
 
 
 class Authenticatedarea extends React.Component {
@@ -10,7 +10,8 @@ class Authenticatedarea extends React.Component {
             displayedScreen: 'lobby',
             opponentPlayer: '"Unknown Player"',
             isFirstPlayer: false,
-            inGame: false
+            inGame: false,
+            finishedGameRecently: false
         }
     }
 
@@ -19,39 +20,42 @@ class Authenticatedarea extends React.Component {
         switch (this.state.displayedScreen) {
             case 'lobby':
                 return <Lobby
-                    displayedScreen={this.props.displayedScreen}
+                    displayedScreen={this.state.displayedScreen}
                     displayForm={this.props.displayForm}
-                    setOpponent =  {this.setOpponent}
+                    setOpponent={this.setOpponent}
                     logged_in={this.props.logged_in}
                     user={this.props.user}
-                    playGame = {this.playGame}
+                    playGame={this.playGame}
                     handleLogout={this.props.handleLogout}
                     getTokenFromLocal={this.props.getTokenFromLocal}
-                    makeFirstPlayer = {this.makeFirstPlayer}
-                    setGameDB = {this.setGameDB}
+                    makeFirstPlayer={this.makeFirstPlayer}
+                    setGameDB={this.setGameDB}
+                    finishedGameRecently={this.state.finishedGameRecently}
+                    finishedGameRecentlyProp = {this.finishedGameRecentlyProp}
                 />;
             case 'game':
-                return <Game displayedScreen={this.displayedScreen}
+                return <Game displayedScreen={this.state.displayedScreen}
                              displayForm={this.props.displayForm}
-                             opponent =  {this.state.opponentPlayer}
-                             goToLobby = {this.goToLobby}
+                             opponent={this.state.opponentPlayer}
+                             goToLobby={this.goToLobby}
                              user={this.props.user}
                              getTokenFromLocal={this.getTokenFromLocal}
                              isFirstPlayer={this.state.isFirstPlayer}
-                             setGameDB = {this.setGameDB}
+                             setGameDB={this.setGameDB}
                 />;
             default:
                 return <Lobby
-                    displayedScreen={this.props.displayedScreen}
+                    displayedScreen={this.state.displayedScreen}
                     displayForm={this.props.displayForm}
-                    setOpponent =  {this.setOpponent}
+                    setOpponent={this.setOpponent}
                     logged_in={this.props.logged_in}
                     user={this.props.user}
-                    playGame = {this.playGame}
+                    playGame={this.playGame}
                     handleLogout={this.props.handleLogout}
                     getTokenFromLocal={this.props.getTokenFromLocal}
-                    makeFirstPlayer = {this.makeFirstPlayer}
-                    setGameDB = {this.setGameDB}
+                    makeFirstPlayer={this.makeFirstPlayer}
+                    setGameDB={this.setGameDB}
+                    finishedGameRecently={this.state.finishedGameRecently}
                 />;
         }
     }
@@ -65,16 +69,24 @@ class Authenticatedarea extends React.Component {
     }
 
     goToLobby = () => {
-        this.setState({displayedScreen: 'lobby'})
+        this.setState({
+            displayedScreen: 'lobby',
+            finishedGameRecently: true
+        })
+    }
+    finishedGameRecentlyProp = (mode) => {
+        this.setState({ finishedGameRecently: mode})
     }
 
-    makeFirstPlayer= () => {
+    makeFirstPlayer = () => {
         this.setState({isFirstPlayer: true})
     }
 
+
     setGameDB = (mode) => {
         // in or out
-        const url = (mode === "in") ? 'http://localhost:8000/api-auth/in_game/' : 'http://localhost:8000/api-auth/out_game/'
+        const partUrl = 'http://' + window.location.host + '/api-auth/'
+        const url = (mode === "in") ? (partUrl + 'in_game/') : (partUrl + 'out_game/')
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -86,6 +98,10 @@ class Authenticatedarea extends React.Component {
 
     render() {
         let screen = this.chooseScreen();
+
+        // if(!this.props.user) {
+        //   return null;
+        // }
 
         return (
             <React.Fragment>

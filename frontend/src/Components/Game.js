@@ -1,8 +1,9 @@
 import React from 'react';
-import {returnPlayerName} from './utils.js';
+import {returnPlayerName} from './static/utils.js';
 import {ReactCheckers} from './ReactCheckers.js';
+import GamePopUp from './GamePopUp.js';
 import Board from './Board.js';
-
+import './styles/Game.scss';
 
 export class Game extends React.Component {
 
@@ -53,6 +54,7 @@ export class Game extends React.Component {
                 console.log("button_message: ", data.button_message);
                 switch (data['button_message']) {
                     case "giveUp":
+                        console.log("Give Up Handled")
                         this.turnGiveUpButton(false);
                         this.turnLobbyButton(true);
                         this.turnPlayAgainButton(true);
@@ -65,10 +67,12 @@ export class Game extends React.Component {
                         this.turnPlayAgainButton(false);
                         this.setState({
                             gameStatus: "Opponent has has moved into lobby.",
-                            isOpponentInGame: false
+                            isOpponentInGame: false,
+                            newGameRequest: false
                         })
                         break;
                     case "newGame":
+                        console.log("Play again Handled")
                         this.turnGiveUpButton(false);
                         this.turnLobbyButton(false);
                         this.turnPlayAgainButton(false);
@@ -77,6 +81,8 @@ export class Game extends React.Component {
                         })
                         break;
                 }
+
+
             } else if ("yes_no_message" in data) {
                 console.log("yes_no_button received");
                 if (data.yes_no_message === true) {
@@ -118,31 +124,36 @@ export class Game extends React.Component {
     turnGiveUpButton = (buttonState) => {
         const giveUpButton = document.getElementById("giveUpButton");
         if (buttonState === true) {
-            giveUpButton.className = "btn btn-sm btn-success";
+            giveUpButton.className = "btn btn-dark";
         } else {
-            giveUpButton.className = "btn btn-sm btn-success disabled";
+            giveUpButton.className = "btn btn-dark disabled";
         }
     }
 
     turnLobbyButton = (buttonState) => {
         const lobbyButton = document.getElementById("lobbyButton");
         if (buttonState === true) {
-            lobbyButton.className = "btn btn-sm btn-success";
+            lobbyButton.className = "btn btn-dark";
         } else {
-            lobbyButton.className = "btn btn-sm btn-success disabled";
+            lobbyButton.className = "btn btn-dark disabled";
         }
     }
 
     turnPlayAgainButton = (buttonState) => {
         const playAgainButton = document.getElementById("playAgainButton");
         if (buttonState === true) {
-            playAgainButton.className = "btn btn-sm btn-success";
+            playAgainButton.className = "btn btn-dark";
         } else {
-            playAgainButton.className = "btn btn-sm btn-success disabled";
+            playAgainButton.className = "btn btn-dark disabled";
         }
     }
 
     handleGiveUpButton = () => {
+        const giveUpButton = document.getElementById("giveUpButton");
+        if (giveUpButton.classList.contains("disabled")) {
+            return;
+        }
+        console.log("Give Up Button Clicked")
         this.turnGiveUpButton(false);
         this.turnLobbyButton(true);
         this.turnPlayAgainButton(true);
@@ -152,6 +163,10 @@ export class Game extends React.Component {
     }
 
     goToLobbyButton = () => {
+        const lobbyButton = document.getElementById("lobbyButton");
+        if (lobbyButton.classList.contains("disabled")) {
+            return;
+        }
         this.sendButtonMessage('lobby');
         try {
             this.gameSocket.close()
@@ -160,19 +175,20 @@ export class Game extends React.Component {
         }
         this.props.setGameDB("out")
             .then(() => {
-                this.informLobbyGamePlayers([this.props.user], "lobby")
+                this.props.goToLobby();
             })
-        this.props.goToLobby();
     }
 
     playAgainButton = () => {
-        console.group("playAgainbutton")
-        console.log("before turn state")
+        const playAgainButton = document.getElementById("playAgainButton");
+        if (playAgainButton.classList.contains("disabled")) {
+            return;
+        }
+        console.log("Play Again Button Clicked")
         this.turnPlayAgainButton(false);
-        console.log("after turn state / before socket send")
         this.sendButtonMessage('newGame');
-        console.log("after socket send")
-        console.groupEnd()
+        this.setState({gameStatus: "Request has been sent"})
+
     }
 
     sendButtonMessage = (strategy) => {
@@ -235,13 +251,6 @@ export class Game extends React.Component {
 
     shouldGameBlocked = (strategy) => {
         this.setState({isGameBlocked: strategy})
-    }
-
-    informLobbyGamePlayers = (ignoredConsumers, mode) => {
-        this.communicationGlobalSocket.send(JSON.stringify({
-            'ignoredConsumers': ignoredConsumers,
-            'mode': mode
-        }));
     }
 
 
@@ -484,66 +493,60 @@ export class Game extends React.Component {
 
             <div className="game-page website-styles center-main-container ">
 
-                <div className="flex-wrapper border-padding btn-group">
-                    <div style={{flex: 3}}>
-                        <button id="giveUpButton" className="btn btn-sm btn-success"
+                <div className="flex-wrapper game-buttons">
+                    <div>
+                        <button id="giveUpButton" className="btn btn-dark"
+                                data-toggle="tooltip" data-placement="bottom" title="You will lose if you give up"
                                 onClick={this.handleGiveUpButton}>Give up
                         </button>
                     </div>
-                    <div style={{flex: 3}}>
-                        <button id="lobbyButton" className="btn btn-sm btn-success disabled"
+                    <div>
+                        <button id="lobbyButton" className="btn btn-dark disabled"
                                 onClick={() => this.goToLobbyButton()}>Exit to
                             lobby
                         </button>
                     </div>
-                    <div style={{flex: 3}}>
-                        <button id="playAgainButton" className="btn btn-sm btn-success disabled"
+                    <div>
+                        <button id="playAgainButton" className="btn btn-dark disabled"
                                 onClick={this.playAgainButton}>Ask to play
                             again
                         </button>
                     </div>
                 </div>
-                <div>
-                    You are playing against {this.props.opponent}
-                </div>
-                <div>
-                    {this.state.newGameRequest &&
-                    <div style={{flex: 7}}>
-                        Opponent wants to play again
-                        <button id="yes-button"
-                                className="btn btn-sm btn-outline-success"
-                                onClick={(e) => {
-                                    this.yesButtonClick(e)
-                                }}
-                        >Yes</button>
-                        <button id="no-button"
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={(e) => {
-                                    this.noButtonClick(e)
-                                }}
-                        >No
-                        </button>
-                    </div>}
-                </div>
 
+                   <div className="game-area">
+                        <div className="first-player-text">
+                            {this.props.isFirstPlayer ? <span>You</span> : <span>{this.props.opponent}</span>}
+                        </div>
+                        <div className="reactCheckers">
+                            <div className="game-status" id="game-status" style={{borderColor: this.setBorderColor()}}>
+                                {this.state.winnerInfo || gameStatus}
+                            </div>
+                            <div className="game-board" style={{borderColor: this.setBorderColor()}}>
+                                <Board
+                                    boardState={boardState}
+                                    currentPlayer={currentPlayer}
+                                    activePiece={activePiece}
+                                    moves={moves}
+                                    columns={columns}
+                                    onClick={(coordinates) => this.handleClick(coordinates)}
+                                />
+                            </div>
+                        </div>
 
-                <div className="reactCheckers">
-                    <div className="game-status" id="game-status">
-                        {this.state.winnerInfo || gameStatus}
-                    </div>
-                    <div className="game-board" style={{borderColor: this.setBorderColor()}}>
-                        <Board
-                            boardState={boardState}
-                            currentPlayer={currentPlayer}
-                            activePiece={activePiece}
-                            moves={moves}
-                            columns={columns}
-                            onClick={(coordinates) => this.handleClick(coordinates)}
-                        />
-                    </div>
+                        <div className="second-player-text">
+                            {this.props.isFirstPlayer ? <span>{this.props.opponent}</span> : <span>You</span>}
+                        </div>
+                        <React.Fragment>
+                            {this.state.newGameRequest &&
+                            <GamePopUp noButton={this.noButtonClick}
+                                       yesButton={this.yesButtonClick}
+                            />}
+                        </React.Fragment>
                 </div>
 
             </div>
+
 
         );
     }
