@@ -12,7 +12,7 @@ An application allows users to play checkers with others. You need to be registe
 :heavy_multiplication_x: Frontend: React  
 :heavy_multiplication_x: Styling: SASS (scss)  
 :heavy_multiplication_x: DataBase: PostreSQL  
-:heavy_multiplication_x: Deployment: AWS (EC2 + RDS) 
+:heavy_multiplication_x: Deployment: AWS (EC2 + RDS)  
 :heavy_multiplication_x: channel layer for Websockets: Redis  
 
 #### Development
