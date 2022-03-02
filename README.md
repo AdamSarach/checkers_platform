@@ -8,11 +8,11 @@ An application allows users to play checkers with others. You need to be registe
   
     
 :heavy_multiplication_x: Environment: Python 3.8  
-:heavy_multiplication_x: Backend: Django 3.1 (+ Django Rest Framework + Django Channels)  
+:heavy_multiplication_x: Backend: Django 3 (+ Django Rest Framework + Django Channels)  
 :heavy_multiplication_x: Frontend: React  
-:heavy_multiplication_x: Frontend: SASS (scss)  
-:heavy_multiplication_x: Data Base: PostreSQL  
-:heavy_multiplication_x: Deployment: AWS  
+:heavy_multiplication_x: Styling: SASS (scss)  
+:heavy_multiplication_x: DataBase: PostreSQL  
+:heavy_multiplication_x: Deployment: AWS (EC2 + RDS) 
 :heavy_multiplication_x: channel layer for Websockets: Redis  
 
 #### Development
